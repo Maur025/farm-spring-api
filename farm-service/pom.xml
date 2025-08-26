@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <artifactId>farm-service</artifactId>
+
+  <build>
+    <finalName>${project.name}</finalName>
+    <plugins>
+      <plugin>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.springframework.boot</groupId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <groupId>net.logstash.logback</groupId>
+      <version>8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-swagger</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-command</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-test</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sf.jasperreports</groupId>
+      <artifactId>jasperreports</artifactId>
+      <version>${jasperreports.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>${zxing.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.barcode4j</groupId>
+      <artifactId>barcode4j</artifactId>
+      <version>${barcode4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-bridge</artifactId>
+      <version>${xmlgraphics.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>${poi.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>${poi.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>${open-csv.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-csv</artifactId>
+      <version>${commons-csv.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+  </dependencies>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.kernotec.farm</groupId>
+    <artifactId>farm-bom</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../farm-bom</relativePath>
+  </parent>
+
+  <profiles>
+    <profile>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <id>dev</id>
+      <properties>
+        <spring.profiles.active>dev</spring.profiles.active>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>prod</id>
+      <properties>
+        <spring.profiles.active>prod</spring.profiles.active>
+      </properties>
+    </profile>
+  </profiles>
+
+  <properties>
+    <barcode4j.version>2.1</barcode4j.version>
+    <commons-csv.version>1.8</commons-csv.version>
+    <jasperreports.version>6.20.5</jasperreports.version>
+    <open-csv.version>5.3</open-csv.version>
+    <poi.version>5.1.0</poi.version>
+    <spring-webflux.version>5.3.10</spring-webflux.version>
+    <xmlgraphics.version>1.14</xmlgraphics.version>
+    <zxing.version>3.4.0</zxing.version>
+  </properties>
+
+</project>
