@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+  objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+  <changeSet id="1756244305197-1" author="mmoya@PragmaInvest.com">
+    <createTable tableName="persons">
+      <column defaultValueComputed="uuid_generate_v4()" name="id" type="uuid">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_persons"/>
+      </column>
+      <column defaultValueComputed="now()" name="created_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column defaultValueComputed="now()" name="updated_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_by" type="VARCHAR(255)"/>
+      <column defaultValueNumeric="0" name="version" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column defaultValueBoolean="false" name="deleted" type="boolean">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(150)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="birth_date" type="DATETIME"/>
+      <column name="document_number" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet id="1756244305197-2" author="mmoya@PragmaInvest.com">
+    <addUniqueConstraint columnNames="document_number" constraintName="uc_persons_document_number"
+      tableName="persons"/>
+  </changeSet>
+
+</databaseChangeLog>
