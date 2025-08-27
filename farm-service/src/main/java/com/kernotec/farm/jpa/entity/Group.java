@@ -19,27 +19,33 @@ import lombok.Setter;
 @Table(name = "groups")
 public class Group extends BaseAuditEntity {
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Column(name = "region_id", nullable = false)
-  private UUID regionId;
+    @Column(name = "is_join", nullable = false, columnDefinition = "boolean default false")
+    private boolean isJoin;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "region_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Region region;
+    @Column(name = "region_id", nullable = false)
+    private UUID regionId;
 
-  @Column(name = "activity_id", nullable = false)
-  private UUID activityId;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Region region;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "activity_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Activity activity;
+    @Column(name = "activity_id", nullable = false)
+    private UUID activityId;
 
-  @Column(name = "activity_type_id", nullable = false)
-  private UUID activityTypeId;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Activity activity;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private ActivityType activityType;
+    @Column(name = "activity_type_id", nullable = false)
+    private UUID activityTypeId;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private ActivityType activityType;
 }

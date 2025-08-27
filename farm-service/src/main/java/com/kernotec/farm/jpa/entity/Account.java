@@ -19,33 +19,36 @@ import lombok.Setter;
 @Table(name = "accounts")
 public class Account extends BaseAuditEntity {
 
-  @Column(name = "username", nullable = false)
-  private String username;
+    @Column(name = "username", nullable = false)
+    private String username;
 
-  @Column(name = "password", nullable = false)
-  private String password;
+    @Column(name = "password", nullable = false)
+    private String password;
 
-  @Column(name = "observation", length = 500)
-  private String observation;
+    @Column(name = "observation", length = 500)
+    private String observation;
 
-  @Column(name = "person_id", nullable = false)
-  private UUID personId;
+    @Column(name = "person_id", nullable = false)
+    private UUID personId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Person person;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Person person;
 
-  @Column(name = "chip_id", nullable = false)
-  private UUID chipId;
+    @Column(name = "chip_id", nullable = false)
+    private UUID chipId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "chip_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Chip chip;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "chip_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Chip chip;
 
-  @Column(name = "social_network_id", nullable = false)
-  private UUID socialNetworkId;
+    @Column(name = "social_network_id", nullable = false)
+    private UUID socialNetworkId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "social_network_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private SocialNetwork socialNetwork;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "social_network_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private SocialNetwork socialNetwork;
 }
