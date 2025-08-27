@@ -25,6 +25,10 @@ public class Group extends BaseAuditEntity {
   @Column(name = "region_id", nullable = false)
   private UUID regionId;
 
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "region_id", referencedColumnName = "id", insertable = false, updatable = false)
+  private Region region;
+
   @Column(name = "activity_id", nullable = false)
   private UUID activityId;
 

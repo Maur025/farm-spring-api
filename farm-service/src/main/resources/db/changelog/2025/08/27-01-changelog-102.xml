@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+  objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+  <changeSet id="1756267264478-1" author="maur025">
+    <addColumn tableName="accounts">
+      <column name="person_id" type="UUID"/>
+    </addColumn>
+  </changeSet>
+  <changeSet id="1756267264478-2" author="maur025">
+    <addNotNullConstraint columnName="person_id" tableName="accounts"/>
+  </changeSet>
+  <changeSet id="1756267264478-3" author="maur025">
+    <addForeignKeyConstraint baseColumnNames="person_id" baseTableName="accounts"
+      constraintName="FK_ACCOUNTS_ON_PERSON" referencedColumnNames="id"
+      referencedTableName="persons"/>
+  </changeSet>
+  <changeSet id="1756267264478-4" author="maur025">
+    <addForeignKeyConstraint baseColumnNames="region_id" baseTableName="groups"
+      constraintName="FK_GROUPS_ON_REGION" referencedColumnNames="id"
+      referencedTableName="regions"/>
+  </changeSet>
+  <changeSet id="1756267264478-5" author="maur025">
+    <addForeignKeyConstraint baseColumnNames="person_id" baseTableName="registration_persons"
+      constraintName="FK_REGISTRATION_PERSONS_ON_PERSON" referencedColumnNames="id"
+      referencedTableName="persons"/>
+  </changeSet>
+
+</databaseChangeLog>
