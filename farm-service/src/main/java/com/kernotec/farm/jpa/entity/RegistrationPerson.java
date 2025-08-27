@@ -1,0 +1,24 @@
+package com.kernotec.farm.jpa.entity;
+
+import com.kernotec.core.jpa.entity.BaseAuditEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "registration_persons")
+public class RegistrationPerson extends BaseAuditEntity {
+
+  @Column(name = "document_number", nullable = false, unique = true)
+  private String documentNumber;
+
+  @Column(name = "person_id", nullable = false)
+  private UUID personId;
+}
