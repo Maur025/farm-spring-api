@@ -28,6 +28,13 @@ public class Account extends BaseAuditEntity {
   @Column(name = "observation", length = 500)
   private String observation;
 
+  @Column(name = "person_id", nullable = false)
+  private UUID personId;
+
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false, updatable = false)
+  private Person person;
+
   @Column(name = "chip_id", nullable = false)
   private UUID chipId;
 
