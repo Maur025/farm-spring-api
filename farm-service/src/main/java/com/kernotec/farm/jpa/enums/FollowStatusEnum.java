@@ -1,4 +1,5 @@
 package com.kernotec.farm.jpa.enums;
 
-public class FollowStatusEnum {
+public enum FollowStatusEnum {
+  ACTIVE, INACTIVE
 }

@@ -16,15 +16,12 @@ import lombok.Setter;
 @Table(name = "persons")
 public class Person extends BaseAuditEntity {
 
-    @Column(name = "name", nullable = false, length = 150)
-    private String name;
+  @Column(name = "name", nullable = false, length = 150)
+  private String name;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+  @Column(name = "last_name", nullable = false)
+  private String lastName;
 
-    @Column(name = "birth_date")
-    private LocalDateTime birthDate;
-
-    @Column(name = "document_number", nullable = false, unique = true)
-    private String documentNumber;
+  @Column(name = "birth_date")
+  private LocalDateTime birthDate;
 }

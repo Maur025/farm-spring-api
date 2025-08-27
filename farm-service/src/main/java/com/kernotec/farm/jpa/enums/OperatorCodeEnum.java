@@ -1,4 +1,5 @@
 package com.kernotec.farm.jpa.enums;
 
-public class OperatorCodeEnum {
+public enum OperatorCodeEnum {
+  TIGO, VIVA, ENTEL;
 }
