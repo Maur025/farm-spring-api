@@ -19,16 +19,17 @@ import lombok.Setter;
 @Table(name = "activity_types")
 public class ActivityType extends BaseAuditEntity {
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Column(name = "code", nullable = false)
-  private String code;
+    @Column(name = "code", nullable = false)
+    private String code;
 
-  @Column(name = "social_network_id", nullable = false)
-  private UUID socialNetworkId;
+    @Column(name = "social_network_id", nullable = false)
+    private UUID socialNetworkId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "social_network_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private SocialNetwork socialNetwork;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "social_network_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private SocialNetwork socialNetwork;
 }

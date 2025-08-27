@@ -18,10 +18,10 @@ import lombok.Setter;
 @Table(name = "operators")
 public class Operator extends BaseEntity {
 
-  @Column(name = "name", nullable = false, length = 50)
-  private String name;
+    @Column(name = "name", nullable = false, length = 50)
+    private String name;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "code", nullable = false)
-  private OperatorCodeEnum code;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "code", nullable = false)
+    private OperatorCodeEnum code;
 }

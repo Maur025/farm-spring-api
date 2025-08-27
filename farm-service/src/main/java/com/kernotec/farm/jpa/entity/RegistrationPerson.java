@@ -19,13 +19,14 @@ import lombok.Setter;
 @Table(name = "registration_persons")
 public class RegistrationPerson extends BaseAuditEntity {
 
-  @Column(name = "document_number", nullable = false, unique = true)
-  private String documentNumber;
+    @Column(name = "document_number", nullable = false, unique = true)
+    private String documentNumber;
 
-  @Column(name = "person_id", nullable = false)
-  private UUID personId;
+    @Column(name = "person_id", nullable = false)
+    private UUID personId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Person person;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Person person;
 }

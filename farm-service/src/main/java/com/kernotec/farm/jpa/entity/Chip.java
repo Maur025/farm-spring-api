@@ -19,27 +19,33 @@ import lombok.Setter;
 @Table(name = "chips")
 public class Chip extends BaseAuditEntity {
 
-  @Column(name = "number_phone", nullable = false)
-  private String numberPhone;
+    @Column(name = "number_phone", nullable = false)
+    private String numberPhone;
 
-  @Column(name = "operator_id", nullable = false)
-  private UUID operatorId;
+    @Column(name = "is_device_inside", nullable = false, columnDefinition = "boolean default false")
+    private boolean isDeviceInside = false;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "operator_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Operator operator;
+    @Column(name = "operator_id", nullable = false)
+    private UUID operatorId;
 
-  @Column(name = "registration_person_id", nullable = false)
-  private UUID registrationPersonId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "operator_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Operator operator;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "registration_person_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private RegistrationPerson registrationPerson;
+    @Column(name = "registration_person_id", nullable = false)
+    private UUID registrationPersonId;
 
-  @Column(name = "device_id", nullable = false)
-  private UUID deviceId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "registration_person_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private RegistrationPerson registrationPerson;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "device_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Device device;
+    @Column(name = "device_id", nullable = false)
+    private UUID deviceId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "device_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Device device;
 }

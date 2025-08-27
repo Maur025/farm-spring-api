@@ -20,16 +20,25 @@ import lombok.Setter;
 @Table(name = "activities")
 public class Activity extends BaseAuditEntity {
 
-  @Column(name = "link", nullable = false, length = 2000)
-  private String link;
+    @Column(name = "link", nullable = false, length = 2000)
+    private String link;
 
-  @Column(name = "activity_date", nullable = false)
-  private LocalDateTime activityDate;
+    @Column(name = "activity_date", nullable = false)
+    private LocalDateTime activityDate;
 
-  @Column(name = "activity_type_id", nullable = false)
-  private UUID activityTypeId;
+    @Column(name = "account_id", nullable = false)
+    private UUID accountId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private ActivityType activityType;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Account account;
+
+    @Column(name = "activity_type_id", nullable = false)
+    private UUID activityTypeId;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private ActivityType activityType;
 }

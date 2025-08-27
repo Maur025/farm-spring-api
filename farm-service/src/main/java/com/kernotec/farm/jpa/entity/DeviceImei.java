@@ -19,13 +19,14 @@ import lombok.Setter;
 @Table(name = "device_imeis")
 public class DeviceImei extends BaseAuditEntity {
 
-  @Column(name = "imei", nullable = false, length = 150)
-  private String imei;
+    @Column(name = "imei", nullable = false, length = 150)
+    private String imei;
 
-  @Column(name = "device_id", nullable = false)
-  private UUID deviceId;
+    @Column(name = "device_id", nullable = false)
+    private UUID deviceId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "device_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Device device;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "device_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Device device;
 }

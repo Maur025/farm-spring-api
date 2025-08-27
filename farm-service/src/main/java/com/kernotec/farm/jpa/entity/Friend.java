@@ -23,28 +23,30 @@ import lombok.Setter;
 @Table(name = "friends")
 public class Friend extends BaseAuditEntity {
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "status", nullable = false)
-  private FriendStatusEnum status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private FriendStatusEnum status;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "type", nullable = false)
-  private FriendTypeEnum type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private FriendTypeEnum type;
 
-  @Column(name = "activity_id", nullable = false)
-  private UUID activityId;
+    @Column(name = "activity_id", nullable = false)
+    private UUID activityId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "activity_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Activity activity;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Activity activity;
 
-  @Column(name = "activity_type_id", nullable = false)
-  private UUID activityTypeId;
+    @Column(name = "activity_type_id", nullable = false)
+    private UUID activityTypeId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private ActivityType activityType;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private ActivityType activityType;
 }

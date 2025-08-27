@@ -18,16 +18,16 @@ import lombok.Setter;
 @Table(name = "farms")
 public class Farm extends BaseAuditEntity {
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Column(name = "code", nullable = false, unique = true, length = 100)
-  private String code;
+    @Column(name = "code", nullable = false, unique = true, length = 100)
+    private String code;
 
-  @Column(name = "description", length = 500)
-  private String description;
+    @Column(name = "description", length = 500)
+    private String description;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "type", length = 100)
-  private FarmTypeEnum type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 100)
+    private FarmTypeEnum type;
 }

@@ -19,24 +19,27 @@ import lombok.Setter;
 @Table(name = "reactions")
 public class Reaction extends BaseAuditEntity {
 
-  @Column(name = "reaction_type_id", nullable = false)
-  private UUID reactionTypeId;
+    @Column(name = "reaction_type_id", nullable = false)
+    private UUID reactionTypeId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "reaction_type_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private ReactionType reactionType;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "reaction_type_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private ReactionType reactionType;
 
-  @Column(name = "activity_id", nullable = false)
-  private UUID activityId;
+    @Column(name = "activity_id", nullable = false)
+    private UUID activityId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "activity_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private Activity activity;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Activity activity;
 
-  @Column(name = "activity_type_id", nullable = false)
-  private UUID activityTypeId;
+    @Column(name = "activity_type_id", nullable = false)
+    private UUID activityTypeId;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false, updatable = false)
-  private ActivityType activityType;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private ActivityType activityType;
 }

@@ -15,9 +15,9 @@ import lombok.Setter;
 @Table(name = "publishing_contexts")
 public class PublishingContext extends BaseEntity {
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Column(name = "code", nullable = false, unique = true)
-  private String code;
+    @Column(name = "code", nullable = false, unique = true)
+    private String code;
 }
