@@ -1,4 +1,4 @@
-package com.kernotec.farm.rest.dto.response;
+package com.kernotec.farm.rest.dto.response.person;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;

@@ -2,7 +2,7 @@ package com.kernotec.farm.rest.controller;
 
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.rest.ApiSpec.PersonSpec;
-import com.kernotec.farm.rest.dto.response.PersonResponse;
+import com.kernotec.farm.rest.dto.response.person.PersonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
