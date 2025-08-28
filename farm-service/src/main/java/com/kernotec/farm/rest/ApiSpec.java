@@ -73,4 +73,14 @@ public class ApiSpec {
         private DeviceSpec() {
         }
     }
+
+    public static final class ReactionTypeSpec {
+
+        public static final String BASE_PATH = ROOT_PATH + "/reaction-types";
+        public static final String TAG_NAME = "REACTION TYPE";
+        public static final String TAG_DESCRIPTION = "Reaction Type management";
+
+        private ReactionTypeSpec() {
+        }
+    }
 }
