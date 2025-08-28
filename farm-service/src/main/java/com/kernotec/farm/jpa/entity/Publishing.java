@@ -19,11 +19,11 @@ import lombok.Setter;
 @Table(name = "publishings")
 public class Publishing extends BaseAuditEntity {
 
-    @Column(name = "publishing_type_id", nullable = false)
-    private UUID publishingTypeId;
-
     @Column(name = "description", length = 500)
     private String description;
+
+    @Column(name = "publishing_type_id", nullable = false)
+    private UUID publishingTypeId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "publishing_type_id", referencedColumnName = "id", insertable = false,
