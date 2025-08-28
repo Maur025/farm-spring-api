@@ -63,4 +63,14 @@ public class ApiSpec {
         private ActivityTypeSpec() {
         }
     }
+
+    public static final class DeviceSpec {
+
+        public static final String BASE_PATH = ROOT_PATH + "/devices";
+        public static final String TAG_NAME = "DEVICE";
+        public static final String TAG_DESCRIPTION = "Device management";
+
+        private DeviceSpec() {
+        }
+    }
 }
