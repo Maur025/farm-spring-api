@@ -9,4 +9,23 @@
   <include file="db/changelog/2025/08/27-01-changelog-102.xml"/>
   <include file="db/changelog/2025/08/27-01-changelog-103.xml"/>
   <include file="db/changelog/2025/08/27-01-changelog-104.xml"/>
+  <include file="db/changelog/2025/08/28-01-changelog-105.xml"/>
+
+  <!-- social networks seeder -->
+  <changeSet id="1756391003974-1" author="Maur025">
+    <sqlFile path="data/social/network/social_network_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- activity type seeder -->
+  <changeSet id="1756391104630-1" author="Maur025">
+    <sqlFile path="data/activity/type/activity_type_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- publishing context seeder -->
+  <changeSet id="1756391165924-1" author="Maur025">
+    <sqlFile path="data/publishing/context/publishing_context_seeder.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- publishing type seeder -->
+  <changeSet id="1756391219003-1" author="Maur025">
+    <sqlFile path="data/publishing/type/publishing_type_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
 </databaseChangeLog>
