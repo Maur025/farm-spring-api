@@ -3,9 +3,13 @@ package com.kernotec.farm.jpa.service;
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.jpa.entity.ActivityType;
+import com.kernotec.farm.jpa.entity.SocialNetwork;
 import com.kernotec.farm.jpa.repository.ActivityTypeRepository;
+import jakarta.persistence.criteria.Join;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -22,5 +26,17 @@ public class ActivityTypeService extends BaseServiceImpl<ActivityType, UUID> {
     @Override
     protected BaseRepository<ActivityType, UUID> repository() {
         return repository;
+    }
+
+    public List<ActivityType> findAllWithFilters(UUID socialNetworkId) {
+        if (socialNetworkId == null) {
+            return repository.findAll();
+        }
+
+        return repository.findAll((Specification<ActivityType>) (root, query, cb) -> {
+            Join<ActivityType, SocialNetwork> socialNetworkJoin = root.join("socialNetworks");
+
+            return cb.or(cb.equal(socialNetworkJoin.get("id"), socialNetworkId));
+        });
     }
 }

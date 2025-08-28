@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+  objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+  <changeSet id="1756396606225-2" author="mmoya@PragmaInvest.com">
+    <addColumn tableName="devices">
+      <column name="device_number" type="VARCHAR(150)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet id="1756396606225-3" author="mmoya@PragmaInvest.com">
+    <addNotNullConstraint columnName="device_number" tableName="devices"/>
+  </changeSet>
+  <changeSet id="1756396606225-1" author="mmoya@PragmaInvest.com">
+    <dropNotNullConstraint columnDataType="varchar(150)" columnName="name" tableName="devices"/>
+  </changeSet>
+
+</databaseChangeLog>
