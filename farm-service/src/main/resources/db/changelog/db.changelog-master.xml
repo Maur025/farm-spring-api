@@ -28,4 +28,18 @@
   <changeSet id="1756391219003-1" author="Maur025">
     <sqlFile path="data/publishing/type/publishing_type_seeder.sql" relativeToChangelogFile="true"/>
   </changeSet>
+
+  <include file="db/changelog/2025/08/28-01-changelog-106.xml"/>
+  <include file="db/changelog/2025/08/28-01-changelog-107.xml"/>
+
+  <!-- activity type seeder update 1-->
+  <changeSet id="1756401402062-1" author="Maur025">
+    <sqlFile path="data/activity/type/activity_type_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- social network action seeder-->
+  <changeSet id="1756402665182-1" author="Maur025">
+    <sqlFile path="data/social/network/action/social_network_actions_seeder.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
 </databaseChangeLog>

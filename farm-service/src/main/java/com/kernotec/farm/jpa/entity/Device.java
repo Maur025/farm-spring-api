@@ -19,8 +19,11 @@ import lombok.Setter;
 @Table(name = "devices")
 public class Device extends BaseAuditEntity {
 
-    @Column(name = "name", nullable = false, length = 150)
+    @Column(name = "name", length = 150)
     private String name;
+
+    @Column(name = "device_number", nullable = false, length = 150)
+    private String deviceNumber;
 
     @Column(name = "model", length = 150)
     private String model;
