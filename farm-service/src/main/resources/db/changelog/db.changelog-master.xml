@@ -44,4 +44,14 @@
   </changeSet>
 
   <include file="db/changelog/2025/08/28-01-changelog-108.xml"/>
+
+  <!-- social network seeder update 1 -->
+  <changeSet id="1756411249294-1" author="Maur025">
+    <sqlFile path="data/social/network/social_network_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- reaction type seeder -->
+  <changeSet id="1756411934763-1" author="Maur025">
+    <sqlFile path="data/reaction/type/reaction_type_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
 </databaseChangeLog>
