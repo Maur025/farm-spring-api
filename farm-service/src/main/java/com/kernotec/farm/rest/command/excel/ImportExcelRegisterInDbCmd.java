@@ -6,6 +6,8 @@ import com.kernotec.farm.jpa.dto.entity.chip.ChipDto;
 import com.kernotec.farm.jpa.dto.entity.device.DeviceDto;
 import com.kernotec.farm.jpa.dto.entity.farm.FarmDto;
 import com.kernotec.farm.jpa.dto.entity.person.PersonDto;
+import com.kernotec.farm.jpa.enums.SocialNetworkEnum;
+import com.kernotec.farm.rest.command.account.AccountSocialNetworkRegisterCmd;
 import com.kernotec.farm.rest.command.chip.ChipAssignRegisterCmd;
 import com.kernotec.farm.rest.command.device.DeviceFindOrCreateCmd;
 import com.kernotec.farm.rest.command.farm.FarmFindOrCreateCmd;
@@ -28,6 +30,7 @@ public class ImportExcelRegisterInDbCmd extends
     private final DeviceFindOrCreateCmd deviceFindOrCreateCmd;
     private final ChipAssignRegisterCmd chipAssignRegisterCmd;
     private final AssignedChipCreateCmd assignedChipCreateCmd;
+    private final AccountSocialNetworkRegisterCmd accountSocialNetworkRegisterCmd;
 
     @Override
     protected Void run(Request request) {
@@ -85,6 +88,57 @@ public class ImportExcelRegisterInDbCmd extends
                 .personId(personFakeDto.getId())
                 .build())
             .execute();
+
+        if (excelDataDto.getFacebookUsername() != null) {
+            accountSocialNetworkRegisterCmd.withRequest(
+                    AccountSocialNetworkRegisterCmd.Request.builder()
+                        .username(excelDataDto.getFacebookUsername())
+                        .password(excelDataDto.getFacebookPassword())
+                        .chipId(chipDto.getId())
+                        .personId(personFakeDto.getId())
+                        .socialNetworkCode(SocialNetworkEnum.FACEBOOK)
+                        .deviceId(deviceDto.getId())
+                        .build())
+                .execute();
+        }
+
+        if (excelDataDto.getTiktokUsername() != null) {
+            accountSocialNetworkRegisterCmd.withRequest(
+                    AccountSocialNetworkRegisterCmd.Request.builder()
+                        .username(excelDataDto.getTiktokUsername())
+                        .password(excelDataDto.getTiktokPassword())
+                        .chipId(chipDto.getId())
+                        .personId(personFakeDto.getId())
+                        .socialNetworkCode(SocialNetworkEnum.TIKTOK)
+                        .deviceId(deviceDto.getId())
+                        .build())
+                .execute();
+        }
+
+        if (excelDataDto.getXUsername() != null) {
+            accountSocialNetworkRegisterCmd.withRequest(
+                    AccountSocialNetworkRegisterCmd.Request.builder()
+                        .username(excelDataDto.getXUsername())
+                        .password(excelDataDto.getXPassword())
+                        .chipId(chipDto.getId())
+                        .personId(personFakeDto.getId())
+                        .socialNetworkCode(SocialNetworkEnum.X)
+                        .deviceId(deviceDto.getId())
+                        .build())
+                .execute();
+        }
+
+        if (excelDataDto.getIsHaveWhatsapp()) {
+            accountSocialNetworkRegisterCmd.withRequest(
+                    AccountSocialNetworkRegisterCmd.Request.builder()
+                        .username(excelDataDto.getPhoneNumber())
+                        .chipId(chipDto.getId())
+                        .personId(personFakeDto.getId())
+                        .socialNetworkCode(SocialNetworkEnum.WHATSAPP)
+                        .deviceId(deviceDto.getId())
+                        .build())
+                .execute();
+        }
 
         return null;
     }
