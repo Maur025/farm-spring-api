@@ -19,8 +19,8 @@ import lombok.Setter;
 @Table(name = "chips")
 public class Chip extends BaseAuditEntity {
 
-    @Column(name = "number_phone", nullable = false)
-    private String numberPhone;
+    @Column(name = "phone_number", nullable = false)
+    private String phoneNumber;
 
     @Column(name = "is_device_inside", nullable = false, columnDefinition = "boolean default false")
     private boolean isDeviceInside = false;
