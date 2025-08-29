@@ -4,6 +4,7 @@ import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.jpa.entity.RegistrationPerson;
 import com.kernotec.farm.jpa.repository.RegistrationPersonRepository;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,5 +23,9 @@ public class RegistrationPersonService extends BaseServiceImpl<RegistrationPerso
     @Override
     protected BaseRepository<RegistrationPerson, UUID> repository() {
         return repository;
+    }
+
+    public Optional<RegistrationPerson> findByPersonId(UUID personId) {
+        return repository.findByPersonId(personId);
     }
 }
