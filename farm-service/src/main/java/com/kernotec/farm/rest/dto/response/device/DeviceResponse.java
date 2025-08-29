@@ -3,6 +3,7 @@ package com.kernotec.farm.rest.dto.response.device;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
+import com.kernotec.farm.rest.dto.response.account.AccountResponse;
 import com.kernotec.farm.rest.dto.response.chip.ChipResponse;
 import com.kernotec.farm.rest.dto.response.farm.FarmResponse;
 import java.util.Set;
@@ -25,4 +26,5 @@ public class DeviceResponse extends EntityResponse {
     private FarmResponse farm;
 
     private Set<ChipResponse> chips;
+    private Set<AccountResponse> accounts;
 }
