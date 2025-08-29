@@ -5,6 +5,7 @@ import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.jpa.entity.Device;
 import com.kernotec.farm.jpa.repository.DeviceRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -39,5 +40,9 @@ public class DeviceService extends BaseServiceImpl<Device, UUID> {
                 );
             }
         });
+    }
+
+    public Optional<Device> findByDeviceNumber(String deviceNumber) {
+        return repository.findByDeviceNumber(deviceNumber);
     }
 }
