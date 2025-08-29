@@ -25,9 +25,6 @@ public class Account extends BaseAuditEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "observation", length = 500)
-    private String observation;
-
     @Column(name = "person_id", nullable = false)
     private UUID personId;
 
