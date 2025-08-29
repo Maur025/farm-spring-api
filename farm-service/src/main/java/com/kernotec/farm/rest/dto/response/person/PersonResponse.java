@@ -14,5 +14,4 @@ public class PersonResponse extends EntityResponse {
     private String name;
     private String lastName;
     private LocalDateTime birthDate;
-    private String documentNumber;
 }
