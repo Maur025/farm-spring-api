@@ -28,4 +28,14 @@ public class ImportExcelDataDto {
     private String ipGateway;
     private String personFakeName;
     private String personFakeLastName;
+    private String facebookObservation;
+    private String tiktokObservation;
+    private String operator;
+    private String imeiOne;
+    private String imeiTwo;
+    private String deviceBrand;
+    private String deviceModel;
+    private String farmType;
+    private String birthDateRegister;
+    private String birthDateFake;
 }
