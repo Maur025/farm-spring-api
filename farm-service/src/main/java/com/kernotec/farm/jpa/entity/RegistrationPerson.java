@@ -19,7 +19,7 @@ import lombok.Setter;
 @Table(name = "registration_persons")
 public class RegistrationPerson extends BaseAuditEntity {
 
-    @Column(name = "document_number", nullable = false, unique = true)
+    @Column(name = "document_number", nullable = false)
     private String documentNumber;
 
     @Column(name = "person_id", nullable = false)

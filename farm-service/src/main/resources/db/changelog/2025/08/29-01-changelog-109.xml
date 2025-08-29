@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+  objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+  <changeSet id="1756477585219-1" author="mmoya@PragmaInvest.com">
+    <createTable tableName="account_observations">
+      <column defaultValueComputed="uuid_generate_v4()" name="id" type="uuid">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_account_observations"/>
+      </column>
+      <column defaultValueComputed="now()" name="created_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column defaultValueComputed="now()" name="updated_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_by" type="VARCHAR(255)"/>
+      <column defaultValueNumeric="0" name="version" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column defaultValueBoolean="false" name="deleted" type="boolean">
+        <constraints nullable="false"/>
+      </column>
+      <column name="account_id" type="UUID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="observation_id" type="UUID">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet id="1756477585219-2" author="mmoya@PragmaInvest.com">
+    <createTable tableName="observations">
+      <column defaultValueComputed="uuid_generate_v4()" name="id" type="uuid">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_observations"/>
+      </column>
+      <column defaultValueComputed="now()" name="created_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column defaultValueComputed="now()" name="updated_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_by" type="VARCHAR(255)"/>
+      <column defaultValueNumeric="0" name="version" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column defaultValueBoolean="false" name="deleted" type="boolean">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="VARCHAR(1000)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet id="1756477585219-3" author="mmoya@PragmaInvest.com">
+    <addForeignKeyConstraint baseColumnNames="account_id" baseTableName="account_observations"
+      constraintName="FK_ACCOUNT_OBSERVATIONS_ON_ACCOUNT" referencedColumnNames="id"
+      referencedTableName="accounts"/>
+  </changeSet>
+  <changeSet id="1756477585219-4" author="mmoya@PragmaInvest.com">
+    <addForeignKeyConstraint baseColumnNames="observation_id" baseTableName="account_observations"
+      constraintName="FK_ACCOUNT_OBSERVATIONS_ON_OBSERVATION" referencedColumnNames="id"
+      referencedTableName="observations"/>
+  </changeSet>
+  <changeSet id="1756477585219-6" author="mmoya@PragmaInvest.com">
+    <dropColumn columnName="observation" tableName="accounts"/>
+  </changeSet>
+
+</databaseChangeLog>

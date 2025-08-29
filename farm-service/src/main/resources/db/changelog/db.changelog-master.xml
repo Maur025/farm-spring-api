@@ -54,4 +54,6 @@
   <changeSet id="1756411934763-1" author="Maur025">
     <sqlFile path="data/reaction/type/reaction_type_seeder.sql" relativeToChangelogFile="true"/>
   </changeSet>
+
+  <include file="db/changelog/2025/08/29-01-changelog-109.xml"/>
 </databaseChangeLog>
