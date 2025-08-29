@@ -19,22 +19,33 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Slf4j
 public class ExcelImportCmd extends
-    AbstractTransactionalRequiredCommand<ExcelImportCmd.Request, Void> {
+    AbstractTransactionalRequiredCommand<ExcelImportCmd.Request, Void>
+{
 
     private final ImportExcelDataGetDtoCmd importExcelDataGetDtoCmd;
+    private final ImportExcelRegisterInDbCmd importExcelRegisterInDbCmd;
 
     @Override
     protected Void run(Request request) {
 
-        try (CSVReader reader = new CSVReaderBuilder(
-            new InputStreamReader(request.getExcelFile().getInputStream())).withSkipLines(1)
-            .build()) {
+        try (CSVReader reader = new CSVReaderBuilder(new InputStreamReader(request.getExcelFile()
+            .getInputStream())).withSkipLines(1)
+            .build())
+        {
 
             String[] csvRow;
 
             while ((csvRow = reader.readNext()) != null) {
                 ImportExcelDataDto importExcelDataDto = importExcelDataGetDtoCmd.withRequest(
-                    ImportExcelDataGetDtoCmd.Request.builder().csvData(csvRow).build()).execute();
+                        ImportExcelDataGetDtoCmd.Request.builder()
+                            .csvData(csvRow)
+                            .build())
+                    .execute();
+
+                importExcelRegisterInDbCmd.withRequest(ImportExcelRegisterInDbCmd.Request.builder()
+                        .importExcelDataDto(importExcelDataDto)
+                        .build())
+                    .execute();
 
                 String strJson = JsonUtil.toString(new ObjectMapper(), importExcelDataDto);
                 log.info("IMPORT DTO DATA: {}", strJson);

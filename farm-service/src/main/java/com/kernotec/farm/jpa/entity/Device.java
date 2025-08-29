@@ -6,11 +6,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
@@ -41,4 +44,8 @@ public class Device extends BaseAuditEntity {
     @JoinColumn(name = "farm_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private Farm farm;
+
+    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
+    @Where(clause = "deleted is false")
+    private Set<Chip> chips;
 }

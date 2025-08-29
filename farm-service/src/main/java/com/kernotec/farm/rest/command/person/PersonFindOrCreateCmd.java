@@ -38,7 +38,8 @@ public class PersonFindOrCreateCmd extends
             .orElseGet(() -> personCreateCmd.withRequest(PersonCreateCmd.Request.builder()
                     .name(request.getName())
                     .lastName(request.getLastName())
-                    .birthDate(getBirthDate(request.getBirthDateString()))
+                    .birthDate(request.getBirthDateString() == null ? null
+                        : getBirthDate(request.getBirthDateString()))
                     .build())
                 .execute());
 

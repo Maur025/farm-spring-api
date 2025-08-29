@@ -57,4 +57,11 @@
 
   <include file="db/changelog/2025/08/29-01-changelog-109.xml"/>
   <include file="db/changelog/2025/08/29-01-changelog-110.xml"/>
+
+  <!-- operator seeder -->
+  <changeSet id="1756495720220-1" author="Maur025">
+    <sqlFile path="data/operator/operator_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/08/29-01-changelog-111.xml"/>
 </databaseChangeLog>

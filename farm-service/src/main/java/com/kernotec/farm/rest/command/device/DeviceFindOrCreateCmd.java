@@ -37,9 +37,10 @@ public class DeviceFindOrCreateCmd extends
                 UUID newDeviceId = deviceCreateCmd.withRequest(DeviceCreateCmd.Request.builder()
                         .name(request.getName())
                         .deviceNumber(request.getDeviceNumber())
-                        .model(request.getModel())
-                        .brand(request.getBrand())
-                        .serialNumber(request.getSerialNumber())
+                        .model(request.getModel() == null ? "N/A" : request.getModel())
+                        .brand(request.getBrand() == null ? "N/A" : request.getBrand())
+                        .serialNumber(
+                            request.getSerialNumber() == null ? "N/A" : request.getSerialNumber())
                         .farmId(request.getFarmId())
                         .build())
                     .execute();
