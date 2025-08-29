@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class ImportExcelRegisterInDbCmd extends
-    AbstractTransactionalRequiredCommand<ImportExcelRegisterInDbCmd.Request, Void> {
+    AbstractTransactionalRequiredCommand<ImportExcelRegisterInDbCmd.Request, Void>
+{
 
     @Override
     protected Void run(Request request) {
