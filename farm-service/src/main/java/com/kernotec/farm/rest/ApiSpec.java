@@ -83,4 +83,14 @@ public class ApiSpec {
         private ReactionTypeSpec() {
         }
     }
+
+    public static final class DataImportSpec {
+
+        public static final String BASE_PATH = ROOT_PATH + "/data-imports";
+        public static final String TAG_NAME = "DATA IMPORT";
+        public static final String TAG_DESCRIPTION = "Data Import management";
+
+        private DataImportSpec() {
+        }
+    }
 }
