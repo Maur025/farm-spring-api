@@ -104,7 +104,10 @@ public class ProcessActivityCreateRequestCmd extends
     public void createCommentRelation(CommentCreateRequest commentRequest, UUID activityId,
         UUID activityTypeId)
     {
-        if (commentRequest == null || commentRequest.getComment() == null) {
+        if (commentRequest == null || commentRequest.getComment() == null
+            || commentRequest.getComment()
+            .isBlank())
+        {
             return;
         }
 
@@ -121,7 +124,9 @@ public class ProcessActivityCreateRequestCmd extends
     public void createGroupRelation(GroupCreateRequest groupRequest, UUID activityId,
         UUID activityTypeId)
     {
-        if (groupRequest == null || groupRequest.getName() == null) {
+        if (groupRequest == null || groupRequest.getName() == null || groupRequest.getName()
+            .isBlank())
+        {
             return;
         }
 
@@ -138,7 +143,10 @@ public class ProcessActivityCreateRequestCmd extends
     public void createFriendRelation(FriendCreateRequest friendRequest, UUID activityId,
         UUID activityTypeId)
     {
-        if (friendRequest == null || friendRequest.getFriendName() == null) {
+        if (friendRequest == null || friendRequest.getFriendName() == null
+            || friendRequest.getFriendName()
+            .isBlank())
+        {
             return;
         }
 
@@ -155,7 +163,9 @@ public class ProcessActivityCreateRequestCmd extends
     public void createFollowRelation(FollowCreateRequest followRequest, UUID activityId,
         UUID activityTypeId)
     {
-        if (followRequest == null || followRequest.getName() == null) {
+        if (followRequest == null || followRequest.getName() == null || followRequest.getName()
+            .isBlank())
+        {
             return;
         }
 
