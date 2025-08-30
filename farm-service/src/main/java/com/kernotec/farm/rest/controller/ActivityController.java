@@ -52,11 +52,12 @@ public class ActivityController {
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<ActivityResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "10") Integer size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "false") boolean descending)
+        @RequestParam(defaultValue = "activityDate") String sortBy,
+        @RequestParam(defaultValue = "false") boolean descending,
+        @RequestParam(required = false) UUID accountId)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Activity> activityPage = activityService.findAll(pageable);
+        Page<Activity> activityPage = activityService.findAllWithFilters(accountId, pageable);
 
         return PageResponse.<ActivityResponse>builder()
             .code(HttpStatus.OK.value())

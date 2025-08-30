@@ -64,4 +64,9 @@
   </changeSet>
 
   <include file="db/changelog/2025/08/29-01-changelog-111.xml"/>
+
+  <!-- region seeder -->
+  <changeSet id="1756530852605-1" author="Maur025">
+    <sqlFile path="data/region/region_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
 </databaseChangeLog>

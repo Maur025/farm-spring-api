@@ -93,4 +93,14 @@ public class ApiSpec {
         private DataImportSpec() {
         }
     }
+
+    public static final class RegionSpec {
+
+        public static final String BASE_PATH = ROOT_PATH + "/regions";
+        public static final String TAG_NAME = "REGION";
+        public static final String TAG_DESCRIPTION = "Region management";
+
+        private RegionSpec() {
+        }
+    }
 }
