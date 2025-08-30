@@ -78,7 +78,7 @@ public class ImportExcelRegisterInDbCmd extends
         PersonDto personFakeDto = personFindOrCreateCmd.withRequest(
                 PersonFindOrCreateCmd.Request.builder()
                     .name(excelDataDto.getPersonFakeName())
-                    .lastName(excelDataDto.getPersonFakeName())
+                    .lastName(excelDataDto.getPersonFakeLastName())
                     .birthDateString(excelDataDto.getBirthDateFake())
                     .build())
             .execute();
