@@ -6,8 +6,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,4 +43,22 @@ public class Activity extends BaseAuditEntity {
     @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private ActivityType activityType;
+
+    @OneToMany(mappedBy = "activity", fetch = FetchType.LAZY)
+    private Set<Publishing> publishings;
+
+    @OneToMany(mappedBy = "activity", fetch = FetchType.LAZY)
+    private Set<Reaction> reactions;
+
+    @OneToMany(mappedBy = "activity", fetch = FetchType.LAZY)
+    private Set<Comment> comments;
+
+    @OneToMany(mappedBy = "activity", fetch = FetchType.LAZY)
+    private Set<Group> groups;
+
+    @OneToMany(mappedBy = "activity", fetch = FetchType.LAZY)
+    private Set<Friend> friends;
+
+    @OneToMany(mappedBy = "activity", fetch = FetchType.LAZY)
+    private Set<Follow> follows;
 }
