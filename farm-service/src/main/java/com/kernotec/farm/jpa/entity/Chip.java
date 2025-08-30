@@ -6,7 +6,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,23 +31,23 @@ public class Chip extends BaseAuditEntity {
     private UUID operatorId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "operator_id", referencedColumnName = "id", insertable = false,
-                updatable = false)
+    @JoinColumn(name = "operator_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Operator operator;
 
     @Column(name = "registration_person_id", nullable = false)
     private UUID registrationPersonId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "registration_person_id", referencedColumnName = "id", insertable = false,
-                updatable = false)
+    @JoinColumn(name = "registration_person_id", referencedColumnName = "id", insertable = false, updatable = false)
     private RegistrationPerson registrationPerson;
 
     @Column(name = "device_id", nullable = false)
     private UUID deviceId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "device_id", referencedColumnName = "id", insertable = false,
-                updatable = false)
+    @JoinColumn(name = "device_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Device device;
+
+    @OneToMany(mappedBy = "chip", fetch = FetchType.LAZY)
+    private Set<Account> accounts;
 }
