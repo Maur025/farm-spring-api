@@ -10,7 +10,7 @@ import com.kernotec.core.test.unit.test.util.TestValidatorUtil;
 import com.kernotec.core.util.MessageUtil;
 import com.kernotec.farm.jpa.entity.Activity;
 import com.kernotec.farm.jpa.service.ActivityService;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -46,7 +46,7 @@ class ActivityCreateCmdTest extends UnitTestWithValidator {
 
         UUID activityId = activityCreateCmd.withRequest(ActivityCreateCmd.Request.builder()
                 .link("http://example.com")
-                .activityDate(LocalDateTime.now())
+                .activityDate(ZonedDateTime.now())
                 .accountId(UUID.randomUUID())
                 .activityTypeId(UUID.randomUUID())
                 .build())

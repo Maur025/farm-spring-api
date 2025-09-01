@@ -11,7 +11,7 @@ import com.kernotec.farm.rest.dto.response.follow.FollowResponse;
 import com.kernotec.farm.rest.dto.response.friend.FriendResponse;
 import com.kernotec.farm.rest.dto.response.group.GroupResponse;
 import com.kernotec.farm.rest.dto.response.reaction.ReactionResponse;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
@@ -23,7 +23,7 @@ import lombok.Setter;
 public class ActivityResponse extends EntityResponse {
 
     private String link;
-    private LocalDateTime activityDate;
+    private ZonedDateTime activityDate;
 
     private UUID accountId;
     private AccountForActivityResponse account;

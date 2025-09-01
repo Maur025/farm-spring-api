@@ -53,7 +53,7 @@ public class ActivityController {
     public PageResponse<ActivityResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "10") Integer size,
         @RequestParam(defaultValue = "activityDate") String sortBy,
-        @RequestParam(defaultValue = "false") boolean descending,
+        @RequestParam(defaultValue = "true") boolean descending,
         @RequestParam(required = false) UUID accountId)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);

@@ -47,7 +47,7 @@ spring:
         format_sql: false
         dialect: com.kernotec.core.config.PGDialect
         jdbc:
-          time_zone: America/La_Paz
+          time_zone: UTC
         connection:
           characterEncoding: UTF-8
           charSet: UTF-8
