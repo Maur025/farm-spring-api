@@ -8,7 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class Activity extends BaseAuditEntity {
     private String link;
 
     @Column(name = "activity_date", nullable = false)
-    private LocalDateTime activityDate;
+    private ZonedDateTime activityDate;
 
     @Column(name = "account_id", nullable = false)
     private UUID accountId;

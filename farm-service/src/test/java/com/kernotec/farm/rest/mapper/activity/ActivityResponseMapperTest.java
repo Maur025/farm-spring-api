@@ -9,7 +9,7 @@ import com.kernotec.farm.jpa.entity.Account;
 import com.kernotec.farm.jpa.entity.Activity;
 import com.kernotec.farm.jpa.entity.ActivityType;
 import com.kernotec.farm.rest.dto.response.activity.ActivityResponse;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -31,7 +31,7 @@ class ActivityResponseMapperTest extends AbstractMapperTest<Activity, ActivityRe
         activity.setId(UUID.randomUUID());
 
         activity.setLink("https://example.com");
-        activity.setActivityDate(LocalDateTime.now());
+        activity.setActivityDate(ZonedDateTime.now());
 
         activity.setAccountId(UUID.randomUUID());
         activity.setAccount(new Account());

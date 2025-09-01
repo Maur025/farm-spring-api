@@ -8,7 +8,7 @@ import com.kernotec.farm.rest.dto.request.friend.FriendCreateRequest;
 import com.kernotec.farm.rest.dto.request.group.GroupCreateRequest;
 import com.kernotec.farm.rest.dto.request.publishing.PublishingCreateRequest;
 import com.kernotec.farm.rest.dto.request.reaction.ReactionCreateRequest;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ import lombok.Setter;
 public class ActivityCreateRequest {
 
     private String link;
-    private LocalDateTime activityDate;
+    private ZonedDateTime activityDate;
     private UUID accountId;
     private UUID activityTypeId;
 

@@ -4,7 +4,7 @@ import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.jpa.entity.Activity;
 import com.kernotec.farm.jpa.service.ActivityService;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class ActivityUpdateCmd extends
         private final UUID activityId;
 
         private final String link;
-        private final LocalDateTime activityDate;
+        private final ZonedDateTime activityDate;
         private final UUID accountId;
         private final UUID activityTypeId;
     }

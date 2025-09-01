@@ -12,7 +12,7 @@ import com.kernotec.core.test.unit.test.util.TestValidatorUtil;
 import com.kernotec.core.util.MessageUtil;
 import com.kernotec.farm.jpa.entity.Activity;
 import com.kernotec.farm.jpa.service.ActivityService;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -39,7 +39,7 @@ class ActivityUpdateCmdTest extends UnitTestWithValidator {
         activity = new Activity();
         activity.setId(UUID.randomUUID());
         activity.setLink("http://example.com");
-        activity.setActivityDate(LocalDateTime.now());
+        activity.setActivityDate(ZonedDateTime.now());
         activity.setAccountId(UUID.randomUUID());
         activity.setActivityTypeId(UUID.randomUUID());
     }
