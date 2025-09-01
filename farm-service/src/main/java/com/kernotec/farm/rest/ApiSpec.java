@@ -103,4 +103,14 @@ public class ApiSpec {
         private RegionSpec() {
         }
     }
+
+    public static final class AccountSpec {
+
+        public static final String BASE_PATH = ROOT_PATH + "/accounts";
+        public static final String TAG_NAME = "ACCOUNT";
+        public static final String TAG_DESCRIPTION = "Account management";
+
+        private AccountSpec() {
+        }
+    }
 }

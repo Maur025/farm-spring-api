@@ -1,4 +1,65 @@
 package com.kernotec.farm.rest.controller;
 
+import com.kernotec.core.jpa.util.PageableUtil;
+import com.kernotec.core.rest.dto.response.PageResponse;
+import com.kernotec.core.rest.dto.response.PaginationResponse;
+import com.kernotec.farm.jpa.entity.Account;
+import com.kernotec.farm.jpa.service.AccountService;
+import com.kernotec.farm.rest.ApiSpec.AccountSpec;
+import com.kernotec.farm.rest.dto.response.account.AccountResponse;
+import com.kernotec.farm.rest.mapper.account.AccountResponseMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+@Tag(name = AccountSpec.TAG_NAME, description = AccountSpec.TAG_DESCRIPTION)
+@RequestMapping(path = AccountSpec.BASE_PATH)
+@AllArgsConstructor
+@RestController
 public class AccountController {
+
+    private final AccountService accountService;
+    private final AccountResponseMapper accountResponseMapper;
+
+    @Operation(summary = "Find all accounts")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public PageResponse<AccountResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
+        @RequestParam(defaultValue = "10") Integer size,
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "false") boolean descending)
+    {
+        Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
+        Page<Account> accountPage = accountService.findAll(pageable);
+
+        return PageResponse.<AccountResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(accountResponseMapper.toResponse(accountPage.getContent()))
+            .pagination(PaginationResponse.builder()
+                .pages(accountPage.getTotalPages())
+                .count(accountPage.getTotalElements())
+                .build())
+            .build();
+    }
+
+    @Operation(summary = "Find all Accounts unpaginated")
+    @GetMapping("unpaginated")
+    @ResponseStatus(HttpStatus.OK)
+    public PageResponse<AccountResponse> findAllUnpaginated() {
+        List<Account> accountList = accountService.findAll();
+
+        return PageResponse.<AccountResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(accountResponseMapper.toResponse(accountList))
+            .build();
+    }
 }
