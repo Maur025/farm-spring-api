@@ -2,8 +2,10 @@ package com.kernotec.farm.rest.command.account;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.command.account.AccountCreateCmd;
+import com.kernotec.farm.command.assigned.chip.AssignedChipCreateCmd;
 import com.kernotec.farm.command.device.account.DeviceAccountCreateCmd;
 import com.kernotec.farm.jpa.entity.SocialNetwork;
+import com.kernotec.farm.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.jpa.enums.SocialNetworkEnum;
 import com.kernotec.farm.jpa.service.SocialNetworkService;
 import jakarta.validation.constraints.NotNull;
@@ -20,8 +22,10 @@ public class AccountSocialNetworkRegisterCmd extends
 {
 
     private final SocialNetworkService socialNetworkService;
+
     private final AccountCreateCmd accountCreateCmd;
     private final DeviceAccountCreateCmd deviceAccountCreateCmd;
+    private final AssignedChipCreateCmd assignedChipCreateCmd;
 
     @Override
     protected Void run(Request request) {
@@ -32,15 +36,21 @@ public class AccountSocialNetworkRegisterCmd extends
         UUID accountId = accountCreateCmd.withRequest(AccountCreateCmd.Request.builder()
                 .username(request.getUsername())
                 .password(request.getPassword() == null ? "N/A" : request.getPassword())
-                .chipId(request.getChipId())
                 .personId(request.getPersonId())
                 .socialNetworkId(socialNetwork.getId())
+                .type(request.getAccountType())
                 .build())
             .execute();
 
         deviceAccountCreateCmd.withRequest(DeviceAccountCreateCmd.Request.builder()
                 .accountId(accountId)
                 .deviceId(request.getDeviceId())
+                .build())
+            .execute();
+
+        assignedChipCreateCmd.withRequest(AssignedChipCreateCmd.Request.builder()
+                .chipId(request.getChipId())
+                .accountId(accountId)
                 .build())
             .execute();
 
@@ -62,5 +72,7 @@ public class AccountSocialNetworkRegisterCmd extends
         private final UUID personId;
         @NotNull
         private final UUID deviceId;
+        @NotNull
+        private final AccountTypeEnum accountType;
     }
 }

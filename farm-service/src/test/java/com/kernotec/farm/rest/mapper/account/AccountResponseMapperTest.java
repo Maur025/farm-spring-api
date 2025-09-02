@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.kernotec.core.test.unit.test.util.AbstractMapperTest;
 import com.kernotec.farm.jpa.entity.Account;
-import com.kernotec.farm.jpa.entity.Chip;
 import com.kernotec.farm.jpa.entity.Device;
 import com.kernotec.farm.jpa.entity.Person;
 import com.kernotec.farm.jpa.entity.SocialNetwork;
@@ -36,9 +35,6 @@ class AccountResponseMapperTest extends AbstractMapperTest<Account, AccountRespo
 
         account.setPersonId(UUID.randomUUID());
         account.setPerson(new Person());
-
-        account.setChipId(UUID.randomUUID());
-        account.setChip(new Chip());
 
         account.setSocialNetworkId(UUID.randomUUID());
         account.setSocialNetwork(new SocialNetwork());
@@ -78,9 +74,6 @@ class AccountResponseMapperTest extends AbstractMapperTest<Account, AccountRespo
             () -> assertNotNull(accountResponse.getPersonId()),
             () -> assertEquals(account.getPersonId(), accountResponse.getPersonId()),
             () -> assertNotNull(accountResponse.getPerson()),
-
-            () -> assertNotNull(accountResponse.getChipId()),
-            () -> assertEquals(account.getChipId(), accountResponse.getChipId()),
 
             () -> assertNotNull(accountResponse.getSocialNetworkId()),
             () -> assertEquals(account.getSocialNetworkId(), accountResponse.getSocialNetworkId()),

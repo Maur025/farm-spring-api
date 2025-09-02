@@ -1,11 +1,11 @@
 package com.kernotec.farm.rest.command.excel;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.command.assigned.chip.AssignedChipCreateCmd;
 import com.kernotec.farm.jpa.dto.entity.chip.ChipDto;
 import com.kernotec.farm.jpa.dto.entity.device.DeviceDto;
 import com.kernotec.farm.jpa.dto.entity.farm.FarmDto;
 import com.kernotec.farm.jpa.dto.entity.person.PersonDto;
+import com.kernotec.farm.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.jpa.enums.SocialNetworkEnum;
 import com.kernotec.farm.rest.command.account.AccountSocialNetworkRegisterCmd;
 import com.kernotec.farm.rest.command.chip.ChipAssignRegisterCmd;
@@ -29,7 +29,6 @@ public class ImportExcelRegisterInDbCmd extends
     private final FarmFindOrCreateCmd farmFindOrCreateCmd;
     private final DeviceFindOrCreateCmd deviceFindOrCreateCmd;
     private final ChipAssignRegisterCmd chipAssignRegisterCmd;
-    private final AssignedChipCreateCmd assignedChipCreateCmd;
     private final AccountSocialNetworkRegisterCmd accountSocialNetworkRegisterCmd;
 
     @Override
@@ -83,12 +82,6 @@ public class ImportExcelRegisterInDbCmd extends
                     .build())
             .execute();
 
-        assignedChipCreateCmd.withRequest(AssignedChipCreateCmd.Request.builder()
-                .chipId(chipDto.getId())
-                .personId(personFakeDto.getId())
-                .build())
-            .execute();
-
         if (excelDataDto.getFacebookUsername() != null) {
             accountSocialNetworkRegisterCmd.withRequest(
                     AccountSocialNetworkRegisterCmd.Request.builder()
@@ -98,6 +91,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .personId(personFakeDto.getId())
                         .socialNetworkCode(SocialNetworkEnum.FACEBOOK)
                         .deviceId(deviceDto.getId())
+                        .accountType(AccountTypeEnum.INTERNAL)
                         .build())
                 .execute();
         }
@@ -111,6 +105,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .personId(personFakeDto.getId())
                         .socialNetworkCode(SocialNetworkEnum.TIKTOK)
                         .deviceId(deviceDto.getId())
+                        .accountType(AccountTypeEnum.INTERNAL)
                         .build())
                 .execute();
         }
@@ -124,6 +119,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .personId(personFakeDto.getId())
                         .socialNetworkCode(SocialNetworkEnum.X)
                         .deviceId(deviceDto.getId())
+                        .accountType(AccountTypeEnum.INTERNAL)
                         .build())
                 .execute();
         }
@@ -136,6 +132,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .personId(personFakeDto.getId())
                         .socialNetworkCode(SocialNetworkEnum.WHATSAPP)
                         .deviceId(deviceDto.getId())
+                        .accountType(AccountTypeEnum.INTERNAL)
                         .build())
                 .execute();
         }
