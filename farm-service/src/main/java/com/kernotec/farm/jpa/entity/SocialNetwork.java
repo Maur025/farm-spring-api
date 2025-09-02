@@ -3,7 +3,10 @@ package com.kernotec.farm.jpa.entity;
 import com.kernotec.core.jpa.entity.BaseAuditEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,4 +26,10 @@ public class SocialNetwork extends BaseAuditEntity {
 
     @Column(name = "icon", length = 150)
     private String icon;
+
+    @Column(name = "color", length = 50)
+    private String color;
+
+    @OneToMany(mappedBy = "socialNetwork", fetch = FetchType.LAZY)
+    private Set<Account> accounts;
 }

@@ -13,4 +13,6 @@ public class SocialNetworkResponse extends EntityResponse {
 
     private String name;
     private String code;
+    private String icon;
+    private String color;
 }

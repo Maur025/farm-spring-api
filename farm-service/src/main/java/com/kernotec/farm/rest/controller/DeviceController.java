@@ -37,12 +37,15 @@ public class DeviceController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<DeviceResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "10") Integer size,
+        @RequestParam(defaultValue = "20") Integer size,
         @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "false") boolean descending)
+        @RequestParam(defaultValue = "false") boolean descending,
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Device> devicePage = deviceService.findAll(pageable);
+        Page<Device> devicePage = deviceService.findAllByKeyword(
+            keyword, socialNetworkId, pageable);
 
         return PageResponse.<DeviceResponse>builder()
             .code(HttpStatus.OK.value())
@@ -57,10 +60,8 @@ public class DeviceController {
     @Operation(summary = "Find all Devices unpaginated")
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
-    public PageResponse<DeviceResponse> findAllUnpaginated(
-        @RequestParam(required = false) String keyword)
-    {
-        List<Device> deviceList = deviceService.findAllByKeyword(keyword);
+    public PageResponse<DeviceResponse> findAllUnpaginated() {
+        List<Device> deviceList = deviceService.findAll();
 
         return PageResponse.<DeviceResponse>builder()
             .code(HttpStatus.OK.value())
