@@ -54,7 +54,7 @@ public class Activity extends BaseAuditEntity {
     private Set<Comment> comments;
 
     @OneToMany(mappedBy = "activity", fetch = FetchType.LAZY)
-    private Set<Group> groups;
+    private Set<GroupMembership> groupMemberships;
 
     @OneToMany(mappedBy = "activity", fetch = FetchType.LAZY)
     private Set<Friend> friends;

@@ -132,10 +132,10 @@ public class ProcessActivityCreateRequestCmd extends
 
         groupCreateCmd.withRequest(GroupCreateCmd.Request.builder()
                 .name(groupRequest.getName())
-                .action(groupRequest.getAction())
+                /*.action(groupRequest.getAction())
                 .regionId(groupRequest.getRegionId())
                 .activityId(activityId)
-                .activityTypeId(activityTypeId)
+                .activityTypeId(activityTypeId)*/
                 .build())
             .execute();
     }
