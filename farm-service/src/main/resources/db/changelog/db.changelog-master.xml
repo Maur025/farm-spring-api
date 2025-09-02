@@ -83,4 +83,11 @@
     <sqlFile path="data/social/network/social_network_seeder_update2.sql"
       relativeToChangelogFile="true"/>
   </changeSet>
+
+  <include file="db/changelog/2025/09/02-01-changelog-114.xml"/>
+
+    <!-- social network seeder update 3 - add colors -->
+    <changeSet id="1756825981012-1" author="Maur025">
+      <sqlFile path="data/social/network/social_network_seeder_update3.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 </databaseChangeLog>
