@@ -27,6 +27,7 @@ public class AccountCreateCmd extends
         account.setPassword(request.getPassword());
         account.setPersonId(request.getPersonId());
         account.setSocialNetworkId(request.getSocialNetworkId());
+        account.setType(request.getType());
 
         account = accountService.save(account);
         return account.getId();
