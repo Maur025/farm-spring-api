@@ -6,8 +6,8 @@ import com.kernotec.core.rest.dto.response.data.EntityResponse;
 import com.kernotec.farm.rest.dto.response.account.AccountForActivityResponse;
 import com.kernotec.farm.rest.dto.response.activity.type.ActivityTypeForActivityResponse;
 import com.kernotec.farm.rest.dto.response.comment.CommentForActivityResponse;
+import com.kernotec.farm.rest.dto.response.connection.ConnectionForActivityResponse;
 import com.kernotec.farm.rest.dto.response.follow.FollowResponse;
-import com.kernotec.farm.rest.dto.response.friend.FriendForActivityResponse;
 import com.kernotec.farm.rest.dto.response.group.membership.GroupMembershipForActivityResponse;
 import com.kernotec.farm.rest.dto.response.publishing.PublishingForActivityResponse;
 import com.kernotec.farm.rest.dto.response.reaction.ReactionForActivityResponse;
@@ -35,6 +35,6 @@ public class ActivityResponse extends EntityResponse {
     private Set<ReactionForActivityResponse> reactions;
     private Set<CommentForActivityResponse> comments;
     private Set<GroupMembershipForActivityResponse> groupMemberships;
-    private Set<FriendForActivityResponse> friends;
+    private Set<ConnectionForActivityResponse> connections;
     private Set<FollowResponse> follows;
 }

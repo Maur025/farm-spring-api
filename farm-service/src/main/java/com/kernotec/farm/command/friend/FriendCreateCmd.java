@@ -2,8 +2,6 @@ package com.kernotec.farm.command.friend;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.jpa.entity.Friend;
-import com.kernotec.farm.jpa.enums.FriendActionEnum;
-import com.kernotec.farm.jpa.enums.FriendTypeEnum;
 import com.kernotec.farm.jpa.service.FriendService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
@@ -24,11 +22,8 @@ public class FriendCreateCmd extends
     protected UUID run(Request request) {
         Friend friend = new Friend();
 
-        friend.setName(request.getName());
-        friend.setAction(request.getAction());
-        friend.setType(request.getType());
-        friend.setActivityId(request.getActivityId());
-        friend.setActivityTypeId(request.getActivityTypeId());
+        friend.setAccountId(request.getAccountId());
+        friend.setFriendAccountId(request.getFriendAccountId());
 
         friend = friendService.save(friend);
         return friend.getId();
@@ -39,16 +34,8 @@ public class FriendCreateCmd extends
     public static class Request {
 
         @NotNull
-        private final String name;
+        private final UUID accountId;
         @NotNull
-        private final FriendActionEnum action;
-        @NotNull
-        private final FriendTypeEnum type;
-        @NotNull
-        private final UUID requestStateId;
-        @NotNull
-        private final UUID activityId;
-        @NotNull
-        private final UUID activityTypeId;
+        private final UUID friendAccountId;
     }
 }

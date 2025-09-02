@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+  objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+  <changeSet id="1756846099729-12" author="mmoya@PragmaInvest.com">
+    <dropForeignKeyConstraint baseTableName="friends" constraintName="fk_friends_on_activity"/>
+  </changeSet>
+  <changeSet id="1756846099729-13" author="mmoya@PragmaInvest.com">
+    <dropForeignKeyConstraint baseTableName="friends" constraintName="fk_friends_on_activity_type"/>
+  </changeSet>
+  <changeSet id="1756846099729-14" author="mmoya@PragmaInvest.com">
+    <dropForeignKeyConstraint baseTableName="friends" constraintName="fk_friends_on_request_state"/>
+  </changeSet>
+  <changeSet id="1756846099729-1" author="mmoya@PragmaInvest.com">
+    <createTable tableName="connections">
+      <column defaultValueComputed="uuid_generate_v4()" name="id" type="uuid">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_connections"/>
+      </column>
+      <column defaultValueComputed="now()" name="created_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column defaultValueComputed="now()" name="updated_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_by" type="VARCHAR(255)"/>
+      <column defaultValueNumeric="0" name="version" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column defaultValueBoolean="false" name="deleted" type="boolean">
+        <constraints nullable="false"/>
+      </column>
+      <column name="potential_friend_account_id" type="UUID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="action" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="type" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="request_state_id" type="UUID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="activity_id" type="UUID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="activity_type_id" type="UUID">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet id="1756846099729-2" author="mmoya@PragmaInvest.com">
+    <addColumn tableName="friends">
+      <column name="account_id" type="UUID"/>
+      <column name="friend_account_id" type="UUID"/>
+    </addColumn>
+  </changeSet>
+  <changeSet id="1756846099729-3" author="mmoya@PragmaInvest.com">
+    <addNotNullConstraint columnName="account_id" tableName="friends"/>
+  </changeSet>
+  <changeSet id="1756846099729-5" author="mmoya@PragmaInvest.com">
+    <addNotNullConstraint columnName="friend_account_id" tableName="friends"/>
+  </changeSet>
+  <changeSet id="1756846099729-6" author="mmoya@PragmaInvest.com">
+    <addForeignKeyConstraint baseColumnNames="activity_id" baseTableName="connections"
+      constraintName="FK_CONNECTIONS_ON_ACTIVITY" referencedColumnNames="id"
+      referencedTableName="activities"/>
+  </changeSet>
+  <changeSet id="1756846099729-7" author="mmoya@PragmaInvest.com">
+    <addForeignKeyConstraint baseColumnNames="activity_type_id" baseTableName="connections"
+      constraintName="FK_CONNECTIONS_ON_ACTIVITY_TYPE" referencedColumnNames="id"
+      referencedTableName="activity_types"/>
+  </changeSet>
+  <changeSet id="1756846099729-8" author="mmoya@PragmaInvest.com">
+    <addForeignKeyConstraint baseColumnNames="potential_friend_account_id"
+      baseTableName="connections" constraintName="FK_CONNECTIONS_ON_POTENTIAL_FRIEND_ACCOUNT"
+      referencedColumnNames="id" referencedTableName="accounts"/>
+  </changeSet>
+  <changeSet id="1756846099729-9" author="mmoya@PragmaInvest.com">
+    <addForeignKeyConstraint baseColumnNames="request_state_id" baseTableName="connections"
+      constraintName="FK_CONNECTIONS_ON_REQUEST_STATE" referencedColumnNames="id"
+      referencedTableName="request_states"/>
+  </changeSet>
+  <changeSet id="1756846099729-10" author="mmoya@PragmaInvest.com">
+    <addForeignKeyConstraint baseColumnNames="account_id" baseTableName="friends"
+      constraintName="FK_FRIENDS_ON_ACCOUNT" referencedColumnNames="id"
+      referencedTableName="accounts"/>
+  </changeSet>
+  <changeSet id="1756846099729-11" author="mmoya@PragmaInvest.com">
+    <addForeignKeyConstraint baseColumnNames="friend_account_id" baseTableName="friends"
+      constraintName="FK_FRIENDS_ON_FRIEND_ACCOUNT" referencedColumnNames="id"
+      referencedTableName="accounts"/>
+  </changeSet>
+  <changeSet id="1756846099729-15" author="mmoya@PragmaInvest.com">
+    <dropColumn columnName="action" tableName="friends"/>
+
+    <dropColumn columnName="activity_id" tableName="friends"/>
+
+    <dropColumn columnName="activity_type_id" tableName="friends"/>
+
+    <dropColumn columnName="name" tableName="friends"/>
+
+    <dropColumn columnName="request_state_id" tableName="friends"/>
+
+    <dropColumn columnName="type" tableName="friends"/>
+  </changeSet>
+
+</databaseChangeLog>
