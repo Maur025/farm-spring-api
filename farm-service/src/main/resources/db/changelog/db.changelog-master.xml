@@ -72,4 +72,15 @@
 
   <include file="db/changelog/2025/09/01-01-changelog-112.xml"/>
   <include file="db/changelog/2025/09/02-01-changelog-113.xml"/>
+
+  <!-- request states seeder -->
+  <changeSet id="1756821165239-1" author="Maur025">
+    <sqlFile path="data/request/state/request_state_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <!-- social network seeder update 2 - add icons -->
+  <changeSet id="1756821752802-1" author="Maur025">
+    <sqlFile path="data/social/network/social_network_seeder_update2.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
 </databaseChangeLog>
