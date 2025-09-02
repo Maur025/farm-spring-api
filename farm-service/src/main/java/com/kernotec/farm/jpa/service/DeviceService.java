@@ -47,7 +47,7 @@ public class DeviceService extends BaseServiceImpl<Device, UUID> {
                         cb.equal(accountJoin.get("socialNetworkId"), socialNetworkId));
                 }
 
-                if (keyword != null) {
+                if (pattern != null) {
                     predicateList.add(cb.or(cb.like(cb.lower(root.get("deviceNumber")), pattern)));
                 }
 

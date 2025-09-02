@@ -11,6 +11,7 @@ import com.kernotec.farm.rest.mapper.account.AccountResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,12 +35,15 @@ public class AccountController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<AccountResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "10") Integer size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "false") boolean descending)
+        @RequestParam(defaultValue = "20") Integer size,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "true") boolean descending,
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Account> accountPage = accountService.findAll(pageable);
+        Page<Account> accountPage = accountService.findAllWithFilters(
+            socialNetworkId, keyword, pageable);
 
         return PageResponse.<AccountResponse>builder()
             .code(HttpStatus.OK.value())
