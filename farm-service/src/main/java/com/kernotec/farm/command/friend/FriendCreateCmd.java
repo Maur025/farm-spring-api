@@ -2,7 +2,7 @@ package com.kernotec.farm.command.friend;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.jpa.entity.Friend;
-import com.kernotec.farm.jpa.enums.FriendStatusEnum;
+import com.kernotec.farm.jpa.enums.FriendActionEnum;
 import com.kernotec.farm.jpa.enums.FriendTypeEnum;
 import com.kernotec.farm.jpa.service.FriendService;
 import jakarta.validation.constraints.NotNull;
@@ -25,7 +25,7 @@ public class FriendCreateCmd extends
         Friend friend = new Friend();
 
         friend.setName(request.getName());
-        friend.setStatus(request.getStatus());
+        friend.setAction(request.getAction());
         friend.setType(request.getType());
         friend.setActivityId(request.getActivityId());
         friend.setActivityTypeId(request.getActivityTypeId());
@@ -41,9 +41,11 @@ public class FriendCreateCmd extends
         @NotNull
         private final String name;
         @NotNull
-        private final FriendStatusEnum status;
+        private final FriendActionEnum action;
         @NotNull
         private final FriendTypeEnum type;
+        @NotNull
+        private final UUID requestStateId;
         @NotNull
         private final UUID activityId;
         @NotNull

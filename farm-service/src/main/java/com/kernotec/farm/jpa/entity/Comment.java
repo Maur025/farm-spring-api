@@ -40,4 +40,12 @@ public class Comment extends BaseAuditEntity {
     @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private ActivityType activityType;
+
+    @Column(name = "publishing_context_id", nullable = false)
+    private UUID publishingContextId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "publishing_context_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private PublishingContext publishingContext;
 }
