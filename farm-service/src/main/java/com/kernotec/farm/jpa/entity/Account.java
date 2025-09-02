@@ -1,8 +1,11 @@
 package com.kernotec.farm.jpa.entity;
 
 import com.kernotec.core.jpa.entity.BaseAuditEntity;
+import com.kernotec.farm.jpa.enums.AccountTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
@@ -27,6 +30,10 @@ public class Account extends BaseAuditEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private AccountTypeEnum type;
+
     @Column(name = "person_id", nullable = false)
     private UUID personId;
 
@@ -34,14 +41,6 @@ public class Account extends BaseAuditEntity {
     @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private Person person;
-
-    @Column(name = "chip_id", nullable = false)
-    private UUID chipId;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "chip_id", referencedColumnName = "id", insertable = false,
-                updatable = false)
-    private Chip chip;
 
     @Column(name = "social_network_id", nullable = false)
     private UUID socialNetworkId;

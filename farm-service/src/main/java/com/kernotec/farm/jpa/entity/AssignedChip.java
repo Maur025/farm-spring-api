@@ -27,11 +27,11 @@ public class AssignedChip extends BaseAuditEntity {
                 updatable = false)
     private Chip chip;
 
-    @Column(name = "person_id", nullable = false)
-    private UUID personId;
+    @Column(name = "accountId", nullable = false)
+    private UUID accountId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false,
+    @JoinColumn(name = "accountId", referencedColumnName = "id", insertable = false,
                 updatable = false)
-    private Person person;
+    private Account account;
 }

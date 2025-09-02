@@ -64,6 +64,7 @@
   </changeSet>
 
   <include file="db/changelog/2025/08/29-01-changelog-111.xml"/>
+  <include file="db/changelog/2025/09/01-01-changelog-112.xml"/>
 
   <!-- region seeder -->
   <changeSet id="1756530852605-1" author="Maur025">

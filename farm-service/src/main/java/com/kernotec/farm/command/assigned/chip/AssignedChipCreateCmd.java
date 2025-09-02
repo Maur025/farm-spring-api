@@ -23,7 +23,7 @@ public class AssignedChipCreateCmd extends
         AssignedChip assignedChip = new AssignedChip();
 
         assignedChip.setChipId(request.getChipId());
-        assignedChip.setPersonId(request.getPersonId());
+        assignedChip.setAccountId(request.getAccountId());
 
         assignedChip = assignedChipService.save(assignedChip);
         return assignedChip.getId();
@@ -36,6 +36,6 @@ public class AssignedChipCreateCmd extends
         @NotNull
         private final UUID chipId;
         @NotNull
-        private final UUID personId;
+        private final UUID accountId;
     }
 }

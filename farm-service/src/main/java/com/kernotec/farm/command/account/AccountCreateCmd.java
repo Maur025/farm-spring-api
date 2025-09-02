@@ -2,6 +2,7 @@ package com.kernotec.farm.command.account;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.jpa.entity.Account;
+import com.kernotec.farm.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.jpa.service.AccountService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
@@ -25,7 +26,6 @@ public class AccountCreateCmd extends
         account.setUsername(request.getUsername());
         account.setPassword(request.getPassword());
         account.setPersonId(request.getPersonId());
-        account.setChipId(request.getChipId());
         account.setSocialNetworkId(request.getSocialNetworkId());
 
         account = accountService.save(account);
@@ -43,8 +43,8 @@ public class AccountCreateCmd extends
         @NotNull
         private final UUID personId;
         @NotNull
-        private final UUID chipId;
-        @NotNull
         private final UUID socialNetworkId;
+        @NotNull
+        private final AccountTypeEnum type;
     }
 }
