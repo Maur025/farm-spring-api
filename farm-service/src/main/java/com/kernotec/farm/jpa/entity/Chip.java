@@ -5,8 +5,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,4 +50,7 @@ public class Chip extends BaseAuditEntity {
     @JoinColumn(name = "device_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private Device device;
+
+    @ManyToMany(mappedBy = "chips", fetch = FetchType.LAZY)
+    private Set<Account> accounts;
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -52,4 +53,10 @@ public class Account extends BaseAuditEntity {
 
     @ManyToMany(mappedBy = "accounts", fetch = FetchType.LAZY)
     private Set<Device> devices;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "assigned_chips",
+               joinColumns = @JoinColumn(name = "account_id", referencedColumnName = "id"),
+               inverseJoinColumns = @JoinColumn(name = "chip_id", referencedColumnName = "id"))
+    private Set<Chip> chips;
 }

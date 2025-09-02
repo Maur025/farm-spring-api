@@ -3,6 +3,7 @@ package com.kernotec.farm.jpa.service;
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.jpa.entity.Account;
+import com.kernotec.farm.jpa.entity.Chip;
 import com.kernotec.farm.jpa.entity.Device;
 import com.kernotec.farm.jpa.entity.Farm;
 import com.kernotec.farm.jpa.entity.Person;
@@ -49,11 +50,13 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
 
                 if (pattern != null) {
                     Join<Account, Person> personJoin = root.join("person", JoinType.INNER);
+                    Join<Account, Chip> chipJoin = root.join("chips", JoinType.INNER);
                     Join<Account, Device> deviceJoin = root.join("devices", JoinType.INNER);
                     Join<Farm, Device> farmDeviceJoin = deviceJoin.join("farm", JoinType.INNER);
 
                     predicateList.add(cb.or(
                         cb.like(cb.lower(root.get("username")), pattern),
+                        cb.like(cb.lower(chipJoin.get("phoneNumber")), pattern),
                         cb.like(cb.lower(personJoin.get("name")), pattern),
                         cb.like(cb.lower(personJoin.get("lastName")), pattern),
                         cb.like(cb.lower(deviceJoin.get("deviceNumber")), pattern),
