@@ -151,11 +151,11 @@ public class ProcessActivityCreateRequestCmd extends
         }
 
         friendCreateCmd.withRequest(FriendCreateCmd.Request.builder()
-                .name(friendRequest.getFriendName())
+                /*.name(friendRequest.getFriendName())
                 .action(friendRequest.getAction())
                 .type(friendRequest.getTypeFriendShip())
                 .activityId(activityId)
-                .activityTypeId(activityTypeId)
+                .activityTypeId(activityTypeId)*/
                 .build())
             .execute();
     }
