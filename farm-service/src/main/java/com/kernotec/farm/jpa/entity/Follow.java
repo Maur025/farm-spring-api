@@ -25,6 +25,22 @@ public class Follow extends BaseAuditEntity {
     @Column(name = "is_following", nullable = false, columnDefinition = "boolean default false")
     private boolean isFollowing;
 
+    @Column(name = "publishing_context_id", nullable = false)
+    private UUID publishingContextId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "publishing_context_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private PublishingContext publishingContext;
+
+    @Column(name = "region_id", nullable = false)
+    private UUID regionId;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Region region;
+
     @Column(name = "activity_id", nullable = false)
     private UUID activityId;
 

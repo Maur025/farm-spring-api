@@ -1,7 +1,7 @@
 package com.kernotec.farm.jpa.entity;
 
 import com.kernotec.core.jpa.entity.BaseAuditEntity;
-import com.kernotec.farm.jpa.enums.FriendStatusEnum;
+import com.kernotec.farm.jpa.enums.FriendActionEnum;
 import com.kernotec.farm.jpa.enums.FriendTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,12 +27,20 @@ public class Friend extends BaseAuditEntity {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private FriendStatusEnum status;
+    @Column(name = "action", nullable = false)
+    private FriendActionEnum action;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private FriendTypeEnum type;
+
+    @Column(name = "request_state_id", nullable = false)
+    private UUID requestStateId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "request_state_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private RequestState requestState;
 
     @Column(name = "activity_id", nullable = false)
     private UUID activityId;

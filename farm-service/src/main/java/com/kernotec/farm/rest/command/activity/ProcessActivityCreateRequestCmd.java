@@ -132,7 +132,7 @@ public class ProcessActivityCreateRequestCmd extends
 
         groupCreateCmd.withRequest(GroupCreateCmd.Request.builder()
                 .name(groupRequest.getName())
-                .isJoin(groupRequest.getIsJoin() != null && groupRequest.getIsJoin())
+                .action(groupRequest.getAction())
                 .regionId(groupRequest.getRegionId())
                 .activityId(activityId)
                 .activityTypeId(activityTypeId)
@@ -152,7 +152,7 @@ public class ProcessActivityCreateRequestCmd extends
 
         friendCreateCmd.withRequest(FriendCreateCmd.Request.builder()
                 .name(friendRequest.getFriendName())
-                .status(friendRequest.getStatus())
+                .action(friendRequest.getAction())
                 .type(friendRequest.getTypeFriendShip())
                 .activityId(activityId)
                 .activityTypeId(activityTypeId)
