@@ -1,5 +1,5 @@
 package com.kernotec.farm.jpa.enums;
 
 public enum FriendActionEnum {
-  ACCEPTED, REJECTED, FRIEND_REQUEST
+    INCOMING_FRIEND_REQUEST, OUTGOING_FRIEND_REQUEST
 }

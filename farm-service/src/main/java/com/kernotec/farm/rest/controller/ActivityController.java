@@ -11,6 +11,7 @@ import com.kernotec.farm.rest.command.activity.ProcessActivityCreateRequestCmd;
 import com.kernotec.farm.rest.command.activity.ProcessActivityDeleteRequestCmd;
 import com.kernotec.farm.rest.command.activity.ProcessActivityUpdateRequestCmd;
 import com.kernotec.farm.rest.dto.request.activity.ActivityCreateRequest;
+import com.kernotec.farm.rest.dto.request.activity.ActivityFindAllFilterRequest;
 import com.kernotec.farm.rest.dto.request.activity.ActivityUpdateRequest;
 import com.kernotec.farm.rest.dto.response.activity.ActivityResponse;
 import com.kernotec.farm.rest.mapper.activity.ActivityResponseMapper;
@@ -54,10 +55,18 @@ public class ActivityController {
         @RequestParam(defaultValue = "10") Integer size,
         @RequestParam(defaultValue = "activityDate") String sortBy,
         @RequestParam(defaultValue = "true") boolean descending,
-        @RequestParam(required = false) UUID accountId)
+        @RequestParam(required = false) UUID accountId,
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) UUID deviceId)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Activity> activityPage = activityService.findAllWithFilters(accountId, pageable);
+        Page<Activity> activityPage = activityService.findAllWithFilters(
+            ActivityFindAllFilterRequest.builder()
+                .accountId(accountId)
+                .socialNetworkId(socialNetworkId)
+                .deviceId(deviceId)
+                .build(), pageable
+        );
 
         return PageResponse.<ActivityResponse>builder()
             .code(HttpStatus.OK.value())

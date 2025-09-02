@@ -3,6 +3,7 @@ package com.kernotec.farm.rest.dto.response.account;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
+import com.kernotec.farm.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.rest.dto.response.chip.ChipForActivityResponse;
 import com.kernotec.farm.rest.dto.response.device.DeviceForActivityResponse;
 import com.kernotec.farm.rest.dto.response.person.PersonResponse;
@@ -20,14 +21,14 @@ public class AccountForActivityResponse extends EntityResponse {
     private String username;
     private String password;
 
+    private AccountTypeEnum type;
+
     private UUID personId;
     private PersonResponse person;
-
-    private UUID chipId;
-    private ChipForActivityResponse chip;
 
     private UUID socialNetworkId;
     private SocialNetworkResponse socialNetwork;
 
     private Set<DeviceForActivityResponse> devices;
+    private Set<ChipForActivityResponse> chip;
 }

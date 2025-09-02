@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
 import com.kernotec.farm.rest.dto.response.PublishingResponse;
 import com.kernotec.farm.rest.dto.response.account.AccountForActivityResponse;
-import com.kernotec.farm.rest.dto.response.activity.type.ActivityTypeResponse;
+import com.kernotec.farm.rest.dto.response.activity.type.ActivityTypeForActivityResponse;
 import com.kernotec.farm.rest.dto.response.comment.CommentResponse;
 import com.kernotec.farm.rest.dto.response.follow.FollowResponse;
-import com.kernotec.farm.rest.dto.response.friend.FriendResponse;
+import com.kernotec.farm.rest.dto.response.friend.FriendForActivityResponse;
 import com.kernotec.farm.rest.dto.response.group.GroupResponse;
 import com.kernotec.farm.rest.dto.response.reaction.ReactionResponse;
 import java.time.ZonedDateTime;
@@ -29,12 +29,12 @@ public class ActivityResponse extends EntityResponse {
     private AccountForActivityResponse account;
 
     private UUID activityTypeId;
-    private ActivityTypeResponse activityType;
+    private ActivityTypeForActivityResponse activityType;
 
     private Set<PublishingResponse> publishings;
     private Set<ReactionResponse> reactions;
     private Set<CommentResponse> comments;
     private Set<GroupResponse> groups;
-    private Set<FriendResponse> friends;
+    private Set<FriendForActivityResponse> friends;
     private Set<FollowResponse> follows;
 }
