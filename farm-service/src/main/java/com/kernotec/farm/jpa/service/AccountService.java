@@ -70,17 +70,23 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
         );
     }
 
-    public Page<Account> findByUsername(String username, Pageable pageable) {
+    public Page<Account> findByUsername(String username, UUID socialNetworkId, Pageable pageable) {
         String usernamePattern =
             username == null || username.isBlank() ? null : username.toLowerCase() + "%";
 
         return repository.findAll(
             (Specification<Account>) (root, query, cb) -> {
-                if (usernamePattern == null) {
-                    return cb.conjunction();
+                List<Predicate> predicateList = new ArrayList<>();
+
+                if (usernamePattern != null) {
+                    predicateList.add(cb.like(cb.lower(root.get("username")), usernamePattern));
                 }
 
-                return cb.and(cb.like(cb.lower(root.get("username")), usernamePattern));
+                if (socialNetworkId != null) {
+                    predicateList.add(cb.equal(root.get("socialNetworkId"), socialNetworkId));
+                }
+
+                return cb.and(predicateList.toArray(Predicate[]::new));
             }, pageable
         );
     }
