@@ -133,4 +133,14 @@ public class ApiSpec {
         private ConnectionSpec() {
         }
     }
+
+    public static final class FriendSpec {
+
+        public static final String BASE_PATH = ROOT_PATH + "/friends";
+        public static final String TAG_NAME = "FRIEND";
+        public static final String TAG_DESCRIPTION = "Friend management";
+
+        private FriendSpec() {
+        }
+    }
 }
