@@ -51,6 +51,7 @@ public class SocialNetworkService extends BaseServiceImpl<SocialNetwork, UUID> {
             root.join("accounts", JoinType.INNER);
 
             query.distinct(true);
+            query.orderBy(cb.asc(root.get("name")));
             return cb.conjunction();
         });
     }

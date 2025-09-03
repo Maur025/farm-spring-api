@@ -70,7 +70,8 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
         );
     }
 
-    public Page<Account> findByUsername(String username, UUID socialNetworkId, Pageable pageable) {
+    public Page<Account> searchByUsername(String username, UUID socialNetworkId, Pageable pageable)
+    {
         String usernamePattern =
             username == null || username.isBlank() ? null : username.toLowerCase() + "%";
 
