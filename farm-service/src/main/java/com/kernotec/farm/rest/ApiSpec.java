@@ -123,4 +123,14 @@ public class ApiSpec {
         private GroupSpec() {
         }
     }
+
+    public static final class ConnectionSpec {
+
+        public static final String BASE_PATH = ROOT_PATH + "/connections";
+        public static final String TAG_NAME = "CONNECTION";
+        public static final String TAG_DESCRIPTION = "Connection management";
+
+        private ConnectionSpec() {
+        }
+    }
 }
