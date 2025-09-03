@@ -69,4 +69,19 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
             }, pageable
         );
     }
+
+    public Page<Account> findByUsername(String username, Pageable pageable) {
+        String usernamePattern =
+            username == null || username.isBlank() ? null : username.toLowerCase() + "%";
+
+        return repository.findAll(
+            (Specification<Account>) (root, query, cb) -> {
+                if (usernamePattern == null) {
+                    return cb.conjunction();
+                }
+
+                return cb.and(cb.like(cb.lower(root.get("username")), usernamePattern));
+            }, pageable
+        );
+    }
 }

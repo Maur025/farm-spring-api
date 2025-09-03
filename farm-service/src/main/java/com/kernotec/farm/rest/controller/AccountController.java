@@ -6,7 +6,9 @@ import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.farm.jpa.entity.Account;
 import com.kernotec.farm.jpa.service.AccountService;
 import com.kernotec.farm.rest.ApiSpec.AccountSpec;
+import com.kernotec.farm.rest.dto.response.account.AccountFlatResponse;
 import com.kernotec.farm.rest.dto.response.account.AccountResponse;
+import com.kernotec.farm.rest.mapper.account.AccountFlatResponseMapper;
 import com.kernotec.farm.rest.mapper.account.AccountResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +32,7 @@ public class AccountController {
 
     private final AccountService accountService;
     private final AccountResponseMapper accountResponseMapper;
+    private final AccountFlatResponseMapper accountFlatResponseMapper;
 
     @Operation(summary = "Find all accounts")
     @GetMapping
@@ -52,6 +55,21 @@ public class AccountController {
                 .pages(accountPage.getTotalPages())
                 .count(accountPage.getTotalElements())
                 .build())
+            .build();
+    }
+
+    @Operation(summary = "Find Accounts by username")
+    @GetMapping("search")
+    @ResponseStatus(HttpStatus.OK)
+    public PageResponse<AccountFlatResponse> findByUsername(
+        @RequestParam(required = false) String username)
+    {
+        Pageable pageable = PageableUtil.of(0, 20, "createdAt", true);
+        Page<Account> accountPage = accountService.findByUsername(username, pageable);
+
+        return PageResponse.<AccountFlatResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(accountFlatResponseMapper.toResponse(accountPage.getContent()))
             .build();
     }
 
