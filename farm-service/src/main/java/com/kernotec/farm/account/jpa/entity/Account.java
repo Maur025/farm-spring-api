@@ -1,10 +1,10 @@
 package com.kernotec.farm.account.jpa.entity;
 
 import com.kernotec.core.jpa.entity.BaseAuditEntity;
-import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.inventory.jpa.entity.Chip;
 import com.kernotec.farm.inventory.jpa.entity.Device;
-import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -62,4 +62,11 @@ public class Account extends BaseAuditEntity {
                joinColumns = @JoinColumn(name = "account_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "chip_id", referencedColumnName = "id"))
     private Set<Chip> chips;
+
+    @ManyToMany
+    @JoinTable(name = "account_observations",
+               joinColumns = @JoinColumn(name = "account_id", referencedColumnName = "id"),
+               inverseJoinColumns = @JoinColumn(name = "observation_id",
+                                                referencedColumnName = "id"))
+    private Set<Observation> observations;
 }
