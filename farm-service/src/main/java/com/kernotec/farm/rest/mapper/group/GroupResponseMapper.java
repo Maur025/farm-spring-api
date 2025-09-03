@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.mapper.group;
 
-import com.kernotec.farm.jpa.entity.Group;
+import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.rest.dto.response.group.GroupResponse;
 import java.util.List;
 import java.util.Set;

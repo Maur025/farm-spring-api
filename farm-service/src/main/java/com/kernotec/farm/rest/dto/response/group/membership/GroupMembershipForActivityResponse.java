@@ -3,7 +3,7 @@ package com.kernotec.farm.rest.dto.response.group.membership;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
-import com.kernotec.farm.jpa.enums.GroupActionEnum;
+import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
 import com.kernotec.farm.rest.dto.response.group.GroupResponse;
 import com.kernotec.farm.rest.dto.response.publishing.context.PublishingContextResponse;
 import com.kernotec.farm.rest.dto.response.region.RegionResponse;

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.kernotec.core.test.unit.test.util.AbstractMapperTest;
-import com.kernotec.farm.jpa.entity.ActivityType;
+import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.rest.dto.response.activity.type.ActivityTypeResponse;
 import java.util.List;
 import java.util.Set;

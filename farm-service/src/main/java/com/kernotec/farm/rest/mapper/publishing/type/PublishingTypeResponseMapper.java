@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.mapper.publishing.type;
 
-import com.kernotec.farm.jpa.entity.PublishingType;
+import com.kernotec.farm.parametric.jpa.entity.PublishingType;
 import com.kernotec.farm.rest.dto.response.publishing.type.PublishingTypeResponse;
 import java.util.List;
 import java.util.Set;

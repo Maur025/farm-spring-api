@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.follow;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Follow;
-import com.kernotec.farm.jpa.service.FollowService;
+import com.kernotec.farm.activity.jpa.entity.Follow;
+import com.kernotec.farm.activity.jpa.service.FollowService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

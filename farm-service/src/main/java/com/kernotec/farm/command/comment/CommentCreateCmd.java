@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.comment;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Comment;
-import com.kernotec.farm.jpa.service.CommentService;
+import com.kernotec.farm.activity.jpa.entity.Comment;
+import com.kernotec.farm.activity.jpa.service.CommentService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

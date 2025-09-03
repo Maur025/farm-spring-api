@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.mapper.publishing.context;
 
-import com.kernotec.farm.jpa.entity.PublishingContext;
+import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
 import com.kernotec.farm.rest.dto.response.publishing.context.PublishingContextResponse;
 import java.util.List;
 import java.util.Set;

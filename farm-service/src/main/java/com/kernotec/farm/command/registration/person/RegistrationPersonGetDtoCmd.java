@@ -1,10 +1,10 @@
 package com.kernotec.farm.command.registration.person;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.dto.entity.registration.person.RegistrationPersonDto;
-import com.kernotec.farm.jpa.dto.mapper.registration.person.RegistrationPersonDtoMapper;
-import com.kernotec.farm.jpa.entity.RegistrationPerson;
-import com.kernotec.farm.jpa.service.RegistrationPersonService;
+import com.kernotec.farm.inventory.jpa.dto.entity.RegistrationPersonDto;
+import com.kernotec.farm.inventory.jpa.dto.mapper.RegistrationPersonDtoMapper;
+import com.kernotec.farm.inventory.jpa.entity.RegistrationPerson;
+import com.kernotec.farm.inventory.jpa.service.RegistrationPersonService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

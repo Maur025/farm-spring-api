@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.friend;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Friend;
-import com.kernotec.farm.jpa.service.FriendService;
+import com.kernotec.farm.activity.jpa.entity.Friend;
+import com.kernotec.farm.activity.jpa.service.FriendService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

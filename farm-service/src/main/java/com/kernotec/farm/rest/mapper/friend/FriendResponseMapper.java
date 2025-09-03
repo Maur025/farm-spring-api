@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.mapper.friend;
 
-import com.kernotec.farm.jpa.entity.Friend;
+import com.kernotec.farm.activity.jpa.entity.Friend;
 import com.kernotec.farm.rest.dto.response.friend.FriendResponse;
 import java.util.List;
 import java.util.Set;

@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.dto.request.connection;
 
-import com.kernotec.farm.jpa.enums.FriendActionEnum;
+import com.kernotec.farm.activity.jpa.enums.FriendActionEnum;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;

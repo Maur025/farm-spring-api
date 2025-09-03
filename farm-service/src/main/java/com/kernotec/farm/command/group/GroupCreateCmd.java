@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.group;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Group;
-import com.kernotec.farm.jpa.service.GroupService;
+import com.kernotec.farm.activity.jpa.entity.Group;
+import com.kernotec.farm.activity.jpa.service.GroupService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

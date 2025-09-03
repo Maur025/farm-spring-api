@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.person;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Person;
-import com.kernotec.farm.jpa.service.PersonService;
+import com.kernotec.farm.account.jpa.entity.Person;
+import com.kernotec.farm.account.jpa.service.PersonService;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.UUID;

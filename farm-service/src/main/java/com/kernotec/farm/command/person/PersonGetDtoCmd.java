@@ -1,10 +1,10 @@
 package com.kernotec.farm.command.person;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.dto.entity.person.PersonDto;
-import com.kernotec.farm.jpa.dto.mapper.person.PersonDtoMapper;
-import com.kernotec.farm.jpa.entity.Person;
-import com.kernotec.farm.jpa.service.PersonService;
+import com.kernotec.farm.account.jpa.dto.entity.PersonDto;
+import com.kernotec.farm.account.jpa.dto.mapper.PersonDtoMapper;
+import com.kernotec.farm.account.jpa.entity.Person;
+import com.kernotec.farm.account.jpa.service.PersonService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

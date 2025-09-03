@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.registration.person;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.RegistrationPerson;
-import com.kernotec.farm.jpa.service.RegistrationPersonService;
+import com.kernotec.farm.inventory.jpa.entity.RegistrationPerson;
+import com.kernotec.farm.inventory.jpa.service.RegistrationPersonService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

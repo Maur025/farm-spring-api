@@ -1,9 +1,9 @@
 package com.kernotec.farm.command.operator;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Operator;
-import com.kernotec.farm.jpa.enums.OperatorCodeEnum;
-import com.kernotec.farm.jpa.service.OperatorService;
+import com.kernotec.farm.parametric.jpa.entity.Operator;
+import com.kernotec.farm.parametric.jpa.enums.OperatorCodeEnum;
+import com.kernotec.farm.parametric.jpa.service.OperatorService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

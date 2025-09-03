@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.mapper.reaction.type;
 
-import com.kernotec.farm.jpa.entity.ReactionType;
+import com.kernotec.farm.parametric.jpa.entity.ReactionType;
 import com.kernotec.farm.rest.dto.response.reaction.type.ReactionTypeResponse;
 import java.util.List;
 import java.util.Set;

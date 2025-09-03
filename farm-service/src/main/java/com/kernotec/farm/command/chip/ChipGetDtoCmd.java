@@ -1,10 +1,10 @@
 package com.kernotec.farm.command.chip;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.dto.entity.chip.ChipDto;
-import com.kernotec.farm.jpa.dto.mapper.chip.ChipDtoMapper;
-import com.kernotec.farm.jpa.entity.Chip;
-import com.kernotec.farm.jpa.service.ChipService;
+import com.kernotec.farm.inventory.jpa.dto.entity.ChipDto;
+import com.kernotec.farm.inventory.jpa.dto.mapper.ChipDtoMapper;
+import com.kernotec.farm.inventory.jpa.entity.Chip;
+import com.kernotec.farm.inventory.jpa.service.ChipService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;
