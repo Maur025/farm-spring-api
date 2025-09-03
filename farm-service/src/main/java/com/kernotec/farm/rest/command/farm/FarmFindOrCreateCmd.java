@@ -1,8 +1,8 @@
 package com.kernotec.farm.rest.command.farm;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.command.farm.FarmCreateCmd;
-import com.kernotec.farm.command.farm.FarmGetDtoCmd;
+import com.kernotec.farm.inventory.command.farm.FarmCreateCmd;
+import com.kernotec.farm.inventory.command.farm.FarmGetDtoCmd;
 import com.kernotec.farm.inventory.jpa.dto.entity.FarmDto;
 import com.kernotec.farm.inventory.jpa.entity.Farm;
 import com.kernotec.farm.inventory.jpa.enums.FarmTypeEnum;

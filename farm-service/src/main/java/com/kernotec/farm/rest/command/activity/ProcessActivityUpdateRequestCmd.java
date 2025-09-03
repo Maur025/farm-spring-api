@@ -1,7 +1,7 @@
 package com.kernotec.farm.rest.command.activity;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.command.activity.ActivityUpdateCmd;
+import com.kernotec.farm.activity.command.activity.ActivityUpdateCmd;
 import com.kernotec.farm.rest.dto.request.activity.ActivityUpdateRequest;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;

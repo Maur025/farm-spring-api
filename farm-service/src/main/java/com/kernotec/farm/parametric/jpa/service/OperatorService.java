@@ -2,7 +2,7 @@ package com.kernotec.farm.parametric.jpa.service;
 
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
-import com.kernotec.farm.exception.OperatorException;
+import com.kernotec.farm.parametric.exception.OperatorException;
 import com.kernotec.farm.parametric.jpa.entity.Operator;
 import com.kernotec.farm.parametric.jpa.enums.OperatorCodeEnum;
 import com.kernotec.farm.parametric.jpa.repository.OperatorRepository;

@@ -1,8 +1,8 @@
 package com.kernotec.farm.rest.command.registration.person;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.command.registration.person.RegistrationPersonCreateCmd;
-import com.kernotec.farm.command.registration.person.RegistrationPersonGetDtoCmd;
+import com.kernotec.farm.inventory.command.registration.person.RegistrationPersonCreateCmd;
+import com.kernotec.farm.inventory.command.registration.person.RegistrationPersonGetDtoCmd;
 import com.kernotec.farm.inventory.jpa.dto.entity.RegistrationPersonDto;
 import com.kernotec.farm.inventory.jpa.entity.RegistrationPerson;
 import com.kernotec.farm.inventory.jpa.service.RegistrationPersonService;
