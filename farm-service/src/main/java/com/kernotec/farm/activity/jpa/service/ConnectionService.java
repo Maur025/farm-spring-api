@@ -6,7 +6,7 @@ import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Connection;
 import com.kernotec.farm.activity.jpa.repository.ConnectionRepository;
-import com.kernotec.farm.rest.dto.request.connection.ConnectionFindAllFilterRequest;
+import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionFindAllFilterRequest;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
