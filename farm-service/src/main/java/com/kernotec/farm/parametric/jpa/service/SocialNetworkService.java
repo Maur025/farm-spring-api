@@ -2,7 +2,7 @@ package com.kernotec.farm.parametric.jpa.service;
 
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
-import com.kernotec.farm.exception.SocialNetworkException;
+import com.kernotec.farm.parametric.exception.SocialNetworkException;
 import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.parametric.jpa.repository.SocialNetworkRepository;
 import jakarta.persistence.criteria.JoinType;

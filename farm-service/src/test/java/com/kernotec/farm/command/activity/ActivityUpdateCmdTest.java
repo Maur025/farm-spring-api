@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.kernotec.core.test.unit.test.UnitTestWithValidator;
 import com.kernotec.core.test.unit.test.util.TestValidatorUtil;
 import com.kernotec.core.util.MessageUtil;
+import com.kernotec.farm.activity.command.activity.ActivityUpdateCmd;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.service.ActivityService;
 import java.time.ZonedDateTime;

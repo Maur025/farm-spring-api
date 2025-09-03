@@ -1,9 +1,9 @@
 package com.kernotec.farm.rest.command.account;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.command.account.AccountCreateCmd;
-import com.kernotec.farm.command.assigned.chip.AssignedChipCreateCmd;
-import com.kernotec.farm.command.device.account.DeviceAccountCreateCmd;
+import com.kernotec.farm.account.command.account.AccountCreateCmd;
+import com.kernotec.farm.account.command.assigned.chip.AssignedChipCreateCmd;
+import com.kernotec.farm.account.command.device.account.DeviceAccountCreateCmd;
 import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.parametric.jpa.enums.SocialNetworkEnum;

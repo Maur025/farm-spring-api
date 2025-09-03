@@ -1,10 +1,10 @@
 package com.kernotec.farm.rest.command.device;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.command.device.DeviceCreateCmd;
-import com.kernotec.farm.command.device.DeviceGetDtoCmd;
-import com.kernotec.farm.command.device.connection.DeviceConnectionCreateCmd;
-import com.kernotec.farm.command.device.imei.DeviceImeiCreateCmd;
+import com.kernotec.farm.inventory.command.device.DeviceCreateCmd;
+import com.kernotec.farm.inventory.command.device.DeviceGetDtoCmd;
+import com.kernotec.farm.inventory.command.device.connection.DeviceConnectionCreateCmd;
+import com.kernotec.farm.inventory.command.device.imei.DeviceImeiCreateCmd;
 import com.kernotec.farm.inventory.jpa.dto.entity.DeviceDto;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.service.DeviceService;

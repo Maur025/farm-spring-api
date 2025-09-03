@@ -1,7 +1,8 @@
-package com.kernotec.farm.rest.command.activity;
+package com.kernotec.farm.activity.command.activity;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.activity.command.activity.ActivityDeleteCmd;
+import com.kernotec.farm.activity.jpa.entity.Activity;
+import com.kernotec.farm.activity.jpa.service.ActivityService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;
@@ -11,18 +12,17 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class ProcessActivityDeleteRequestCmd extends
-    AbstractTransactionalRequiredCommand<ProcessActivityDeleteRequestCmd.Request, Void>
+public class ActivityDeleteCmd extends
+    AbstractTransactionalRequiredCommand<ActivityDeleteCmd.Request, Void>
 {
 
-    private final ActivityDeleteCmd activityDeleteCmd;
+    private final ActivityService activityService;
 
     @Override
     protected Void run(Request request) {
-        activityDeleteCmd.withRequest(ActivityDeleteCmd.Request.builder()
-                .activityId(request.getActivityId())
-                .build())
-            .execute();
+        Activity activity = activityService.findByIdThrow(request.getActivityId());
+
+        activityService.delete(activity);
 
         return null;
     }

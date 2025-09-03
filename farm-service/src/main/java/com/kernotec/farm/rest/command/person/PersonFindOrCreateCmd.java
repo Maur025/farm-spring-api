@@ -1,8 +1,8 @@
 package com.kernotec.farm.rest.command.person;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.command.person.PersonCreateCmd;
-import com.kernotec.farm.command.person.PersonGetDtoCmd;
+import com.kernotec.farm.account.command.person.PersonCreateCmd;
+import com.kernotec.farm.account.command.person.PersonGetDtoCmd;
 import com.kernotec.farm.account.jpa.dto.entity.PersonDto;
 import com.kernotec.farm.account.jpa.entity.Person;
 import com.kernotec.farm.account.jpa.service.PersonService;

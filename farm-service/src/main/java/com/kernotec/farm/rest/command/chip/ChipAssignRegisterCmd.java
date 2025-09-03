@@ -1,9 +1,9 @@
 package com.kernotec.farm.rest.command.chip;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.command.chip.ChipCreateCmd;
-import com.kernotec.farm.command.chip.ChipGetDtoCmd;
-import com.kernotec.farm.command.registration.person.RegistrationPersonCreateCmd;
+import com.kernotec.farm.inventory.command.chip.ChipCreateCmd;
+import com.kernotec.farm.inventory.command.chip.ChipGetDtoCmd;
+import com.kernotec.farm.inventory.command.registration.person.RegistrationPersonCreateCmd;
 import com.kernotec.farm.inventory.jpa.dto.entity.ChipDto;
 import com.kernotec.farm.parametric.jpa.entity.Operator;
 import com.kernotec.farm.parametric.jpa.enums.OperatorCodeEnum;
