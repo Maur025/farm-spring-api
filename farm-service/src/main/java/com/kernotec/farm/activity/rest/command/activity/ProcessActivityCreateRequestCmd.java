@@ -10,9 +10,9 @@ import com.kernotec.farm.activity.command.publishing.PublishingCreateCmd;
 import com.kernotec.farm.activity.command.reaction.ReactionCreateCmd;
 import com.kernotec.farm.activity.rest.dto.request.activity.ActivityCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.comment.CommentCreateRequest;
+import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.follow.FollowCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.friend.FriendCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.group.GroupCreateRequest;
+import com.kernotec.farm.activity.rest.dto.request.group.membership.GroupMembershipCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.publishing.PublishingCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.reaction.ReactionCreateRequest;
 import jakarta.validation.constraints.NotNull;
@@ -57,11 +57,11 @@ public class ProcessActivityCreateRequestCmd extends
         createCommentRelation(
             activityRequest.getComment(), activityId, activityRequest.getActivityTypeId());
 
-        createGroupRelation(
-            activityRequest.getGroup(), activityId, activityRequest.getActivityTypeId());
+        createGroupMembershipRelation(
+            activityRequest.getGroupMembership(), activityId, activityRequest.getActivityTypeId());
 
-        createFriendRelation(
-            activityRequest.getFriend(), activityId, activityRequest.getActivityTypeId());
+        createConnectionRelation(
+            activityRequest.getConnection(), activityId, activityRequest.getActivityTypeId());
 
         createFollowRelation(
             activityRequest.getFollow(), activityId, activityRequest.getActivityTypeId());
@@ -121,10 +121,10 @@ public class ProcessActivityCreateRequestCmd extends
             .execute();
     }
 
-    public void createGroupRelation(GroupCreateRequest groupRequest, UUID activityId,
-        UUID activityTypeId)
+    public void createGroupMembershipRelation(GroupMembershipCreateRequest groupMembershipRequest,
+        UUID activityId, UUID activityTypeId)
     {
-        if (groupRequest == null || groupRequest.getName() == null || groupRequest.getName()
+        /*if (groupRequest == null || groupRequest.getName() == null || groupRequest.getName()
             .isBlank())
         {
             return;
@@ -132,18 +132,17 @@ public class ProcessActivityCreateRequestCmd extends
 
         groupCreateCmd.withRequest(GroupCreateCmd.Request.builder()
                 .name(groupRequest.getName())
-                /*.action(groupRequest.getAction())
+                *//*.action(groupRequest.getAction())
                 .regionId(groupRequest.getRegionId())
                 .activityId(activityId)
-                .activityTypeId(activityTypeId)*/
-                .build())
-            .execute();
+                .activityTypeId(activityTypeId)*//*.build())
+            .execute();*/
     }
 
-    public void createFriendRelation(FriendCreateRequest friendRequest, UUID activityId,
+    public void createConnectionRelation(ConnectionCreateRequest connectionRequest, UUID activityId,
         UUID activityTypeId)
     {
-        if (friendRequest == null || friendRequest.getFriendName() == null
+        /*if (friendRequest == null || friendRequest.getFriendName() == null
             || friendRequest.getFriendName()
             .isBlank())
         {
@@ -151,13 +150,12 @@ public class ProcessActivityCreateRequestCmd extends
         }
 
         friendCreateCmd.withRequest(FriendCreateCmd.Request.builder()
-                /*.name(friendRequest.getFriendName())
+                *//*.name(friendRequest.getFriendName())
                 .action(friendRequest.getAction())
                 .type(friendRequest.getTypeFriendShip())
                 .activityId(activityId)
-                .activityTypeId(activityTypeId)*/
-                .build())
-            .execute();
+                .activityTypeId(activityTypeId)*//*.build())
+            .execute();*/
     }
 
     public void createFollowRelation(FollowCreateRequest followRequest, UUID activityId,

@@ -1,4 +1,4 @@
-package com.kernotec.farm.activity.rest.dto.request.group;
+package com.kernotec.farm.activity.rest.dto.request.group.membership;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -11,9 +11,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(Include.NON_NULL)
-public class GroupCreateRequest extends BaseRequest {
+public class GroupMembershipCreateRequest extends BaseRequest {
 
-    private String name;
+    private UUID groupId;
+
+    private String groupName;
+    private Boolean isNewGroup;
+
     private GroupActionEnum action;
     private UUID regionId;
+    private UUID publishingContextId;
 }

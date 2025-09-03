@@ -3,9 +3,9 @@ package com.kernotec.farm.activity.rest.dto.request.activity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.farm.activity.rest.dto.request.comment.CommentCreateRequest;
+import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.follow.FollowCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.friend.FriendCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.group.GroupCreateRequest;
+import com.kernotec.farm.activity.rest.dto.request.group.membership.GroupMembershipCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.publishing.PublishingCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.reaction.ReactionCreateRequest;
 import java.time.ZonedDateTime;
@@ -28,7 +28,7 @@ public class ActivityCreateRequest {
     private PublishingCreateRequest publishing;
     private ReactionCreateRequest reaction;
     private CommentCreateRequest comment;
-    private GroupCreateRequest group;
-    private FriendCreateRequest friend;
+    private GroupMembershipCreateRequest groupMembership;
+    private ConnectionCreateRequest connection;
     private FollowCreateRequest follow;
 }
