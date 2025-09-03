@@ -113,4 +113,14 @@ public class ApiSpec {
         private AccountSpec() {
         }
     }
+
+    public static final class GroupSpec {
+
+        public static final String BASE_PATH = ROOT_PATH + "/groups";
+        public static final String TAG_NAME = "GROUP";
+        public static final String TAG_DESCRIPTION = "Group management";
+
+        private GroupSpec() {
+        }
+    }
 }
