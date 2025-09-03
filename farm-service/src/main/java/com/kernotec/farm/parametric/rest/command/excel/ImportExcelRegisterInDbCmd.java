@@ -1,17 +1,17 @@
 package com.kernotec.farm.parametric.rest.command.excel;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
+import com.kernotec.farm.account.jpa.dto.entity.PersonDto;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.account.rest.command.account.AccountSocialNetworkRegisterCmd;
+import com.kernotec.farm.account.rest.command.person.PersonFindOrCreateCmd;
 import com.kernotec.farm.inventory.jpa.dto.entity.ChipDto;
 import com.kernotec.farm.inventory.jpa.dto.entity.DeviceDto;
 import com.kernotec.farm.inventory.jpa.dto.entity.FarmDto;
-import com.kernotec.farm.account.jpa.dto.entity.PersonDto;
-import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
-import com.kernotec.farm.parametric.jpa.enums.SocialNetworkEnum;
-import com.kernotec.farm.account.rest.command.account.AccountSocialNetworkRegisterCmd;
 import com.kernotec.farm.inventory.rest.command.chip.ChipAssignRegisterCmd;
 import com.kernotec.farm.inventory.rest.command.device.DeviceFindOrCreateCmd;
 import com.kernotec.farm.inventory.rest.command.farm.FarmFindOrCreateCmd;
-import com.kernotec.farm.account.rest.command.person.PersonFindOrCreateCmd;
+import com.kernotec.farm.parametric.jpa.enums.SocialNetworkEnum;
 import com.kernotec.farm.parametric.rest.dto.ImportExcelDataDto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -92,6 +92,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .socialNetworkCode(SocialNetworkEnum.FACEBOOK)
                         .deviceId(deviceDto.getId())
                         .accountType(AccountTypeEnum.INTERNAL)
+                        .observation(excelDataDto.getFacebookObservation())
                         .build())
                 .execute();
         }
@@ -106,6 +107,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .socialNetworkCode(SocialNetworkEnum.TIKTOK)
                         .deviceId(deviceDto.getId())
                         .accountType(AccountTypeEnum.INTERNAL)
+                        .observation(excelDataDto.getTiktokObservation())
                         .build())
                 .execute();
         }

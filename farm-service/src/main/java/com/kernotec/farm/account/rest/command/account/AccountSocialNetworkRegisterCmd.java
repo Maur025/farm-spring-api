@@ -2,13 +2,16 @@ package com.kernotec.farm.account.rest.command.account;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.account.command.account.AccountCreateCmd;
+import com.kernotec.farm.account.command.account.observation.AccountObservationCreateCmd;
 import com.kernotec.farm.account.command.assigned.chip.AssignedChipCreateCmd;
 import com.kernotec.farm.account.command.device.account.DeviceAccountCreateCmd;
-import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
+import com.kernotec.farm.account.command.observation.ObservationCreateCmd;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.parametric.jpa.enums.SocialNetworkEnum;
 import com.kernotec.farm.parametric.jpa.service.SocialNetworkService;
 import jakarta.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +29,8 @@ public class AccountSocialNetworkRegisterCmd extends
     private final AccountCreateCmd accountCreateCmd;
     private final DeviceAccountCreateCmd deviceAccountCreateCmd;
     private final AssignedChipCreateCmd assignedChipCreateCmd;
+    private final ObservationCreateCmd observationCreateCmd;
+    private final AccountObservationCreateCmd accountObservationCreateCmd;
 
     @Override
     protected Void run(Request request) {
@@ -54,6 +59,24 @@ public class AccountSocialNetworkRegisterCmd extends
                 .build())
             .execute();
 
+        if (request.getObservation() == null || request.getObservation()
+            .isBlank())
+        {
+            return null;
+        }
+
+        UUID observationId = observationCreateCmd.withRequest(ObservationCreateCmd.Request.builder()
+                .description(request.getObservation())
+                .dateObserved(ZonedDateTime.now())
+                .build())
+            .execute();
+
+        accountObservationCreateCmd.withRequest(AccountObservationCreateCmd.Request.builder()
+                .accountId(accountId)
+                .observationId(observationId)
+                .build())
+            .execute();
+
         return null;
     }
 
@@ -74,5 +97,6 @@ public class AccountSocialNetworkRegisterCmd extends
         private final UUID deviceId;
         @NotNull
         private final AccountTypeEnum accountType;
+        private final String observation;
     }
 }
