@@ -1,9 +1,9 @@
 package com.kernotec.farm.command.account;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Account;
-import com.kernotec.farm.jpa.enums.AccountTypeEnum;
-import com.kernotec.farm.jpa.service.AccountService;
+import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.account.jpa.service.AccountService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

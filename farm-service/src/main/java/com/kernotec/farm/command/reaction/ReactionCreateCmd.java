@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.reaction;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Reaction;
-import com.kernotec.farm.jpa.service.ReactionService;
+import com.kernotec.farm.activity.jpa.entity.Reaction;
+import com.kernotec.farm.activity.jpa.service.ReactionService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

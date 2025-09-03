@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.account.observation;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.AccountObservation;
-import com.kernotec.farm.jpa.service.AccountObservationService;
+import com.kernotec.farm.account.jpa.entity.AccountObservation;
+import com.kernotec.farm.account.jpa.service.AccountObservationService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

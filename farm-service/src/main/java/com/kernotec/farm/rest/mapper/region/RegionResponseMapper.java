@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.mapper.region;
 
-import com.kernotec.farm.jpa.entity.Region;
+import com.kernotec.farm.parametric.jpa.entity.Region;
 import com.kernotec.farm.rest.dto.response.region.RegionResponse;
 import java.util.List;
 import java.util.Set;

@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.mapper.activity.type;
 
-import com.kernotec.farm.jpa.entity.ActivityType;
+import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.rest.dto.response.activity.type.ActivityTypeResponse;
 import java.util.List;
 import java.util.Set;

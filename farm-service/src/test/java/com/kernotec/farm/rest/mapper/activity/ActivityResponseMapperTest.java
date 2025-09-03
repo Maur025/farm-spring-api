@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.kernotec.core.test.unit.test.util.AbstractMapperTest;
-import com.kernotec.farm.jpa.entity.Account;
-import com.kernotec.farm.jpa.entity.Activity;
-import com.kernotec.farm.jpa.entity.ActivityType;
+import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.activity.jpa.entity.Activity;
+import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.rest.dto.response.activity.ActivityResponse;
 import java.time.ZonedDateTime;
 import java.util.List;

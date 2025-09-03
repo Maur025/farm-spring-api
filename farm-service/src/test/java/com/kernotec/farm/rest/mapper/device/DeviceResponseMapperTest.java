@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.kernotec.core.test.unit.test.util.AbstractMapperTest;
-import com.kernotec.farm.jpa.entity.Account;
-import com.kernotec.farm.jpa.entity.Chip;
-import com.kernotec.farm.jpa.entity.Device;
-import com.kernotec.farm.jpa.entity.Farm;
+import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.inventory.jpa.entity.Chip;
+import com.kernotec.farm.inventory.jpa.entity.Device;
+import com.kernotec.farm.inventory.jpa.entity.Farm;
 import com.kernotec.farm.rest.dto.response.device.DeviceResponse;
 import java.util.List;
 import java.util.Set;

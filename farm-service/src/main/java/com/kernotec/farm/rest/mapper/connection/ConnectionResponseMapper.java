@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.mapper.connection;
 
-import com.kernotec.farm.jpa.entity.Connection;
+import com.kernotec.farm.activity.jpa.entity.Connection;
 import com.kernotec.farm.rest.dto.response.connection.ConnectionResponse;
 import java.util.List;
 import java.util.Set;

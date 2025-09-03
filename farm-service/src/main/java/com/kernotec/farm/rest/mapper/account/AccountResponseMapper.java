@@ -1,6 +1,6 @@
 package com.kernotec.farm.rest.mapper.account;
 
-import com.kernotec.farm.jpa.entity.Account;
+import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.rest.dto.response.account.AccountResponse;
 import java.util.List;
 import java.util.Set;

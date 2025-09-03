@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.publishing;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Publishing;
-import com.kernotec.farm.jpa.service.PublishingService;
+import com.kernotec.farm.activity.jpa.entity.Publishing;
+import com.kernotec.farm.activity.jpa.service.PublishingService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

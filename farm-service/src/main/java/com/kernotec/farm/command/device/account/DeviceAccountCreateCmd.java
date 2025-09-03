@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.device.account;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.DeviceAccount;
-import com.kernotec.farm.jpa.service.DeviceAccountService;
+import com.kernotec.farm.account.jpa.entity.DeviceAccount;
+import com.kernotec.farm.account.jpa.service.DeviceAccountService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

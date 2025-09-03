@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.device.imei;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.DeviceImei;
-import com.kernotec.farm.jpa.service.DeviceImeiService;
+import com.kernotec.farm.inventory.jpa.entity.DeviceImei;
+import com.kernotec.farm.inventory.jpa.service.DeviceImeiService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

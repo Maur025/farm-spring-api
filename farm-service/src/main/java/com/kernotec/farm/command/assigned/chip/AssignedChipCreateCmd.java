@@ -1,8 +1,8 @@
 package com.kernotec.farm.command.assigned.chip;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.AssignedChip;
-import com.kernotec.farm.jpa.service.AssignedChipService;
+import com.kernotec.farm.account.jpa.entity.AssignedChip;
+import com.kernotec.farm.account.jpa.service.AssignedChipService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;

@@ -1,9 +1,9 @@
 package com.kernotec.farm.command.farm;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.jpa.entity.Farm;
-import com.kernotec.farm.jpa.enums.FarmTypeEnum;
-import com.kernotec.farm.jpa.service.FarmService;
+import com.kernotec.farm.inventory.jpa.entity.Farm;
+import com.kernotec.farm.inventory.jpa.enums.FarmTypeEnum;
+import com.kernotec.farm.inventory.jpa.service.FarmService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;
