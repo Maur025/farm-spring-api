@@ -3,6 +3,7 @@ package com.kernotec.farm.activity.command.group;
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.activity.jpa.service.GroupService;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;
@@ -35,6 +36,7 @@ public class GroupCreateCmd extends
     public static class Request {
 
         @NotNull
+        @NotBlank
         private final String name;
         @NotNull
         private final UUID regionId;

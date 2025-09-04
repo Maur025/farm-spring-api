@@ -9,8 +9,12 @@ import com.kernotec.farm.activity.command.activity.ActivityCreateCmd;
 import com.kernotec.farm.activity.command.comment.CommentCreateCmd;
 import com.kernotec.farm.activity.command.connection.ConnectionCreateCmd;
 import com.kernotec.farm.activity.command.follow.FollowCreateCmd;
+import com.kernotec.farm.activity.command.group.GroupCreateCmd;
+import com.kernotec.farm.activity.command.group.membership.GroupMembershipCreateCmd;
 import com.kernotec.farm.activity.command.publishing.PublishingCreateCmd;
 import com.kernotec.farm.activity.command.reaction.ReactionCreateCmd;
+import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
+import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
 import com.kernotec.farm.activity.rest.dto.request.activity.ActivityCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.comment.CommentCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
@@ -18,7 +22,6 @@ import com.kernotec.farm.activity.rest.dto.request.follow.FollowCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.group.membership.GroupMembershipCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.publishing.PublishingCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.reaction.ReactionCreateRequest;
-import com.kernotec.farm.parametric.jpa.entity.RequestState;
 import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
 import com.kernotec.farm.parametric.jpa.service.RequestStateService;
 import jakarta.validation.constraints.NotNull;
@@ -44,6 +47,8 @@ public class ProcessActivityCreateRequestCmd extends
     private final ConnectionCreateCmd connectionCreateCmd;
     private final AccountCreateCmd accountCreateCmd;
     private final AccountGetDtoCmd accountGetDtoCmd;
+    private final GroupMembershipCreateCmd groupMembershipCreateCmd;
+    private final GroupCreateCmd groupCreateCmd;
 
     @Override
     protected UUID run(Request request) {
@@ -136,26 +141,45 @@ public class ProcessActivityCreateRequestCmd extends
     public void createGroupMembershipRelation(GroupMembershipCreateRequest groupMembershipRequest,
         UUID activityId, UUID activityTypeId)
     {
-        /*if (groupRequest == null || groupRequest.getName() == null || groupRequest.getName()
-            .isBlank())
-        {
+        if (groupMembershipRequest == null) {
             return;
         }
 
-        groupCreateCmd.withRequest(GroupCreateCmd.Request.builder()
-                .name(groupRequest.getName())
-                *//*.action(groupRequest.getAction())
-                .regionId(groupRequest.getRegionId())
+        UUID requestStatePendingId = getRequestStateId(RequestStateCodeEnum.PENDING);
+        UUID requestStateNothingId = getRequestStateId(RequestStateCodeEnum.NOTHING_WAS_REQUESTED);
+
+        UUID groupToRegisterId = groupMembershipRequest.getGroupId();
+
+        if (groupMembershipRequest.getIsNewGroup() && groupToRegisterId == null) {
+            groupToRegisterId = groupCreateCmd.withRequest(GroupCreateCmd.Request.builder()
+                    .name(groupMembershipRequest.getGroupName())
+                    .regionId(groupMembershipRequest.getRegionId())
+                    .description("N/A")
+                    .build())
+                .execute();
+        }
+
+        groupMembershipCreateCmd.withRequest(GroupMembershipCreateCmd.Request.builder()
+                .action(groupMembershipRequest.getAction())
+                .groupId(groupToRegisterId)
+                .publishingContextId(groupMembershipRequest.getPublishingContextId())
+                .requestStateId(groupMembershipRequest.getAction()
+                    .equals(GroupActionEnum.JOIN_REQUEST) ? requestStatePendingId
+                    : requestStateNothingId)
                 .activityId(activityId)
-                .activityTypeId(activityTypeId)*//*.build())
-            .execute();*/
+                .activityTypeId(activityTypeId)
+                .build())
+            .execute();
     }
 
     public void createConnectionRelation(ConnectionCreateRequest connectionRequest, UUID activityId,
         UUID activityTypeId, UUID accountId)
     {
-        RequestState requestState = requestStateService.findByCodeThrow(
-            RequestStateCodeEnum.PENDING);
+        if (connectionRequest == null) {
+            return;
+        }
+
+        UUID requestStateId = getRequestStateId(RequestStateCodeEnum.PENDING);
 
         AccountDto accountDto = accountGetDtoCmd.withRequest(AccountGetDtoCmd.Request.builder()
                 .accountId(accountId)
@@ -169,16 +193,22 @@ public class ProcessActivityCreateRequestCmd extends
                     .username(connectionRequest.getFriendUsername())
                     .password("N/A")
                     .socialNetworkId(accountDto.getSocialNetworkId())
-                    .type(AccountTypeEnum.fromValue(connectionRequest.getTypeFriendShip()))
+                    .type(AccountTypeEnum.EXTERNAL)
                     .build())
                 .execute();
         }
 
+        AccountDto accountPotentialDto = accountGetDtoCmd.withRequest(
+                AccountGetDtoCmd.Request.builder()
+                    .accountId(potentialAccountId)
+                    .build())
+            .execute();
+
         connectionCreateCmd.withRequest(ConnectionCreateCmd.Request.builder()
                 .potentialFriendAccountId(potentialAccountId)
                 .action(connectionRequest.getAction())
-                .type(connectionRequest.getTypeFriendShip())
-                .requestStateId(requestState.getId())
+                .type(ConnectionTypeEnum.fromValue(accountPotentialDto.getType()))
+                .requestStateId(requestStateId)
                 .activityId(activityId)
                 .activityTypeId(activityTypeId)
                 .build())
@@ -203,6 +233,11 @@ public class ProcessActivityCreateRequestCmd extends
                 .regionId(followRequest.getRegionId())
                 .build())
             .execute();
+    }
+
+    public UUID getRequestStateId(RequestStateCodeEnum code) {
+        return requestStateService.findByCodeThrow(code)
+            .getId();
     }
 
     @Builder

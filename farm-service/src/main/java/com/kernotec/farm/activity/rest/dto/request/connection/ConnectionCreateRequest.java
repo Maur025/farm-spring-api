@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.request.BaseRequest;
 import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
-import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,5 +19,4 @@ public class ConnectionCreateRequest extends BaseRequest {
     private Boolean isNewConnection;
 
     private ConnectionActionEnum action;
-    private ConnectionTypeEnum typeFriendShip;
 }

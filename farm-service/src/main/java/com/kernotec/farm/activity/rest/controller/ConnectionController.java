@@ -11,6 +11,7 @@ import com.kernotec.farm.activity.rest.ApiSpec.ConnectionSpec;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionFindAllFilterRequest;
 import com.kernotec.farm.activity.rest.dto.response.connection.ConnectionResponse;
 import com.kernotec.farm.activity.rest.mapper.connection.ConnectionResponseMapper;
+import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -44,7 +45,7 @@ public class ConnectionController {
         @RequestParam(defaultValue = "true") boolean descending,
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) UUID accountId,
-        @RequestParam(required = false) UUID requestStateId,
+        @RequestParam(required = false) RequestStateCodeEnum requestStateCode,
         @RequestParam(required = false) ConnectionActionEnum action)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
@@ -52,7 +53,7 @@ public class ConnectionController {
             ConnectionFindAllFilterRequest.builder()
                 .socialNetworkId(socialNetworkId)
                 .accountId(accountId)
-                .requestStateId(requestStateId)
+                .requestStateCode(requestStateCode)
                 .action(action)
                 .build(), pageable
         );
