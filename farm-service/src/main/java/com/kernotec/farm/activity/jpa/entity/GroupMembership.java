@@ -1,11 +1,10 @@
 package com.kernotec.farm.activity.jpa.entity;
 
 import com.kernotec.core.jpa.entity.BaseAuditEntity;
+import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
 import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
-import com.kernotec.farm.parametric.jpa.entity.Region;
 import com.kernotec.farm.parametric.jpa.entity.RequestState;
-import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,14 +36,6 @@ public class GroupMembership extends BaseAuditEntity {
     @JoinColumn(name = "group_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private Group group;
-
-    @Column(name = "region_id", nullable = false)
-    private UUID regionId;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "region_id", referencedColumnName = "id", insertable = false,
-                updatable = false)
-    private Region region;
 
     @Column(name = "publishing_context_id", nullable = false)
     private UUID publishingContextId;

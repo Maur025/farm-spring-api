@@ -41,7 +41,6 @@ public class AccountCreateCmd extends
         private final String username;
         @NotNull
         private final String password;
-        @NotNull
         private final UUID personId;
         @NotNull
         private final UUID socialNetworkId;
