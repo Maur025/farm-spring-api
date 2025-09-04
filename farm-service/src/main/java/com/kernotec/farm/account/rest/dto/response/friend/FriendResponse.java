@@ -1,4 +1,4 @@
-package com.kernotec.farm.activity.rest.dto.response.friend;
+package com.kernotec.farm.account.rest.dto.response.friend;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

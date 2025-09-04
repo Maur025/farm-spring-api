@@ -1,14 +1,14 @@
-package com.kernotec.farm.activity.rest.controller;
+package com.kernotec.farm.account.rest.controller;
 
 import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
-import com.kernotec.farm.activity.jpa.entity.Friend;
-import com.kernotec.farm.activity.jpa.service.FriendService;
+import com.kernotec.farm.account.jpa.entity.Friend;
+import com.kernotec.farm.account.jpa.service.FriendService;
 import com.kernotec.farm.activity.rest.ApiSpec.FriendSpec;
-import com.kernotec.farm.activity.rest.dto.response.friend.FriendResponse;
-import com.kernotec.farm.activity.rest.mapper.friend.FriendResponseMapper;
+import com.kernotec.farm.account.rest.dto.response.friend.FriendResponse;
+import com.kernotec.farm.account.rest.mapper.friend.FriendResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
