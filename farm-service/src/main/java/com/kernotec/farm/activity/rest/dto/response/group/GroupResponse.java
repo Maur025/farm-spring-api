@@ -3,6 +3,8 @@ package com.kernotec.farm.activity.rest.dto.response.group;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
+import com.kernotec.farm.parametric.rest.dto.response.region.RegionResponse;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +15,7 @@ public class GroupResponse extends EntityResponse {
 
     private String name;
     private String description;
+
+    private UUID regionId;
+    private RegionResponse region;
 }

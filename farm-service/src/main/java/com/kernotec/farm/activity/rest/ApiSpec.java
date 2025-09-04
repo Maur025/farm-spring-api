@@ -43,4 +43,14 @@ public class ApiSpec {
         private FriendSpec() {
         }
     }
+
+    public static final class GroupMembershipSpec {
+
+        public static final String BASE_PATH = ApiSpecMain.ROOT_PATH + "/group-memberships";
+        public static final String TAG_NAME = "GROUP MEMBERSHIP";
+        public static final String TAG_DESCRIPTION = "Group Membership management";
+
+        private GroupMembershipSpec() {
+        }
+    }
 }

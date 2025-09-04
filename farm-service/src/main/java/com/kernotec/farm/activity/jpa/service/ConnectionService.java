@@ -7,6 +7,7 @@ import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Connection;
 import com.kernotec.farm.activity.jpa.repository.ConnectionRepository;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionFindAllFilterRequest;
+import com.kernotec.farm.parametric.jpa.entity.RequestState;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -38,7 +39,6 @@ public class ConnectionService extends BaseServiceImpl<Connection, UUID> {
     public Page<Connection> findAllWithFilters(ConnectionFindAllFilterRequest filterRequest,
         Pageable pageable)
     {
-
         return repository.findAll(
             (Specification<Connection>) (root, query, cb) -> {
                 List<Predicate> predicateList = new ArrayList<>();
@@ -60,9 +60,14 @@ public class ConnectionService extends BaseServiceImpl<Connection, UUID> {
                         cb.equal(activityJoin.get("accountId"), filterRequest.getAccountId()));
                 }
 
-                if (filterRequest.getRequestStateId() != null) {
-                    predicateList.add(
-                        cb.equal(root.get("requestStateId"), filterRequest.getRequestStateId()));
+                if (filterRequest.getRequestStateCode() != null) {
+                    Join<Connection, RequestState> requestStateJoin = root.join(
+                        "requestState", JoinType.INNER);
+
+                    predicateList.add(cb.equal(
+                        requestStateJoin.get("code"), filterRequest.getRequestStateCode()
+                            .toString()
+                    ));
                 }
 
                 if (filterRequest.getAction() != null) {
