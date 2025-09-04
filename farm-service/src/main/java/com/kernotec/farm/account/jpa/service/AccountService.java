@@ -3,11 +3,11 @@ package com.kernotec.farm.account.jpa.service;
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.account.jpa.entity.Person;
+import com.kernotec.farm.account.jpa.repository.AccountRepository;
 import com.kernotec.farm.inventory.jpa.entity.Chip;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.entity.Farm;
-import com.kernotec.farm.account.jpa.entity.Person;
-import com.kernotec.farm.account.jpa.repository.AccountRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -70,7 +70,8 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
         );
     }
 
-    public Page<Account> searchByUsername(String username, UUID socialNetworkId, Pageable pageable)
+    public Page<Account> searchByUsername(String username, UUID socialNetworkId,
+        UUID ignoreAccountId, Pageable pageable)
     {
         String usernamePattern =
             username == null || username.isBlank() ? null : username.toLowerCase() + "%";
@@ -85,6 +86,10 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
 
                 if (socialNetworkId != null) {
                     predicateList.add(cb.equal(root.get("socialNetworkId"), socialNetworkId));
+                }
+
+                if (ignoreAccountId != null) {
+                    predicateList.add(cb.notEqual(root.get("id"), ignoreAccountId));
                 }
 
                 return cb.and(predicateList.toArray(Predicate[]::new));
