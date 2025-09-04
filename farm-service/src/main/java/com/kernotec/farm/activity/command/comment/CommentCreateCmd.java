@@ -24,6 +24,7 @@ public class CommentCreateCmd extends
 
         comment.setComment(request.getComment());
         comment.setAgreeComment(request.isAgreeComment());
+        comment.setPublishingContextId(request.getPublishingContextId());
         comment.setActivityId(request.getActivityId());
         comment.setActivityTypeId(request.getActivityTypeId());
 
@@ -39,6 +40,8 @@ public class CommentCreateCmd extends
         private final String comment;
         @NotNull
         private final boolean isAgreeComment;
+        @NotNull
+        private final UUID publishingContextId;
         @NotNull
         private final UUID activityId;
         @NotNull
