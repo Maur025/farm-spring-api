@@ -1,0 +1,15 @@
+INSERT INTO publishing_contexts(name, code)
+VALUES ('Ciencia', 'CIENCIA'),
+       ('Educación', 'EDUCACION'),
+       ('Entretenimiento', 'ENTRETENIMIENTO'),
+       ('Economía', 'ECONOMIA'),
+       ('Medio Ambiente', 'MEDIO_AMBIENTE'),
+       ('Viajes', 'VIAJES'),
+       ('Opinión', 'OPINION'),
+       ('Noticias', 'NOTICIAS'),
+       ('Moda', 'MODA'),
+       ('Cultura', 'CULTURA'),
+       ('Humor', 'HUMOR'),
+       ('Compra y Venta', 'COMPRA_VENTA'),
+       ('Persona pública', 'PERSONA_PUBLICA'),
+       ('Otros', 'OTROS');
