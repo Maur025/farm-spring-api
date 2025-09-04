@@ -24,6 +24,7 @@ public class GroupCreateCmd extends
 
         group.setName(request.getName());
         group.setDescription(request.getDescription());
+        group.setRegionId(request.getRegionId());
 
         group = groupService.save(group);
         return group.getId();
@@ -36,6 +37,7 @@ public class GroupCreateCmd extends
         @NotNull
         private final String name;
         @NotNull
+        private final UUID regionId;
         private final String description;
     }
 }

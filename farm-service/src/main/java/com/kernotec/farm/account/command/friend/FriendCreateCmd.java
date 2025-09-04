@@ -4,6 +4,7 @@ import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.account.jpa.entity.Friend;
 import com.kernotec.farm.account.jpa.service.FriendService;
 import jakarta.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,8 +35,13 @@ public class FriendCreateCmd extends
     public static class Request {
 
         @NotNull
+        private final ZonedDateTime acceptedAt;
+        private final ZonedDateTime endedAt;
+        @NotNull
         private final UUID accountId;
         @NotNull
         private final UUID friendAccountId;
+        @NotNull
+        private final UUID friendStateId;
     }
 }

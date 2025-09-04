@@ -115,4 +115,7 @@
   <changeSet id="1757000783381-1" author="Maur025">
     <sqlFile path="data/friend/state/friend_state_seeder.sql" relativeToChangelogFile="true"/>
   </changeSet>
+
+  <include file="db/changelog/2025/09/04-01-changelog-120.xml"/>
+  <include file="db/changelog/2025/09/04-01-changelog-121.xml"/>
 </databaseChangeLog>

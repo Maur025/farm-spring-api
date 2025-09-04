@@ -38,10 +38,10 @@ public class Account extends BaseAuditEntity {
     @Column(name = "type", nullable = false)
     private AccountTypeEnum type;
 
-    @Column(name = "person_id", nullable = false)
+    @Column(name = "person_id")
     private UUID personId;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private Person person;
