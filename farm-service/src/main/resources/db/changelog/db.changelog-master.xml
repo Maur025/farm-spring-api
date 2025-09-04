@@ -97,4 +97,22 @@
   <include file="db/changelog/2025/09/03-01-changelog-117.xml"/>
   <include file="db/changelog/2025/09/04-01-changelog-118.xml"/>
   <include file="db/changelog/2025/09/04-01-changelog-119.xml"/>
+
+  <!-- publishing context seeder update1 - add more contexts -->
+  <changeSet id="1756999567227-1" author="Maur025">
+    <sqlFile path="data/publishing/context/publishing_context_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- region seeder update1 - add wildcard option -->
+  <changeSet id="1756999979012-1" author="Maur025">
+    <sqlFile path="data/region/region_seeder_update1.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- group state seeder -->
+  <changeSet id="1757000298536-1" author="Maur025">
+    <sqlFile path="data/group/state/group_state_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- friend state seeder -->
+  <changeSet id="1757000783381-1" author="Maur025">
+    <sqlFile path="data/friend/state/friend_state_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
 </databaseChangeLog>
