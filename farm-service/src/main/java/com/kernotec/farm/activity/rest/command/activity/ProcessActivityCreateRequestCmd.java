@@ -4,7 +4,7 @@ import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.activity.command.activity.ActivityCreateCmd;
 import com.kernotec.farm.activity.command.comment.CommentCreateCmd;
 import com.kernotec.farm.activity.command.follow.FollowCreateCmd;
-import com.kernotec.farm.activity.command.friend.FriendCreateCmd;
+import com.kernotec.farm.account.command.friend.FriendCreateCmd;
 import com.kernotec.farm.activity.command.group.GroupCreateCmd;
 import com.kernotec.farm.activity.command.publishing.PublishingCreateCmd;
 import com.kernotec.farm.activity.command.reaction.ReactionCreateCmd;

@@ -1,6 +1,6 @@
 package com.kernotec.farm.activity.rest.dto.request.connection;
 
-import com.kernotec.farm.activity.jpa.enums.FriendActionEnum;
+import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,5 +12,5 @@ public class ConnectionFindAllFilterRequest {
     private UUID socialNetworkId;
     private UUID accountId;
     private UUID requestStateId;
-    private FriendActionEnum action;
+    private ConnectionActionEnum action;
 }

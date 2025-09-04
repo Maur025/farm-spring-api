@@ -4,8 +4,8 @@ import com.kernotec.core.jpa.entity.BaseAuditEntity;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.parametric.jpa.entity.RequestState;
-import com.kernotec.farm.activity.jpa.enums.FriendActionEnum;
-import com.kernotec.farm.activity.jpa.enums.FriendTypeEnum;
+import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
+import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,11 +36,11 @@ public class Connection extends BaseAuditEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "action", nullable = false)
-    private FriendActionEnum action;
+    private ConnectionActionEnum action;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private FriendTypeEnum type;
+    private ConnectionTypeEnum type;
 
     @Column(name = "request_state_id", nullable = false)
     private UUID requestStateId;

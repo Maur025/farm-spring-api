@@ -3,8 +3,8 @@ package com.kernotec.farm.activity.rest.dto.response.connection;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
-import com.kernotec.farm.activity.jpa.enums.FriendActionEnum;
-import com.kernotec.farm.activity.jpa.enums.FriendTypeEnum;
+import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
+import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
 import com.kernotec.farm.account.rest.dto.response.account.AccountFlatResponse;
 import com.kernotec.farm.activity.rest.dto.response.activity.ActivityFlatResponse;
 import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeForActivityResponse;
@@ -21,8 +21,8 @@ public class ConnectionResponse extends EntityResponse {
     private UUID potentialFriendAccountId;
     private AccountFlatResponse potentialFriendAccount;
 
-    private FriendActionEnum action;
-    private FriendTypeEnum type;
+    private ConnectionActionEnum action;
+    private ConnectionTypeEnum type;
 
     private UUID requestStateId;
     private RequestStateResponse requestState;

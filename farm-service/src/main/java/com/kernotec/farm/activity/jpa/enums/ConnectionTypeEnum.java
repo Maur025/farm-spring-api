@@ -1,5 +1,5 @@
 package com.kernotec.farm.activity.jpa.enums;
 
-public enum FriendTypeEnum {
+public enum ConnectionTypeEnum {
   INTERNAL, EXTERNAL
 }

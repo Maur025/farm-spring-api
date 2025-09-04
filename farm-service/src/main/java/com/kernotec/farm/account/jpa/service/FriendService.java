@@ -1,10 +1,10 @@
-package com.kernotec.farm.activity.jpa.service;
+package com.kernotec.farm.account.jpa.service;
 
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
-import com.kernotec.farm.activity.jpa.entity.Friend;
-import com.kernotec.farm.activity.jpa.repository.FriendRepository;
+import com.kernotec.farm.account.jpa.entity.Friend;
+import com.kernotec.farm.account.jpa.repository.FriendRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;

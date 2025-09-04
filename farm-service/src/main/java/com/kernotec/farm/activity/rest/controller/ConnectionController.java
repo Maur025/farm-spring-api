@@ -5,7 +5,7 @@ import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.activity.jpa.entity.Connection;
-import com.kernotec.farm.activity.jpa.enums.FriendActionEnum;
+import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
 import com.kernotec.farm.activity.jpa.service.ConnectionService;
 import com.kernotec.farm.activity.rest.ApiSpec.ConnectionSpec;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionFindAllFilterRequest;
@@ -45,7 +45,7 @@ public class ConnectionController {
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) UUID accountId,
         @RequestParam(required = false) UUID requestStateId,
-        @RequestParam(required = false) FriendActionEnum action)
+        @RequestParam(required = false) ConnectionActionEnum action)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
         Page<Connection> connectionPage = connectionService.findAllWithFilters(

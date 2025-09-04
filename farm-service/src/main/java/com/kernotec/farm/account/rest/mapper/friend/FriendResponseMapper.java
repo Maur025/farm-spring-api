@@ -1,7 +1,7 @@
-package com.kernotec.farm.activity.rest.mapper.friend;
+package com.kernotec.farm.account.rest.mapper.friend;
 
-import com.kernotec.farm.activity.jpa.entity.Friend;
-import com.kernotec.farm.activity.rest.dto.response.friend.FriendResponse;
+import com.kernotec.farm.account.jpa.entity.Friend;
+import com.kernotec.farm.account.rest.dto.response.friend.FriendResponse;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
