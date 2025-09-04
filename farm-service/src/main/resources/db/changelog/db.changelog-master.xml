@@ -118,4 +118,9 @@
 
   <include file="db/changelog/2025/09/04-01-changelog-120.xml"/>
   <include file="db/changelog/2025/09/04-01-changelog-121.xml"/>
+
+  <!-- region seeder update2 - remove varios, add global -->
+  <changeSet id="1757028478394-1" author="Maur025">
+    <sqlFile path="data/region/region_seeder_update2.sql" relativeToChangelogFile="true"/>
+  </changeSet>
 </databaseChangeLog>
