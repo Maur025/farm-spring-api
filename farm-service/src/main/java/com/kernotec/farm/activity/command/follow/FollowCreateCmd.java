@@ -24,6 +24,8 @@ public class FollowCreateCmd extends
 
         follow.setName(request.getName());
         follow.setFollowing(request.isFollowing());
+        follow.setPublishingContextId(request.getPublishingContextId());
+        follow.setRegionId(request.getRegionId());
         follow.setActivityId(request.getActivityId());
         follow.setActivityTypeId(request.getActivityTypeId());
 
@@ -39,6 +41,10 @@ public class FollowCreateCmd extends
         private final String name;
         @NotNull
         private final boolean isFollowing;
+        @NotNull
+        private final UUID publishingContextId;
+        @NotNull
+        private final UUID regionId;
         @NotNull
         private final UUID activityId;
         @NotNull

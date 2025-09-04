@@ -1,10 +1,10 @@
 package com.kernotec.farm.activity.rest.command.activity;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
+import com.kernotec.farm.account.command.friend.FriendCreateCmd;
 import com.kernotec.farm.activity.command.activity.ActivityCreateCmd;
 import com.kernotec.farm.activity.command.comment.CommentCreateCmd;
 import com.kernotec.farm.activity.command.follow.FollowCreateCmd;
-import com.kernotec.farm.account.command.friend.FriendCreateCmd;
 import com.kernotec.farm.activity.command.group.GroupCreateCmd;
 import com.kernotec.farm.activity.command.publishing.PublishingCreateCmd;
 import com.kernotec.farm.activity.command.reaction.ReactionCreateCmd;
@@ -117,6 +117,7 @@ public class ProcessActivityCreateRequestCmd extends
                     commentRequest.getIsAgreeComment() != null && commentRequest.getIsAgreeComment())
                 .activityId(activityId)
                 .activityTypeId(activityTypeId)
+                .publishingContextId(commentRequest.getPublishingContextId())
                 .build())
             .execute();
     }
@@ -172,6 +173,8 @@ public class ProcessActivityCreateRequestCmd extends
                 .isFollowing(followRequest.getIsFollowing() != null && followRequest.getIsFollowing())
                 .activityId(activityId)
                 .activityTypeId(activityTypeId)
+                .publishingContextId(followRequest.getPublishingContextId())
+                .regionId(followRequest.getRegionId())
                 .build())
             .execute();
     }
