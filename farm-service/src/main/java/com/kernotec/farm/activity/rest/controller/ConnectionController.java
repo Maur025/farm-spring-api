@@ -8,6 +8,7 @@ import com.kernotec.farm.activity.jpa.entity.Connection;
 import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
 import com.kernotec.farm.activity.jpa.service.ConnectionService;
 import com.kernotec.farm.activity.rest.ApiSpec.ConnectionSpec;
+import com.kernotec.farm.activity.rest.command.connection.ProcessConnectionUpdateRequestCmd;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionFindAllFilterRequest;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionUpdateRequest;
 import com.kernotec.farm.activity.rest.dto.response.connection.ConnectionResponse;
@@ -38,6 +39,7 @@ public class ConnectionController {
 
     private final ConnectionService connectionService;
     private final ConnectionResponseMapper connectionResponseMapper;
+    private final ProcessConnectionUpdateRequestCmd processConnectionUpdateRequestCmd;
 
     @Operation(summary = "Find all Connections")
     @GetMapping
@@ -104,6 +106,13 @@ public class ConnectionController {
         @PathVariable("connectionId") UUID connectionId,
         @RequestBody ConnectionUpdateRequest request)
     {
+        processConnectionUpdateRequestCmd.withRequest(
+                ProcessConnectionUpdateRequestCmd.Request.builder()
+                    .connectionId(connectionId)
+                    .connectionRequest(request)
+                    .build())
+            .execute();
+
         return SingleResponse.<ConnectionResponse>builder()
             .code(HttpStatus.OK.value())
             .message("update successfully")
