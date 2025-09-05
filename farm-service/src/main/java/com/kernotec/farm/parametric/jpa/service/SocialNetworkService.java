@@ -37,18 +37,20 @@ public class SocialNetworkService extends BaseServiceImpl<SocialNetwork, UUID> {
     public SocialNetwork findByCodeThrow(String code) {
         return findByCode(code).orElseThrow(
             () -> new SocialNetworkException(
-                "code.not.found", "'" + code + "'",
-                HttpStatus.NOT_FOUND.value()
-            ));
+                "code.not.found", "'" + code + "'", HttpStatus.NOT_FOUND.value()));
     }
 
-    public List<SocialNetwork> findAllWithFilters(Boolean isHasAccounts) {
-        if (isHasAccounts == null || isHasAccounts.equals(Boolean.FALSE)) {
-            return repository.findAll();
-        }
-
+    public List<SocialNetwork> findAllWithFilters(Boolean isHasAccounts, Boolean isHasActivityTypes)
+    {
         return repository.findAll((Specification<SocialNetwork>) (root, query, cb) -> {
-            root.join("accounts", JoinType.INNER);
+
+            if (isHasAccounts != null && isHasAccounts.equals(Boolean.TRUE)) {
+                root.join("accounts", JoinType.INNER);
+            }
+
+            if (isHasActivityTypes != null && isHasActivityTypes.equals(Boolean.TRUE)) {
+                root.join("activityTypes", JoinType.INNER);
+            }
 
             query.distinct(true);
             query.orderBy(cb.asc(root.get("name")));

@@ -59,10 +59,11 @@ public class SocialNetworkController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<SocialNetworkResponse> findAllUnpaginated(
-        @RequestParam(required = false) Boolean isHasAccounts)
+        @RequestParam(required = false) Boolean isHasAccounts,
+        @RequestParam(required = false) Boolean isHasActivityTypes)
     {
         List<SocialNetwork> socialNetworkList = socialNetworkService.findAllWithFilters(
-            isHasAccounts);
+            isHasAccounts, isHasActivityTypes);
 
         return PageResponse.<SocialNetworkResponse>builder()
             .code(HttpStatus.OK.value())
