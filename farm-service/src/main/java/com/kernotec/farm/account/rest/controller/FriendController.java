@@ -6,9 +6,9 @@ import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.account.jpa.entity.Friend;
 import com.kernotec.farm.account.jpa.service.FriendService;
-import com.kernotec.farm.activity.rest.ApiSpec.FriendSpec;
 import com.kernotec.farm.account.rest.dto.response.friend.FriendResponse;
 import com.kernotec.farm.account.rest.mapper.friend.FriendResponseMapper;
+import com.kernotec.farm.activity.rest.ApiSpec.FriendSpec;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
@@ -43,7 +43,8 @@ public class FriendController {
         @RequestParam(required = false) UUID socialNetworkId)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Friend> friendPage = friendService.findAll(pageable);
+        Page<Friend> friendPage = friendService.findAllWithFilters(
+            accountId, socialNetworkId, pageable);
 
         return PageResponse.<FriendResponse>builder()
             .code(HttpStatus.OK.value())

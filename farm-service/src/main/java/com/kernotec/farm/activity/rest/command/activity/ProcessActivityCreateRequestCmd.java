@@ -3,6 +3,7 @@ package com.kernotec.farm.activity.rest.command.activity;
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.account.command.account.AccountCreateCmd;
 import com.kernotec.farm.account.command.account.AccountGetDtoCmd;
+import com.kernotec.farm.account.command.account.group.AccountGroupCreateCmd;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.activity.command.activity.ActivityCreateCmd;
@@ -22,9 +23,13 @@ import com.kernotec.farm.activity.rest.dto.request.follow.FollowCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.group.membership.GroupMembershipCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.publishing.PublishingCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.reaction.ReactionCreateRequest;
+import com.kernotec.farm.parametric.jpa.entity.GroupState;
+import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
 import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
+import com.kernotec.farm.parametric.jpa.service.GroupStateService;
 import com.kernotec.farm.parametric.jpa.service.RequestStateService;
 import jakarta.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,6 +54,8 @@ public class ProcessActivityCreateRequestCmd extends
     private final AccountGetDtoCmd accountGetDtoCmd;
     private final GroupMembershipCreateCmd groupMembershipCreateCmd;
     private final GroupCreateCmd groupCreateCmd;
+    private final AccountGroupCreateCmd accountGroupCreateCmd;
+    private final GroupStateService groupStateService;
 
     @Override
     protected UUID run(Request request) {
@@ -72,7 +79,9 @@ public class ProcessActivityCreateRequestCmd extends
             activityRequest.getComment(), activityId, activityRequest.getActivityTypeId());
 
         createGroupMembershipRelation(
-            activityRequest.getGroupMembership(), activityId, activityRequest.getActivityTypeId());
+            activityRequest.getGroupMembership(), activityId, activityRequest.getActivityTypeId(),
+            activityRequest.getAccountId(), activityRequest.getActivityDate()
+        );
 
         createConnectionRelation(
             activityRequest.getConnection(), activityId, activityRequest.getActivityTypeId(),
@@ -139,7 +148,7 @@ public class ProcessActivityCreateRequestCmd extends
     }
 
     public void createGroupMembershipRelation(GroupMembershipCreateRequest groupMembershipRequest,
-        UUID activityId, UUID activityTypeId)
+        UUID activityId, UUID activityTypeId, UUID accountId, ZonedDateTime activityDate)
     {
         if (groupMembershipRequest == null) {
             return;
@@ -170,6 +179,20 @@ public class ProcessActivityCreateRequestCmd extends
                 .activityTypeId(activityTypeId)
                 .build())
             .execute();
+
+        if (groupMembershipRequest.getAction()
+            .equals(GroupActionEnum.JOIN))
+        {
+            GroupState groupState = groupStateService.findByCodeThrow(GroupStateCodeEnum.JOINED);
+
+            accountGroupCreateCmd.withRequest(AccountGroupCreateCmd.Request.builder()
+                    .joinedAt(activityDate)
+                    .accountId(accountId)
+                    .groupId(groupToRegisterId)
+                    .groupStateId(groupState.getId())
+                    .build())
+                .execute();
+        }
     }
 
     public void createConnectionRelation(ConnectionCreateRequest connectionRequest, UUID activityId,
