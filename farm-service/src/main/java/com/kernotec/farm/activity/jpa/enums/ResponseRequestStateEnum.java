@@ -1,5 +1,5 @@
 package com.kernotec.farm.activity.jpa.enums;
 
-public enum ConnectionResponseRequestStateEnum {
+public enum ResponseRequestStateEnum {
     APPROVED, REJECTED;
 }
