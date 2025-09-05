@@ -23,8 +23,11 @@ public class FriendCreateCmd extends
     protected UUID run(Request request) {
         Friend friend = new Friend();
 
+        friend.setAcceptedAt(request.getAcceptedAt());
+        friend.setEndedAt(request.getEndedAt());
         friend.setAccountId(request.getAccountId());
         friend.setFriendAccountId(request.getFriendAccountId());
+        friend.setFriendStateId(request.getFriendStateId());
 
         friend = friendService.save(friend);
         return friend.getId();
