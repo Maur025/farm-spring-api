@@ -5,12 +5,14 @@ import com.kernotec.farm.account.jpa.entity.Account;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
@@ -33,4 +35,8 @@ public class SocialNetwork extends BaseAuditEntity {
 
     @OneToMany(mappedBy = "socialNetwork", fetch = FetchType.LAZY)
     private Set<Account> accounts;
+
+    @Where(clause = "deleted is false")
+    @ManyToMany(mappedBy = "socialNetworks", fetch = FetchType.LAZY)
+    private Set<ActivityType> activityTypes;
 }
