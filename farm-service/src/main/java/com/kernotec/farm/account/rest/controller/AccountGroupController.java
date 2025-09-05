@@ -4,11 +4,11 @@ import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
-import com.kernotec.farm.account.jpa.entity.Friend;
-import com.kernotec.farm.account.jpa.service.FriendService;
-import com.kernotec.farm.account.rest.ApiSpec.FriendSpec;
-import com.kernotec.farm.account.rest.dto.response.friend.FriendResponse;
-import com.kernotec.farm.account.rest.mapper.friend.FriendResponseMapper;
+import com.kernotec.farm.account.jpa.entity.AccountGroup;
+import com.kernotec.farm.account.jpa.service.AccountGroupService;
+import com.kernotec.farm.account.rest.ApiSpec.AccountGroupSpec;
+import com.kernotec.farm.account.rest.dto.response.account.group.AccountGroupResponse;
+import com.kernotec.farm.account.rest.mapper.account.group.AccountGroupResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
@@ -23,19 +23,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = FriendSpec.TAG_NAME, description = FriendSpec.TAG_DESCRIPTION)
-@RequestMapping(path = FriendSpec.BASE_PATH)
+@Tag(name = AccountGroupSpec.TAG_NAME, description = AccountGroupSpec.TAG_DESCRIPTION)
+@RequestMapping(path = AccountGroupSpec.BASE_PATH)
 @AllArgsConstructor
 @RestController
-public class FriendController {
+public class AccountGroupController {
 
-    private final FriendService friendService;
-    private final FriendResponseMapper friendResponseMapper;
+    private final AccountGroupService accountGroupService;
+    private final AccountGroupResponseMapper accountGroupResponseMapper;
 
-    @Operation(summary = "Find all friends")
+    @Operation(summary = "Find all account groups")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PageResponse<FriendResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
+    public PageResponse<AccountGroupResponse> findAll(
+        @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "10") Integer size,
         @RequestParam(defaultValue = "createdAt") String sortBy,
         @RequestParam(defaultValue = "true") boolean descending,
@@ -43,28 +44,30 @@ public class FriendController {
         @RequestParam(required = false) UUID socialNetworkId)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Friend> friendPage = friendService.findAllWithFilters(
+        Page<AccountGroup> accountGroupPage = accountGroupService.findAllWithFilters(
             accountId, socialNetworkId, pageable);
 
-        return PageResponse.<FriendResponse>builder()
+        return PageResponse.<AccountGroupResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(friendResponseMapper.toResponse(friendPage.getContent()))
+            .data(accountGroupResponseMapper.toResponse(accountGroupPage.getContent()))
             .pagination(PaginationResponse.builder()
-                .pages(friendPage.getTotalPages())
-                .count(friendPage.getTotalElements())
+                .pages(accountGroupPage.getTotalPages())
+                .count(accountGroupPage.getTotalElements())
                 .build())
             .build();
     }
 
-    @Operation(summary = "Find friend by id")
-    @GetMapping("{friendId}")
+    @Operation(summary = "Find account group by id")
+    @GetMapping("{accountGroupId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<FriendResponse> findById(@PathVariable("friendId") UUID friendId) {
-        Friend friend = friendService.findByIdThrow(friendId);
+    public SingleResponse<AccountGroupResponse> findById(
+        @PathVariable("accountGroupId") UUID accountGroupId)
+    {
+        AccountGroup accountGroup = accountGroupService.findByIdThrow(accountGroupId);
 
-        return SingleResponse.<FriendResponse>builder()
+        return SingleResponse.<AccountGroupResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(friendResponseMapper.toResponse(friend))
+            .data(accountGroupResponseMapper.toResponse(accountGroup))
             .build();
     }
 }

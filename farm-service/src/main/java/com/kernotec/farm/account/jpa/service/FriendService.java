@@ -50,6 +50,7 @@ public class FriendService extends BaseServiceImpl<Friend, UUID> {
                         cb.equal(accountJoin.get("socialNetworkId"), socialNetworkId));
                 }
 
+                query.distinct(true);
                 return cb.and(predicateList.toArray(Predicate[]::new));
             }, pageable
         );
