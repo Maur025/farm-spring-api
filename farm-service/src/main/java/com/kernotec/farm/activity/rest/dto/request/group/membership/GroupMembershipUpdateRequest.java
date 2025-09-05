@@ -1,4 +1,4 @@
-package com.kernotec.farm.activity.rest.dto.request.connection;
+package com.kernotec.farm.activity.rest.dto.request.group.membership;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
-public class ConnectionUpdateRequest extends BaseRequest {
+public class GroupMembershipUpdateRequest extends BaseRequest {
 
     private ResponseRequestStateEnum responseRequestState;
     private ZonedDateTime responseDate;

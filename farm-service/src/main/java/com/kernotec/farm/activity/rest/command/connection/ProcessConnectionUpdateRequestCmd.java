@@ -5,6 +5,7 @@ import com.kernotec.farm.account.command.friend.FriendCreateCmd;
 import com.kernotec.farm.activity.command.connection.ConnectionGetDtoCmd;
 import com.kernotec.farm.activity.command.connection.ConnectionUpdateCmd;
 import com.kernotec.farm.activity.jpa.dto.entity.ConnectionDto;
+import com.kernotec.farm.activity.jpa.enums.ResponseRequestStateEnum;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionUpdateRequest;
 import com.kernotec.farm.parametric.jpa.entity.FriendState;
 import com.kernotec.farm.parametric.jpa.entity.RequestState;
@@ -38,31 +39,36 @@ public class ProcessConnectionUpdateRequestCmd extends
         RequestState requestState = requestStateService.findByCodeThrow(
             RequestStateCodeEnum.fromValue(connectionRequest.getResponseRequestState()));
 
-        ConnectionDto connectionDto = connectionGetDtoCmd.withRequest(
-                ConnectionGetDtoCmd.Request.builder()
-                    .connectionId(request.getConnectionId())
+        if (connectionRequest.getResponseRequestState()
+            .equals(ResponseRequestStateEnum.APPROVED))
+        {
+            ConnectionDto connectionDto = connectionGetDtoCmd.withRequest(
+                    ConnectionGetDtoCmd.Request.builder()
+                        .connectionId(request.getConnectionId())
+                        .build())
+                .execute();
+
+            FriendState friendState = friendStateService.findByCodeThrow(
+                FriendStateCodeEnum.ACTIVE);
+
+            friendCreateCmd.withRequest(FriendCreateCmd.Request.builder()
+                    .acceptedAt(connectionRequest.getResponseDate())
+                    .accountId(connectionDto.getActivity()
+                        .getAccountId())
+                    .friendAccountId(connectionDto.getPotentialFriendAccountId())
+                    .friendStateId(friendState.getId())
                     .build())
-            .execute();
+                .execute();
 
-        FriendState friendState = friendStateService.findByCodeThrow(FriendStateCodeEnum.ACTIVE);
-
-        friendCreateCmd.withRequest(FriendCreateCmd.Request.builder()
-                .acceptedAt(connectionRequest.getResponseDate())
-                .accountId(connectionDto.getActivity()
-                    .getAccountId())
-                .friendAccountId(connectionDto.getPotentialFriendAccountId())
-                .friendStateId(friendState.getId())
-                .build())
-            .execute();
-
-        friendCreateCmd.withRequest(FriendCreateCmd.Request.builder()
-                .acceptedAt(connectionRequest.getResponseDate())
-                .accountId(connectionDto.getPotentialFriendAccountId())
-                .friendAccountId(connectionDto.getActivity()
-                    .getAccountId())
-                .friendStateId(friendState.getId())
-                .build())
-            .execute();
+            friendCreateCmd.withRequest(FriendCreateCmd.Request.builder()
+                    .acceptedAt(connectionRequest.getResponseDate())
+                    .accountId(connectionDto.getPotentialFriendAccountId())
+                    .friendAccountId(connectionDto.getActivity()
+                        .getAccountId())
+                    .friendStateId(friendState.getId())
+                    .build())
+                .execute();
+        }
 
         connectionUpdateCmd.withRequest(ConnectionUpdateCmd.Request.builder()
                 .connectionId(request.getConnectionId())

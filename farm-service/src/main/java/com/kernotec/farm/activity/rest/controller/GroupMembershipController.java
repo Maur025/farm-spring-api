@@ -8,7 +8,9 @@ import com.kernotec.farm.activity.jpa.entity.GroupMembership;
 import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
 import com.kernotec.farm.activity.jpa.service.GroupMembershipService;
 import com.kernotec.farm.activity.rest.ApiSpec.GroupMembershipSpec;
+import com.kernotec.farm.activity.rest.command.group.membership.ProcessGroupMembershipUpdateRequestCmd;
 import com.kernotec.farm.activity.rest.dto.request.group.membership.GroupMembershipFindAllFilterRequest;
+import com.kernotec.farm.activity.rest.dto.request.group.membership.GroupMembershipUpdateRequest;
 import com.kernotec.farm.activity.rest.dto.response.group.membership.GroupMembershipResponse;
 import com.kernotec.farm.activity.rest.mapper.group.membership.GroupMembershipResponseMapper;
 import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
@@ -21,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,6 +38,7 @@ public class GroupMembershipController {
 
     private final GroupMembershipService groupMembershipService;
     private final GroupMembershipResponseMapper groupMembershipResponseMapper;
+    private final ProcessGroupMembershipUpdateRequestCmd processGroupMembershipUpdateRequestCmd;
 
     @Operation(summary = "Find all group memberships")
     @GetMapping
@@ -79,6 +84,26 @@ public class GroupMembershipController {
         return SingleResponse.<GroupMembershipResponse>builder()
             .code(HttpStatus.OK.value())
             .data(groupMembershipResponseMapper.toResponse(groupMembership))
+            .build();
+    }
+
+    @Operation(summary = "Update group membership")
+    @PutMapping("{groupMembershipId}")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<GroupMembershipResponse> update(
+        @PathVariable("groupMembershipId") UUID groupMembershipId,
+        @RequestBody GroupMembershipUpdateRequest request)
+    {
+        processGroupMembershipUpdateRequestCmd.withRequest(
+                ProcessGroupMembershipUpdateRequestCmd.Request.builder()
+                    .groupMembershipId(groupMembershipId)
+                    .groupMembershipRequest(request)
+                    .build())
+            .execute();
+
+        return SingleResponse.<GroupMembershipResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message("update successfully")
             .build();
     }
 }

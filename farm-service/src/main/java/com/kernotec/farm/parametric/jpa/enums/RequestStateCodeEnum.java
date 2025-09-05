@@ -1,11 +1,11 @@
 package com.kernotec.farm.parametric.jpa.enums;
 
-import com.kernotec.farm.activity.jpa.enums.ConnectionResponseRequestStateEnum;
+import com.kernotec.farm.activity.jpa.enums.ResponseRequestStateEnum;
 
 public enum RequestStateCodeEnum {
     PENDING, APPROVED, REJECTED, NOTHING_WAS_REQUESTED;
 
-    public static RequestStateCodeEnum fromValue(ConnectionResponseRequestStateEnum value) {
+    public static RequestStateCodeEnum fromValue(ResponseRequestStateEnum value) {
         if (value == null) {
             return null;
         }
