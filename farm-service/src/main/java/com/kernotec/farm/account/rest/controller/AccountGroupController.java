@@ -9,6 +9,7 @@ import com.kernotec.farm.account.jpa.service.AccountGroupService;
 import com.kernotec.farm.account.rest.ApiSpec.AccountGroupSpec;
 import com.kernotec.farm.account.rest.dto.response.account.group.AccountGroupResponse;
 import com.kernotec.farm.account.rest.mapper.account.group.AccountGroupResponseMapper;
+import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
@@ -41,11 +42,12 @@ public class AccountGroupController {
         @RequestParam(defaultValue = "createdAt") String sortBy,
         @RequestParam(defaultValue = "true") boolean descending,
         @RequestParam(required = false) UUID accountId,
-        @RequestParam(required = false) UUID socialNetworkId)
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) GroupStateCodeEnum groupStateCode)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
         Page<AccountGroup> accountGroupPage = accountGroupService.findAllWithFilters(
-            accountId, socialNetworkId, pageable);
+            accountId, socialNetworkId, groupStateCode, pageable);
 
         return PageResponse.<AccountGroupResponse>builder()
             .code(HttpStatus.OK.value())
