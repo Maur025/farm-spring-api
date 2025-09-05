@@ -10,6 +10,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -55,5 +56,12 @@ public class AccountGroupService extends BaseServiceImpl<AccountGroup, UUID> {
                 return cb.and(predicateList.toArray(jakarta.persistence.criteria.Predicate[]::new));
             }, pageable
         );
+    }
+
+    public Optional<AccountGroup> findByAccountIdAndGroupIdAndGroupStateId(UUID accountId,
+        UUID groupId, UUID groupStateId)
+    {
+        return repository.findByAccountIdAndGroupIdAndGroupStateId(
+            accountId, groupId, groupStateId);
     }
 }

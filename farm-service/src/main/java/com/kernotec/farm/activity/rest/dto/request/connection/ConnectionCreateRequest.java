@@ -16,7 +16,7 @@ public class ConnectionCreateRequest extends BaseRequest {
     private UUID potentialFriendAccountId;
 
     private String friendUsername;
-    private Boolean isNewConnection;
+    private Boolean isNewAccount;
 
     private ConnectionActionEnum action;
 }

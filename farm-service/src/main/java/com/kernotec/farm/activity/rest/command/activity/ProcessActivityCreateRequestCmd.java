@@ -1,35 +1,15 @@
 package com.kernotec.farm.activity.rest.command.activity;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.farm.account.command.account.AccountCreateCmd;
-import com.kernotec.farm.account.command.account.AccountGetDtoCmd;
-import com.kernotec.farm.account.command.account.group.AccountGroupCreateCmd;
-import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
-import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.activity.command.activity.ActivityCreateCmd;
-import com.kernotec.farm.activity.command.comment.CommentCreateCmd;
-import com.kernotec.farm.activity.command.connection.ConnectionCreateCmd;
-import com.kernotec.farm.activity.command.follow.FollowCreateCmd;
-import com.kernotec.farm.activity.command.group.GroupCreateCmd;
-import com.kernotec.farm.activity.command.group.membership.GroupMembershipCreateCmd;
-import com.kernotec.farm.activity.command.publishing.PublishingCreateCmd;
-import com.kernotec.farm.activity.command.reaction.ReactionCreateCmd;
-import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
-import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
+import com.kernotec.farm.activity.rest.command.comment.CommentCreateActivityRelationCmd;
+import com.kernotec.farm.activity.rest.command.connection.ConnectionCreateActivityRelationCmd;
+import com.kernotec.farm.activity.rest.command.follow.FollowCreateActivityRelationCmd;
+import com.kernotec.farm.activity.rest.command.group.membership.GroupMembershipCreateActivityRelationCmd;
+import com.kernotec.farm.activity.rest.command.publishing.PublishingCreateActivityRelationCmd;
+import com.kernotec.farm.activity.rest.command.reaction.ReactionCreateActivityRelationCmd;
 import com.kernotec.farm.activity.rest.dto.request.activity.ActivityCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.comment.CommentCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.follow.FollowCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.group.membership.GroupMembershipCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.publishing.PublishingCreateRequest;
-import com.kernotec.farm.activity.rest.dto.request.reaction.ReactionCreateRequest;
-import com.kernotec.farm.parametric.jpa.entity.GroupState;
-import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
-import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
-import com.kernotec.farm.parametric.jpa.service.GroupStateService;
-import com.kernotec.farm.parametric.jpa.service.RequestStateService;
 import jakarta.validation.constraints.NotNull;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,20 +22,13 @@ public class ProcessActivityCreateRequestCmd extends
     AbstractTransactionalRequiredCommand<ProcessActivityCreateRequestCmd.Request, UUID>
 {
 
-    private final RequestStateService requestStateService;
-
     private final ActivityCreateCmd activityCreateCmd;
-    private final PublishingCreateCmd publishingCreateCmd;
-    private final ReactionCreateCmd reactionCreateCmd;
-    private final CommentCreateCmd commentCreateCmd;
-    private final FollowCreateCmd followCreateCmd;
-    private final ConnectionCreateCmd connectionCreateCmd;
-    private final AccountCreateCmd accountCreateCmd;
-    private final AccountGetDtoCmd accountGetDtoCmd;
-    private final GroupMembershipCreateCmd groupMembershipCreateCmd;
-    private final GroupCreateCmd groupCreateCmd;
-    private final AccountGroupCreateCmd accountGroupCreateCmd;
-    private final GroupStateService groupStateService;
+    private final PublishingCreateActivityRelationCmd publishingCreateActivityRelationCmd;
+    private final ReactionCreateActivityRelationCmd reactionCreateActivityRelationCmd;
+    private final CommentCreateActivityRelationCmd commentCreateActivityRelationCmd;
+    private final FollowCreateActivityRelationCmd followCreateActivityRelationCmd;
+    private final GroupMembershipCreateActivityRelationCmd groupMembershipCreateActivityRelationCmd;
+    private final ConnectionCreateActivityRelationCmd connectionCreateActivityRelationCmd;
 
     @Override
     protected UUID run(Request request) {
@@ -69,198 +42,58 @@ public class ProcessActivityCreateRequestCmd extends
                 .build())
             .execute();
 
-        createPublishingRelation(
-            activityRequest.getPublishing(), activityId, activityRequest.getActivityTypeId());
+        publishingCreateActivityRelationCmd.withRequest(
+                PublishingCreateActivityRelationCmd.Request.builder()
+                    .publishingRequest(activityRequest.getPublishing())
+                    .activityId(activityId)
+                    .activityTypeId(activityRequest.getActivityTypeId())
+                    .build())
+            .execute();
 
-        createReactionRelation(
-            activityRequest.getReaction(), activityId, activityRequest.getActivityTypeId());
+        reactionCreateActivityRelationCmd.withRequest(
+                ReactionCreateActivityRelationCmd.Request.builder()
+                    .reactionRequest(activityRequest.getReaction())
+                    .activityId(activityId)
+                    .activityTypeId(activityRequest.getActivityTypeId())
+                    .build())
+            .execute();
 
-        createCommentRelation(
-            activityRequest.getComment(), activityId, activityRequest.getActivityTypeId());
+        commentCreateActivityRelationCmd.withRequest(
+                CommentCreateActivityRelationCmd.Request.builder()
+                    .commentRequest(activityRequest.getComment())
+                    .activityId(activityId)
+                    .activityTypeId(activityRequest.getActivityTypeId())
+                    .build())
+            .execute();
 
-        createGroupMembershipRelation(
-            activityRequest.getGroupMembership(), activityId, activityRequest.getActivityTypeId(),
-            activityRequest.getAccountId(), activityRequest.getActivityDate()
-        );
+        groupMembershipCreateActivityRelationCmd.withRequest(
+                GroupMembershipCreateActivityRelationCmd.Request.builder()
+                    .groupMembershipRequest(activityRequest.getGroupMembership())
+                    .activityId(activityId)
+                    .activityTypeId(activityRequest.getActivityTypeId())
+                    .accountId(activityRequest.getAccountId())
+                    .activityDate(activityRequest.getActivityDate())
+                    .build())
+            .execute();
 
-        createConnectionRelation(
-            activityRequest.getConnection(), activityId, activityRequest.getActivityTypeId(),
-            activityRequest.getAccountId()
-        );
+        connectionCreateActivityRelationCmd.withRequest(
+                ConnectionCreateActivityRelationCmd.Request.builder()
+                    .connectionRequest(activityRequest.getConnection())
+                    .activityId(activityId)
+                    .activityTypeId(activityRequest.getActivityTypeId())
+                    .accountId(activityRequest.getAccountId())
+                    .build())
+            .execute();
 
-        createFollowRelation(
-            activityRequest.getFollow(), activityId, activityRequest.getActivityTypeId());
+        followCreateActivityRelationCmd.withRequest(
+                FollowCreateActivityRelationCmd.Request.builder()
+                    .followRequest(activityRequest.getFollow())
+                    .activityId(activityId)
+                    .activityTypeId(activityRequest.getActivityTypeId())
+                    .build())
+            .execute();
 
         return activityId;
-    }
-
-    public void createPublishingRelation(PublishingCreateRequest publishingRequest, UUID activityId,
-        UUID activityTypeId)
-    {
-        if (publishingRequest == null || publishingRequest.getPublishingContextId() == null) {
-            return;
-        }
-
-        publishingCreateCmd.withRequest(PublishingCreateCmd.Request.builder()
-                .description(publishingRequest.getDescription())
-                .publishingTypeId(publishingRequest.getPublishingTypeId())
-                .publishingContextId(publishingRequest.getPublishingContextId())
-                .activityId(activityId)
-                .activityTypeId(activityTypeId)
-                .build())
-            .execute();
-    }
-
-    public void createReactionRelation(ReactionCreateRequest reactionRequest, UUID activityId,
-        UUID activityTypeId)
-    {
-        if (reactionRequest == null || reactionRequest.getReactionTypeId() == null) {
-            return;
-        }
-
-        reactionCreateCmd.withRequest(ReactionCreateCmd.Request.builder()
-                .reactionTypeId(reactionRequest.getReactionTypeId())
-                .activityId(activityId)
-                .activityTypeId(activityTypeId)
-                .build())
-            .execute();
-    }
-
-    public void createCommentRelation(CommentCreateRequest commentRequest, UUID activityId,
-        UUID activityTypeId)
-    {
-        if (commentRequest == null || commentRequest.getComment() == null
-            || commentRequest.getComment()
-            .isBlank())
-        {
-            return;
-        }
-
-        commentCreateCmd.withRequest(CommentCreateCmd.Request.builder()
-                .comment(commentRequest.getComment())
-                .isAgreeComment(
-                    commentRequest.getIsAgreeComment() != null && commentRequest.getIsAgreeComment())
-                .activityId(activityId)
-                .activityTypeId(activityTypeId)
-                .publishingContextId(commentRequest.getPublishingContextId())
-                .build())
-            .execute();
-    }
-
-    public void createGroupMembershipRelation(GroupMembershipCreateRequest groupMembershipRequest,
-        UUID activityId, UUID activityTypeId, UUID accountId, ZonedDateTime activityDate)
-    {
-        if (groupMembershipRequest == null) {
-            return;
-        }
-
-        UUID requestStatePendingId = getRequestStateId(RequestStateCodeEnum.PENDING);
-        UUID requestStateNothingId = getRequestStateId(RequestStateCodeEnum.NOTHING_WAS_REQUESTED);
-
-        UUID groupToRegisterId = groupMembershipRequest.getGroupId();
-
-        if (groupMembershipRequest.getIsNewGroup() && groupToRegisterId == null) {
-            groupToRegisterId = groupCreateCmd.withRequest(GroupCreateCmd.Request.builder()
-                    .name(groupMembershipRequest.getGroupName())
-                    .regionId(groupMembershipRequest.getRegionId())
-                    .description("N/A")
-                    .build())
-                .execute();
-        }
-
-        groupMembershipCreateCmd.withRequest(GroupMembershipCreateCmd.Request.builder()
-                .action(groupMembershipRequest.getAction())
-                .groupId(groupToRegisterId)
-                .publishingContextId(groupMembershipRequest.getPublishingContextId())
-                .requestStateId(groupMembershipRequest.getAction()
-                    .equals(GroupActionEnum.JOIN_REQUEST) ? requestStatePendingId
-                    : requestStateNothingId)
-                .activityId(activityId)
-                .activityTypeId(activityTypeId)
-                .build())
-            .execute();
-
-        if (groupMembershipRequest.getAction()
-            .equals(GroupActionEnum.JOIN))
-        {
-            GroupState groupState = groupStateService.findByCodeThrow(GroupStateCodeEnum.JOINED);
-
-            accountGroupCreateCmd.withRequest(AccountGroupCreateCmd.Request.builder()
-                    .joinedAt(activityDate)
-                    .accountId(accountId)
-                    .groupId(groupToRegisterId)
-                    .groupStateId(groupState.getId())
-                    .build())
-                .execute();
-        }
-    }
-
-    public void createConnectionRelation(ConnectionCreateRequest connectionRequest, UUID activityId,
-        UUID activityTypeId, UUID accountId)
-    {
-        if (connectionRequest == null) {
-            return;
-        }
-
-        UUID requestStateId = getRequestStateId(RequestStateCodeEnum.PENDING);
-
-        AccountDto accountDto = accountGetDtoCmd.withRequest(AccountGetDtoCmd.Request.builder()
-                .accountId(accountId)
-                .build())
-            .execute();
-
-        UUID potentialAccountId = connectionRequest.getPotentialFriendAccountId();
-
-        if (connectionRequest.getIsNewConnection() && potentialAccountId == null) {
-            potentialAccountId = accountCreateCmd.withRequest(AccountCreateCmd.Request.builder()
-                    .username(connectionRequest.getFriendUsername())
-                    .password("N/A")
-                    .socialNetworkId(accountDto.getSocialNetworkId())
-                    .type(AccountTypeEnum.EXTERNAL)
-                    .build())
-                .execute();
-        }
-
-        AccountDto accountPotentialDto = accountGetDtoCmd.withRequest(
-                AccountGetDtoCmd.Request.builder()
-                    .accountId(potentialAccountId)
-                    .build())
-            .execute();
-
-        connectionCreateCmd.withRequest(ConnectionCreateCmd.Request.builder()
-                .potentialFriendAccountId(potentialAccountId)
-                .action(connectionRequest.getAction())
-                .type(ConnectionTypeEnum.fromValue(accountPotentialDto.getType()))
-                .requestStateId(requestStateId)
-                .activityId(activityId)
-                .activityTypeId(activityTypeId)
-                .build())
-            .execute();
-    }
-
-    public void createFollowRelation(FollowCreateRequest followRequest, UUID activityId,
-        UUID activityTypeId)
-    {
-        if (followRequest == null || followRequest.getName() == null || followRequest.getName()
-            .isBlank())
-        {
-            return;
-        }
-
-        followCreateCmd.withRequest(FollowCreateCmd.Request.builder()
-                .name(followRequest.getName())
-                .isFollowing(followRequest.getIsFollowing() != null && followRequest.getIsFollowing())
-                .activityId(activityId)
-                .activityTypeId(activityTypeId)
-                .publishingContextId(followRequest.getPublishingContextId())
-                .regionId(followRequest.getRegionId())
-                .build())
-            .execute();
-    }
-
-    public UUID getRequestStateId(RequestStateCodeEnum code) {
-        return requestStateService.findByCodeThrow(code)
-            .getId();
     }
 
     @Builder

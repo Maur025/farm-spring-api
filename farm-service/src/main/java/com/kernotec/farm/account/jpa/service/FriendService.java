@@ -10,6 +10,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -54,5 +55,12 @@ public class FriendService extends BaseServiceImpl<Friend, UUID> {
                 return cb.and(predicateList.toArray(Predicate[]::new));
             }, pageable
         );
+    }
+
+    public Optional<Friend> findByAccountIdAndFriendAccountIdAndFriendStateId(UUID accountId,
+        UUID friendAccountId, UUID friendStateId)
+    {
+        return repository.findByAccountIdAndFriendAccountIdAndFriendStateId(
+            accountId, friendAccountId, friendStateId);
     }
 }
