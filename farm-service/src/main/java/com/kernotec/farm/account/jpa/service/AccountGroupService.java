@@ -5,6 +5,9 @@ import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.account.jpa.repository.AccountGroupRepository;
+import com.kernotec.farm.activity.exception.AccountGroupException;
+import com.kernotec.farm.parametric.jpa.entity.GroupState;
+import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -16,6 +19,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -35,7 +39,7 @@ public class AccountGroupService extends BaseServiceImpl<AccountGroup, UUID> {
     }
 
     public Page<AccountGroup> findAllWithFilters(UUID accountId, UUID socialNetworkId,
-        Pageable pageable)
+        GroupStateCodeEnum groupStateCode, Pageable pageable)
     {
         return repository.findAll(
             (Specification<AccountGroup>) (root, query, cb) -> {
@@ -52,6 +56,14 @@ public class AccountGroupService extends BaseServiceImpl<AccountGroup, UUID> {
                         cb.equal(accountJoin.get("socialNetworkId"), socialNetworkId));
                 }
 
+                if (groupStateCode != null) {
+                    Join<AccountGroup, GroupState> groupStateJoin = root.join(
+                        "groupState", JoinType.INNER);
+
+                    predicateList.add(
+                        cb.equal(groupStateJoin.get("code"), groupStateCode.toString()));
+                }
+
                 query.distinct(true);
                 return cb.and(predicateList.toArray(jakarta.persistence.criteria.Predicate[]::new));
             }, pageable
@@ -63,5 +75,16 @@ public class AccountGroupService extends BaseServiceImpl<AccountGroup, UUID> {
     {
         return repository.findByAccountIdAndGroupIdAndGroupStateId(
             accountId, groupId, groupStateId);
+    }
+
+    public AccountGroup findByAccountIdAndGroupIdAndGroupStateIdThrow(UUID accountId, UUID groupId,
+        UUID groupStateId)
+    {
+        return repository.findByAccountIdAndGroupIdAndGroupStateId(accountId, groupId, groupStateId)
+            .orElseThrow(
+                () -> new AccountGroupException(
+                    "", String.format("'account: %s' -> ' group: %s'", accountId, groupId),
+                    HttpStatus.NOT_FOUND.value()
+                ));
     }
 }

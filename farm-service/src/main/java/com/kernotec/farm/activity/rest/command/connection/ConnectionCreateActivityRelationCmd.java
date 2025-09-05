@@ -83,7 +83,7 @@ public class ConnectionCreateActivityRelationCmd extends
                 .type(ConnectionTypeEnum.fromValue(accountPotentialDto.getType()))
                 .requestStateId(requestStateId)
                 .activityId(request.getActivityId())
-                .activityTypeId(request.getActivityId())
+                .activityTypeId(request.getActivityTypeId())
                 .build())
             .execute();
 

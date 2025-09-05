@@ -2,6 +2,7 @@ package com.kernotec.farm.activity.rest.command.group.membership;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.account.rest.command.account.group.AccountGroupCreateInActionJoinCmd;
+import com.kernotec.farm.account.rest.command.account.group.AccountGroupUpdateInLeaveCmd;
 import com.kernotec.farm.activity.command.group.GroupCreateCmd;
 import com.kernotec.farm.activity.command.group.membership.GroupMembershipCreateCmd;
 import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
@@ -28,6 +29,7 @@ public class GroupMembershipCreateActivityRelationCmd extends
     private final GroupMembershipCreateCmd groupMembershipCreateCmd;
     private final AccountGroupCreateInActionJoinCmd accountGroupCreateInActionJoinCmd;
     private final GroupMemberCreateActivityValidationCmd groupMemberCreateActivityValidationCmd;
+    private final AccountGroupUpdateInLeaveCmd accountGroupUpdateInLeaveCmd;
 
     @Override
     protected Void run(Request request) {
@@ -88,6 +90,14 @@ public class GroupMembershipCreateActivityRelationCmd extends
                     .accountId(request.getAccountId())
                     .groupId(groupToRegisterId)
                     .build())
+            .execute();
+
+        accountGroupUpdateInLeaveCmd.withRequest(AccountGroupUpdateInLeaveCmd.Request.builder()
+                .action(groupMembershipRequest.getAction())
+                .leftAt(request.getActivityDate())
+                .accountId(request.getAccountId())
+                .groupId(groupToRegisterId)
+                .build())
             .execute();
 
         return null;
