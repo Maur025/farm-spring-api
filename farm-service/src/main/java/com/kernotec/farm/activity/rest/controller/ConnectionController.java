@@ -9,6 +9,7 @@ import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
 import com.kernotec.farm.activity.jpa.service.ConnectionService;
 import com.kernotec.farm.activity.rest.ApiSpec.ConnectionSpec;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionFindAllFilterRequest;
+import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionUpdateRequest;
 import com.kernotec.farm.activity.rest.dto.response.connection.ConnectionResponse;
 import com.kernotec.farm.activity.rest.mapper.connection.ConnectionResponseMapper;
 import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
@@ -22,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -91,6 +94,19 @@ public class ConnectionController {
         return SingleResponse.<ConnectionResponse>builder()
             .code(HttpStatus.OK.value())
             .data(connectionResponseMapper.toResponse(connection))
+            .build();
+    }
+
+    @Operation(summary = "Update connection")
+    @PutMapping("{connectionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<ConnectionResponse> update(
+        @PathVariable("connectionId") UUID connectionId,
+        @RequestBody ConnectionUpdateRequest request)
+    {
+        return SingleResponse.<ConnectionResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message("update successfully")
             .build();
     }
 }
