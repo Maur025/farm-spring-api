@@ -3,9 +3,10 @@ package com.kernotec.farm.inventory.rest.dto.response.chip;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
-import com.kernotec.farm.account.rest.dto.response.account.AccountFlatResponse;
-import com.kernotec.farm.parametric.rest.dto.response.operator.OperatorResponse;
+import com.kernotec.farm.account.rest.dto.response.account.AccountResponse;
+import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
 import com.kernotec.farm.inventory.rest.dto.response.registration.person.RegistrationPersonResponse;
+import com.kernotec.farm.parametric.rest.dto.response.operator.OperatorResponse;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
@@ -26,5 +27,7 @@ public class ChipResponse extends EntityResponse {
     private RegistrationPersonResponse registrationPerson;
 
     private UUID deviceId;
-    private Set<AccountFlatResponse> accounts;
+    private DeviceResponse device;
+
+    private Set<AccountResponse> accounts;
 }

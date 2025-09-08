@@ -6,7 +6,7 @@ import com.kernotec.core.rest.dto.response.data.EntityResponse;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.rest.dto.response.observation.ObservationResponse;
 import com.kernotec.farm.account.rest.dto.response.person.PersonResponse;
-import com.kernotec.farm.inventory.rest.dto.response.chip.ChipForAccountResponse;
+import com.kernotec.farm.inventory.rest.dto.response.chip.ChipResponse;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
 import com.kernotec.farm.parametric.rest.dto.response.social.network.SocialNetworkResponse;
 import java.util.Set;
@@ -31,7 +31,7 @@ public class AccountResponse extends EntityResponse {
     private SocialNetworkResponse socialNetwork;
 
     private Set<DeviceResponse> devices;
-    private Set<ChipForAccountResponse> chips;
+    private Set<ChipResponse> chips;
 
     private Set<ObservationResponse> observations;
 }

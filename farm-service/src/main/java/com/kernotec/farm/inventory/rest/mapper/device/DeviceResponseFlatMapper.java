@@ -2,21 +2,22 @@ package com.kernotec.farm.inventory.rest.mapper.device;
 
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
-import com.kernotec.farm.inventory.rest.mapper.chip.ChipResponseToDeviceMapper;
-import com.kernotec.farm.inventory.rest.mapper.device.imei.DeviceImeiResponseFlatMapper;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(uses = {ChipResponseToDeviceMapper.class, DeviceImeiResponseFlatMapper.class})
-public interface DeviceResponseMapper {
+@Mapper
+public interface DeviceResponseFlatMapper {
+
+    @Mapping(target = "farm", ignore = true)
+    @Mapping(target = "chips", ignore = true)
+    @Mapping(target = "accounts", ignore = true)
+    @Mapping(target = "deviceImeis", ignore = true)
+    DeviceResponse toResponse(Device device);
 
     DeviceResponse toResponse(UUID id);
-
-    @Mapping(target = "accounts", ignore = true)
-    DeviceResponse toResponse(Device device);
 
     List<DeviceResponse> toResponse(List<Device> deviceList);
 

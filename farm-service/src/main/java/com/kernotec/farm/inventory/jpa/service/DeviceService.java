@@ -3,6 +3,7 @@ package com.kernotec.farm.inventory.jpa.service;
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.account.jpa.entity.Person;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.repository.DeviceRepository;
 import jakarta.persistence.criteria.Join;
@@ -34,21 +35,30 @@ public class DeviceService extends BaseServiceImpl<Device, UUID> {
         return repository;
     }
 
-    public Page<Device> findAllByKeyword(String keyword, UUID socialNetworkId, Pageable pageable) {
+    public Page<Device> findAllWithFilters(String keyword, UUID socialNetworkId, Pageable pageable)
+    {
         String pattern = keyword == null || keyword.isBlank() ? null : keyword.toLowerCase() + "%";
 
         return repository.findAll(
             (Specification<Device>) (root, query, cb) -> {
                 List<Predicate> predicateList = new ArrayList<>();
 
+                Join<Device, Account> accountJoin = root.join("accounts", JoinType.INNER);
+
                 if (socialNetworkId != null) {
-                    Join<Device, Account> accountJoin = root.join("accounts", JoinType.INNER);
+
                     predicateList.add(
                         cb.equal(accountJoin.get("socialNetworkId"), socialNetworkId));
                 }
 
                 if (pattern != null) {
-                    predicateList.add(cb.or(cb.like(cb.lower(root.get("deviceNumber")), pattern)));
+                    Join<Account, Person> personJoin = accountJoin.join("person", JoinType.INNER);
+                    predicateList.add(cb.or(
+                        cb.equal(cb.lower(root.get("deviceNumber")), keyword),
+                        cb.like(cb.lower(accountJoin.get("username")), pattern),
+                        cb.like(cb.lower(personJoin.get("name")), pattern),
+                        cb.like(cb.lower(personJoin.get("lastName")), pattern)
+                    ));
                 }
 
                 query.distinct(true);

@@ -55,7 +55,7 @@ public class DeviceFindOrCreateCmd extends
                         .build())
                     .execute();
 
-                if (request.getImeiOne() == null) {
+                if (request.getImeiOne() != null) {
                     deviceImeiCreateCmd.withRequest(DeviceImeiCreateCmd.Request.builder()
                             .imei(request.getImeiOne())
                             .deviceId(newDeviceId)
@@ -63,7 +63,7 @@ public class DeviceFindOrCreateCmd extends
                         .execute();
                 }
 
-                if (request.getImeiTwo() == null) {
+                if (request.getImeiTwo() != null) {
                     deviceImeiCreateCmd.withRequest(DeviceImeiCreateCmd.Request.builder()
                             .imei(request.getImeiTwo())
                             .deviceId(newDeviceId)

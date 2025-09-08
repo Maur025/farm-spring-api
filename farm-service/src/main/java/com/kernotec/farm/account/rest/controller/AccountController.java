@@ -6,9 +6,8 @@ import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.service.AccountService;
 import com.kernotec.farm.account.rest.ApiSpec.AccountSpec;
-import com.kernotec.farm.account.rest.dto.response.account.AccountFlatResponse;
 import com.kernotec.farm.account.rest.dto.response.account.AccountResponse;
-import com.kernotec.farm.account.rest.mapper.account.AccountFlatResponseMapper;
+import com.kernotec.farm.account.rest.mapper.account.AccountResponseFlatMapper;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +31,7 @@ public class AccountController {
 
     private final AccountService accountService;
     private final AccountResponseMapper accountResponseMapper;
-    private final AccountFlatResponseMapper accountFlatResponseMapper;
+    private final AccountResponseFlatMapper accountResponseFlatMapper;
 
     @Operation(summary = "Find all accounts")
     @GetMapping
@@ -61,7 +60,7 @@ public class AccountController {
     @Operation(summary = "Search accounts by username")
     @GetMapping("search")
     @ResponseStatus(HttpStatus.OK)
-    public PageResponse<AccountFlatResponse> searchByUsername(@RequestParam String username,
+    public PageResponse<AccountResponse> searchByUsername(@RequestParam String username,
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) UUID ignoreAccountId)
     {
@@ -69,9 +68,9 @@ public class AccountController {
         Page<Account> accountPage = accountService.searchByUsername(
             username, socialNetworkId, ignoreAccountId, pageable);
 
-        return PageResponse.<AccountFlatResponse>builder()
+        return PageResponse.<AccountResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(accountFlatResponseMapper.toResponse(accountPage.getContent()))
+            .data(accountResponseFlatMapper.toResponse(accountPage.getContent()))
             .build();
     }
 
