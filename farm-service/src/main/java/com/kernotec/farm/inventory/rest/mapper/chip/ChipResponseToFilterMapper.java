@@ -1,6 +1,6 @@
 package com.kernotec.farm.inventory.rest.mapper.chip;
 
-import com.kernotec.farm.account.rest.mapper.account.AccountResponseToDeviceMapper;
+import com.kernotec.farm.account.rest.mapper.account.AccountResponseForDeviceMapper;
 import com.kernotec.farm.inventory.jpa.entity.Chip;
 import com.kernotec.farm.inventory.rest.dto.response.chip.ChipResponse;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(uses = {AccountResponseToDeviceMapper.class})
+@Mapper(uses = {AccountResponseForDeviceMapper.class})
 public interface ChipResponseToFilterMapper {
 
     @Mapping(target = "device", ignore = true)

@@ -12,7 +12,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface AccountResponseToDeviceMapper {
+public interface AccountResponseForDeviceMapper {
 
     @Mapping(target = "person", ignore = true)
     @Mapping(target = "socialNetwork", ignore = true)
