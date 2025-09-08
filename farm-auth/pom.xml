@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>farm-auth</artifactId>
+
+  <build>
+    <finalName>${project.name}</finalName>
+    <plugins>
+      <plugin>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.springframework.boot</groupId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-swagger</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-command</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
+      <artifactId>core-test</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+  </dependencies>
+
+  <parent>
+    <groupId>com.kernotec.farm</groupId>
+    <artifactId>farm-bom</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../farm-bom</relativePath>
+  </parent>
+
+  <profiles>
+    <profile>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <id>dev</id>
+      <properties>
+        <spring.profiles.active>dev</spring.profiles.active>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>prod</id>
+      <properties>
+        <spring.profiles.active>prod</spring.profiles.active>
+      </properties>
+    </profile>
+  </profiles>
+</project>
