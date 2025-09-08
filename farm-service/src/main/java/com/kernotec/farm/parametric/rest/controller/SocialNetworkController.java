@@ -8,7 +8,7 @@ import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.parametric.jpa.service.SocialNetworkService;
 import com.kernotec.farm.parametric.rest.ApiSpec.SocialNetworkSpec;
 import com.kernotec.farm.parametric.rest.dto.response.social.network.SocialNetworkResponse;
-import com.kernotec.farm.parametric.rest.mapper.social.network.SocialNetworkResponseMapper;
+import com.kernotec.farm.parametric.rest.mapper.social.network.SocialNetworkResponseFlatMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocialNetworkController {
 
     private final SocialNetworkService socialNetworkService;
-    private final SocialNetworkResponseMapper socialNetworkResponseMapper;
+    private final SocialNetworkResponseFlatMapper socialNetworkResponseFlatMapper;
 
     @Operation(summary = "Find all Social Networks")
     @GetMapping
@@ -47,7 +47,7 @@ public class SocialNetworkController {
 
         return PageResponse.<SocialNetworkResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(socialNetworkResponseMapper.toResponse(socialNetworkPage.getContent()))
+            .data(socialNetworkResponseFlatMapper.toResponse(socialNetworkPage.getContent()))
             .pagination(PaginationResponse.builder()
                 .pages(socialNetworkPage.getTotalPages())
                 .count(socialNetworkPage.getTotalElements())
@@ -67,7 +67,7 @@ public class SocialNetworkController {
 
         return PageResponse.<SocialNetworkResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(socialNetworkResponseMapper.toResponse(socialNetworkList))
+            .data(socialNetworkResponseFlatMapper.toResponse(socialNetworkList))
             .build();
     }
 
@@ -81,7 +81,7 @@ public class SocialNetworkController {
 
         return SingleResponse.<SocialNetworkResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(socialNetworkResponseMapper.toResponse(socialNetwork))
+            .data(socialNetworkResponseFlatMapper.toResponse(socialNetwork))
             .build();
     }
 }

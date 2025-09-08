@@ -2,21 +2,23 @@ package com.kernotec.farm.account.rest.mapper.account;
 
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.rest.dto.response.account.AccountResponse;
-import com.kernotec.farm.inventory.rest.mapper.chip.ChipResponseFlatMapper;
-import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseFlatMapper;
-import com.kernotec.farm.parametric.rest.mapper.social.network.SocialNetworkResponseFlatMapper;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Mapper(uses = {SocialNetworkResponseFlatMapper.class, DeviceResponseFlatMapper.class,
-    ChipResponseFlatMapper.class})
-public interface AccountResponseMapper {
+@Mapper
+public interface AccountResponseFlatMapper {
+
+    @Mapping(target = "person", ignore = true)
+    @Mapping(target = "socialNetwork", ignore = true)
+    @Mapping(target = "devices", ignore = true)
+    @Mapping(target = "chips", ignore = true)
+    @Mapping(target = "observations", ignore = true)
+    AccountResponse toResponse(Account account);
 
     AccountResponse toResponse(UUID id);
-
-    AccountResponse toResponse(Account account);
 
     List<AccountResponse> toResponse(List<Account> accountList);
 

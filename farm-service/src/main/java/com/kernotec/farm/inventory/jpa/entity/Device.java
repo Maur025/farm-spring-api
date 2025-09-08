@@ -57,4 +57,8 @@ public class Device extends BaseAuditEntity {
                joinColumns = @JoinColumn(name = "device_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "account_id", referencedColumnName = "id"))
     private Set<Account> accounts;
+
+    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
+    @Where(clause = "deleted is false")
+    private Set<DeviceImei> deviceImeis;
 }

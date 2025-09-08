@@ -10,7 +10,6 @@ import com.kernotec.farm.inventory.jpa.entity.Chip;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.entity.Farm;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
-import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseMapperImpl;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;

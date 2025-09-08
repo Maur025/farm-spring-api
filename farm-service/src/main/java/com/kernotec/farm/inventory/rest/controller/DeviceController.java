@@ -8,6 +8,7 @@ import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.service.DeviceService;
 import com.kernotec.farm.inventory.rest.ApiSpec.DeviceSpec;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
+import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseFilterMapper;
 import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,24 +33,28 @@ public class DeviceController {
 
     private final DeviceService deviceService;
     private final DeviceResponseMapper deviceResponseMapper;
+    private final DeviceResponseFilterMapper deviceResponseFilterMapper;
 
     @Operation(summary = "Find all Devices")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<DeviceResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "20") Integer size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "false") boolean descending,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "true") boolean descending,
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Device> devicePage = deviceService.findAllByKeyword(
+        Page<Device> devicePage = deviceService.findAllWithFilters(
             keyword, socialNetworkId, pageable);
 
         return PageResponse.<DeviceResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(deviceResponseMapper.toResponse(devicePage.getContent()))
+            .data(deviceResponseFilterMapper.toResponse(
+                devicePage.getContent(), socialNetworkId,
+                keyword
+            ))
             .pagination(PaginationResponse.builder()
                 .pages(devicePage.getTotalPages())
                 .count(devicePage.getTotalElements())
