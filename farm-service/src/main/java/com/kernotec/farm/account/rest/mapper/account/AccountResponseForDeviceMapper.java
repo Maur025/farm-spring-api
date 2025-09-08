@@ -18,7 +18,6 @@ public interface AccountResponseForDeviceMapper {
     @Mapping(target = "socialNetwork", ignore = true)
     @Mapping(target = "devices", ignore = true)
     @Mapping(target = "chips", ignore = true)
-    @Mapping(target = "observations", ignore = true)
     AccountResponse toResponse(Account account);
 
     default List<AccountResponse> toResponse(List<Account> accountList,

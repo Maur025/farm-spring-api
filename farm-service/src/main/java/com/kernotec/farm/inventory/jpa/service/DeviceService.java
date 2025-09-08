@@ -53,8 +53,9 @@ public class DeviceService extends BaseServiceImpl<Device, UUID> {
 
                 if (pattern != null) {
                     Join<Account, Person> personJoin = accountJoin.join("person", JoinType.INNER);
+
                     predicateList.add(cb.or(
-                        cb.equal(cb.lower(root.get("deviceNumber")), keyword),
+                        cb.equal(root.get("deviceNumber"), keyword),
                         cb.like(cb.lower(accountJoin.get("username")), pattern),
                         cb.like(cb.lower(personJoin.get("name")), pattern),
                         cb.like(cb.lower(personJoin.get("lastName")), pattern)
