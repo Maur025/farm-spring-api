@@ -3,8 +3,8 @@ package com.kernotec.farm.activity.rest.dto.response.publishing;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
-import com.kernotec.farm.activity.rest.dto.response.activity.ActivityFlatResponse;
-import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeForActivityResponse;
+import com.kernotec.farm.activity.rest.dto.response.activity.ActivityResponse;
+import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeResponse;
 import com.kernotec.farm.parametric.rest.dto.response.publishing.context.PublishingContextResponse;
 import com.kernotec.farm.parametric.rest.dto.response.publishing.type.PublishingTypeResponse;
 import java.util.UUID;
@@ -25,8 +25,8 @@ public class PublishingResponse extends EntityResponse {
     private PublishingContextResponse publishingContext;
 
     private UUID activityId;
-    private ActivityFlatResponse activity;
+    private ActivityResponse activity;
 
     private UUID activityTypeId;
-    private ActivityTypeForActivityResponse activityType;
+    private ActivityTypeResponse activityType;
 }

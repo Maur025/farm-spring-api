@@ -11,10 +11,10 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface ActivityTypeResponseFlatMapper {
 
-    ActivityTypeResponse toResponse(UUID id);
-
     @Mapping(target = "socialNetworks", ignore = true)
     ActivityTypeResponse toResponse(ActivityType activityType);
+
+    ActivityTypeResponse toResponse(UUID id);
 
     List<ActivityTypeResponse> toResponse(List<ActivityType> activityTypeList);
 

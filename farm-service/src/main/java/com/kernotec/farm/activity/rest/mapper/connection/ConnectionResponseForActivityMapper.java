@@ -1,19 +1,18 @@
 package com.kernotec.farm.activity.rest.mapper.connection;
 
-import com.kernotec.farm.account.rest.mapper.account.AccountResponseFlatMapper;
 import com.kernotec.farm.activity.jpa.entity.Connection;
 import com.kernotec.farm.activity.rest.dto.response.connection.ConnectionResponse;
-import com.kernotec.farm.activity.rest.mapper.activity.ActivityResponseFlatMapper;
-import com.kernotec.farm.parametric.rest.mapper.activity.type.ActivityTypeResponseFlatMapper;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Mapper(uses = {AccountResponseFlatMapper.class, ActivityResponseFlatMapper.class,
-    ActivityTypeResponseFlatMapper.class})
-public interface ConnectionResponseMapper {
+@Mapper
+public interface ConnectionResponseForActivityMapper {
 
+    @Mapping(target = "activity", ignore = true)
+    @Mapping(target = "activityType", ignore = true)
     ConnectionResponse toResponse(Connection connection);
 
     ConnectionResponse toResponse(UUID id);

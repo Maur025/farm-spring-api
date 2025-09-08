@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
 import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
-import com.kernotec.farm.activity.rest.dto.response.activity.ActivityFlatResponse;
-import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeForActivityResponse;
+import com.kernotec.farm.activity.rest.dto.response.activity.ActivityResponse;
 import com.kernotec.farm.activity.rest.dto.response.group.GroupResponse;
+import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeResponse;
 import com.kernotec.farm.parametric.rest.dto.response.publishing.context.PublishingContextResponse;
 import com.kernotec.farm.parametric.rest.dto.response.region.RegionResponse;
 import com.kernotec.farm.parametric.rest.dto.response.request.state.RequestStateResponse;
@@ -34,8 +34,8 @@ public class GroupMembershipResponse extends EntityResponse {
     private RequestStateResponse requestState;
 
     private UUID activityId;
-    private ActivityFlatResponse activity;
+    private ActivityResponse activity;
 
     private UUID activityTypeId;
-    private ActivityTypeForActivityResponse activityType;
+    private ActivityTypeResponse activityType;
 }
