@@ -37,14 +37,6 @@ public class GroupMembership extends BaseAuditEntity {
                 updatable = false)
     private Group group;
 
-    @Column(name = "publishing_context_id", nullable = false)
-    private UUID publishingContextId;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "publishing_context_id", referencedColumnName = "id", insertable = false,
-                updatable = false)
-    private PublishingContext publishingContext;
-
     @Column(name = "request_state_id", nullable = false)
     private UUID requestStateId;
 

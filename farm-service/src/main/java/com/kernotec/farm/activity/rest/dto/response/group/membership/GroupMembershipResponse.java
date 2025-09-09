@@ -7,7 +7,6 @@ import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
 import com.kernotec.farm.activity.rest.dto.response.activity.ActivityResponse;
 import com.kernotec.farm.activity.rest.dto.response.group.GroupResponse;
 import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeResponse;
-import com.kernotec.farm.parametric.rest.dto.response.publishing.context.PublishingContextResponse;
 import com.kernotec.farm.parametric.rest.dto.response.region.RegionResponse;
 import com.kernotec.farm.parametric.rest.dto.response.request.state.RequestStateResponse;
 import java.util.UUID;
@@ -26,9 +25,6 @@ public class GroupMembershipResponse extends EntityResponse {
 
     private UUID regionId;
     private RegionResponse region;
-
-    private UUID publishingContextId;
-    private PublishingContextResponse publishingContext;
 
     private UUID requestStateId;
     private RequestStateResponse requestState;

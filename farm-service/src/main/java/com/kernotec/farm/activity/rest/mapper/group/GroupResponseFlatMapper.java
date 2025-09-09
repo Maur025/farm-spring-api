@@ -12,6 +12,8 @@ import org.mapstruct.Mapping;
 public interface GroupResponseFlatMapper {
 
     @Mapping(target = "region", ignore = true)
+    @Mapping(target = "publishingContext", ignore = true)
+    @Mapping(target = "groupMemberships", ignore = true)
     GroupResponse toResponse(Group group);
 
     GroupResponse toResponse(UUID id);

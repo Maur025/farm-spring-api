@@ -25,7 +25,6 @@ public class GroupMembershipCreateCmd extends
 
         groupMembership.setAction(request.getAction());
         groupMembership.setGroupId(request.getGroupId());
-        groupMembership.setPublishingContextId(request.getPublishingContextId());
         groupMembership.setRequestStateId(request.getRequestStateId());
         groupMembership.setActivityId(request.getActivityId());
         groupMembership.setActivityTypeId(request.getActivityTypeId());
@@ -42,8 +41,6 @@ public class GroupMembershipCreateCmd extends
         private final GroupActionEnum action;
         @NotNull
         private final UUID groupId;
-        @NotNull
-        private final UUID publishingContextId;
         @NotNull
         private final UUID requestStateId;
         @NotNull

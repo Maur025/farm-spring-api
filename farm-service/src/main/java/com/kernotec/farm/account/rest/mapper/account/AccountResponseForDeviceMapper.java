@@ -14,7 +14,6 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface AccountResponseForDeviceMapper {
 
-    @Mapping(target = "person", ignore = true)
     @Mapping(target = "socialNetwork", ignore = true)
     @Mapping(target = "devices", ignore = true)
     @Mapping(target = "chips", ignore = true)
