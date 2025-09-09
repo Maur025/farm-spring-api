@@ -7,11 +7,10 @@ import com.kernotec.farm.activity.command.connection.ConnectionUpdateCmd;
 import com.kernotec.farm.activity.jpa.dto.entity.ConnectionDto;
 import com.kernotec.farm.activity.jpa.enums.ResponseRequestStateEnum;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionUpdateRequest;
-import com.kernotec.farm.parametric.jpa.entity.FriendState;
+import com.kernotec.farm.parametric.command.friend.state.FriendStateGetIdByCodeCmd;
 import com.kernotec.farm.parametric.jpa.entity.RequestState;
 import com.kernotec.farm.parametric.jpa.enums.FriendStateCodeEnum;
 import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
-import com.kernotec.farm.parametric.jpa.service.FriendStateService;
 import com.kernotec.farm.parametric.jpa.service.RequestStateService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
@@ -30,7 +29,7 @@ public class ProcessConnectionUpdateRequestCmd extends
     private final ConnectionUpdateCmd connectionUpdateCmd;
     private final ConnectionGetDtoCmd connectionGetDtoCmd;
     private final FriendCreateCmd friendCreateCmd;
-    private final FriendStateService friendStateService;
+    private final FriendStateGetIdByCodeCmd friendStateGetIdByCodeCmd;
 
     @Override
     protected Void run(Request request) {
@@ -48,15 +47,18 @@ public class ProcessConnectionUpdateRequestCmd extends
                         .build())
                 .execute();
 
-            FriendState friendState = friendStateService.findByCodeThrow(
-                FriendStateCodeEnum.ACTIVE);
+            UUID friendStateId = friendStateGetIdByCodeCmd.withRequest(
+                    FriendStateGetIdByCodeCmd.Request.builder()
+                        .code(FriendStateCodeEnum.ACTIVE)
+                        .build())
+                .execute();
 
             friendCreateCmd.withRequest(FriendCreateCmd.Request.builder()
                     .acceptedAt(connectionRequest.getResponseDate())
                     .accountId(connectionDto.getActivity()
                         .getAccountId())
                     .friendAccountId(connectionDto.getPotentialFriendAccountId())
-                    .friendStateId(friendState.getId())
+                    .friendStateId(friendStateId)
                     .build())
                 .execute();
 
@@ -65,7 +67,7 @@ public class ProcessConnectionUpdateRequestCmd extends
                     .accountId(connectionDto.getPotentialFriendAccountId())
                     .friendAccountId(connectionDto.getActivity()
                         .getAccountId())
-                    .friendStateId(friendState.getId())
+                    .friendStateId(friendStateId)
                     .build())
                 .execute();
         }
