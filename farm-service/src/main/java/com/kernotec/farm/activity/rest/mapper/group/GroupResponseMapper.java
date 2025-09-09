@@ -2,12 +2,13 @@ package com.kernotec.farm.activity.rest.mapper.group;
 
 import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.activity.rest.dto.response.group.GroupResponse;
+import com.kernotec.farm.activity.rest.mapper.group.membership.GroupMembershipResponseFlatMapper;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(uses = {GroupMembershipResponseFlatMapper.class})
 public interface GroupResponseMapper {
 
     GroupResponse toResponse(UUID id);

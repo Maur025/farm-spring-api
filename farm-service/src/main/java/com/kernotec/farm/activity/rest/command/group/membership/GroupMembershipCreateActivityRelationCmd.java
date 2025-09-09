@@ -58,6 +58,7 @@ public class GroupMembershipCreateActivityRelationCmd extends
             groupToRegisterId = groupCreateCmd.withRequest(GroupCreateCmd.Request.builder()
                     .name(groupMembershipRequest.getGroupName())
                     .regionId(groupMembershipRequest.getRegionId())
+                    .publishingContextId(groupMembershipRequest.getPublishingContextId())
                     .description("N/A")
                     .build())
                 .execute();
@@ -74,7 +75,6 @@ public class GroupMembershipCreateActivityRelationCmd extends
         groupMembershipCreateCmd.withRequest(GroupMembershipCreateCmd.Request.builder()
                 .action(groupMembershipRequest.getAction())
                 .groupId(groupToRegisterId)
-                .publishingContextId(groupMembershipRequest.getPublishingContextId())
                 .requestStateId(groupMembershipRequest.getAction()
                     .equals(GroupActionEnum.JOIN_REQUEST) ? requestStatePendingId
                     : requestStateNothingId)

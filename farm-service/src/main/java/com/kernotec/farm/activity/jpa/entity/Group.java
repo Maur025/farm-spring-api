@@ -1,6 +1,7 @@
 package com.kernotec.farm.activity.jpa.entity;
 
 import com.kernotec.core.jpa.entity.BaseAuditEntity;
+import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
 import com.kernotec.farm.parametric.jpa.entity.Region;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,6 +37,14 @@ public class Group extends BaseAuditEntity {
     @JoinColumn(name = "region_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private Region region;
+
+    @Column(name = "publishing_context_id", nullable = false)
+    private UUID publishingContextId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "publishing_context_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private PublishingContext publishingContext;
 
     @Where(clause = "deleted is false")
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)

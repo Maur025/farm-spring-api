@@ -6,6 +6,7 @@ import com.kernotec.farm.account.command.account.AccountGetDtoCmd;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.activity.command.connection.ConnectionCreateCmd;
+import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
 import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
 import com.kernotec.farm.parametric.command.request.state.RequestStateGetIdByCodeCmd;
@@ -39,11 +40,7 @@ public class ConnectionCreateActivityRelationCmd extends
             return null;
         }
 
-        UUID requestStateId = requestStateGetIdByCodeCmd.withRequest(
-                RequestStateGetIdByCodeCmd.Request.builder()
-                    .code(RequestStateCodeEnum.PENDING)
-                    .build())
-            .execute();
+        UUID requestStateId = getRequestStateIdByAction(connectionRequest.getAction());
 
         AccountDto accountDto = accountGetDtoCmd.withRequest(AccountGetDtoCmd.Request.builder()
                 .accountId(request.getAccountId())
@@ -88,6 +85,21 @@ public class ConnectionCreateActivityRelationCmd extends
             .execute();
 
         return null;
+    }
+
+    private UUID getRequestStateIdByAction(ConnectionActionEnum action) {
+        if (action.equals(ConnectionActionEnum.INCOMING_FRIEND_REQUEST_AND_CONFIRMED)) {
+            return requestStateGetIdByCodeCmd.withRequest(
+                    RequestStateGetIdByCodeCmd.Request.builder()
+                        .code(RequestStateCodeEnum.APPROVED)
+                        .build())
+                .execute();
+        }
+
+        return requestStateGetIdByCodeCmd.withRequest(RequestStateGetIdByCodeCmd.Request.builder()
+                .code(RequestStateCodeEnum.PENDING)
+                .build())
+            .execute();
     }
 
     @Builder
