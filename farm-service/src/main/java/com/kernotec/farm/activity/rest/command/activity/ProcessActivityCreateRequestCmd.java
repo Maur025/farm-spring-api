@@ -82,6 +82,7 @@ public class ProcessActivityCreateRequestCmd extends
                     .activityId(activityId)
                     .activityTypeId(activityRequest.getActivityTypeId())
                     .accountId(activityRequest.getAccountId())
+                    .activityDate(activityRequest.getActivityDate())
                     .build())
             .execute();
 

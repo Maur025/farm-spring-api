@@ -11,6 +11,7 @@ import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
 import com.kernotec.farm.parametric.command.request.state.RequestStateGetIdByCodeCmd;
 import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class ConnectionCreateActivityRelationCmd extends
     private final AccountCreateCmd accountCreateCmd;
     private final ConnectionCreateCmd connectionCreateCmd;
     private final ConnectionCreateActivityValidationCmd connectionCreateActivityValidationCmd;
+    private final ConnectionCreateDirectConnectionCmd connectionCreateDirectConnectionCmd;
 
     @Override
     protected Void run(Request request) {
@@ -74,6 +76,15 @@ public class ConnectionCreateActivityRelationCmd extends
                     .build())
             .execute();
 
+        connectionCreateDirectConnectionCmd.withRequest(
+                ConnectionCreateDirectConnectionCmd.Request.builder()
+                    .accountDto(accountDto)
+                    .accountFriendDto(accountPotentialDto)
+                    .action(connectionRequest.getAction())
+                    .activityDate(request.getActivityDate())
+                    .build())
+            .execute();
+
         connectionCreateCmd.withRequest(ConnectionCreateCmd.Request.builder()
                 .potentialFriendAccountId(potentialAccountId)
                 .action(connectionRequest.getAction())
@@ -110,5 +121,6 @@ public class ConnectionCreateActivityRelationCmd extends
         private final UUID activityId;
         private final UUID activityTypeId;
         private final UUID accountId;
+        private final ZonedDateTime activityDate;
     }
 }

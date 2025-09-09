@@ -10,6 +10,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import java.util.Set;
 import java.util.UUID;
@@ -50,6 +51,7 @@ public class Device extends BaseAuditEntity {
 
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
     @Where(clause = "deleted is false")
+    @OrderBy("phoneNumber ASC")
     private Set<Chip> chips;
 
     @ManyToMany
