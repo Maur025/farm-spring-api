@@ -10,6 +10,6 @@ public class JpaConfigDev {
 
     @Bean("auditorAware")
     public AuditorAware<String> auditorAware() {
-        return () -> Optional.of("farm-test-user");
+        return () -> Optional.of("farm-auth-admin");
     }
 }
