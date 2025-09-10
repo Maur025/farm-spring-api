@@ -14,6 +14,16 @@ public class ApiSpec {
         }
     }
 
+    public static class OpenIdConnectSpec {
+
+        public static final String BASE_PATH = ROOT_PATH + "/protocol/openid-connect";
+        public static final String TAG_NAME = "OPENID CONNECT";
+        public static final String TAG_DESCRIPTION = "OpenID Connect endpoints";
+
+        private OpenIdConnectSpec() {
+        }
+    }
+
     public static class UserSpec {
 
         public static final String BASE_PATH = ROOT_PATH + "/users";
