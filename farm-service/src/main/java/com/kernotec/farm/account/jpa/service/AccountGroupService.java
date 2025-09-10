@@ -5,7 +5,7 @@ import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.account.jpa.repository.AccountGroupRepository;
-import com.kernotec.farm.activity.exception.AccountGroupException;
+import com.kernotec.farm.account.exception.AccountGroupException;
 import com.kernotec.farm.parametric.jpa.entity.GroupState;
 import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
 import jakarta.persistence.criteria.Join;

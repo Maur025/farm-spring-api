@@ -7,10 +7,13 @@ import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.account.jpa.service.AccountGroupService;
 import com.kernotec.farm.account.rest.ApiSpec.AccountGroupSpec;
+import com.kernotec.farm.account.rest.command.account.group.AccountGroupLeaveCmd;
+import com.kernotec.farm.account.rest.dto.request.account.group.AccountGroupLeaveRequest;
 import com.kernotec.farm.account.rest.dto.response.account.group.AccountGroupResponse;
 import com.kernotec.farm.account.rest.mapper.account.group.AccountGroupResponseMapper;
 import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -32,6 +36,7 @@ public class AccountGroupController {
 
     private final AccountGroupService accountGroupService;
     private final AccountGroupResponseMapper accountGroupResponseMapper;
+    private final AccountGroupLeaveCmd accountGroupLeaveCmd;
 
     @Operation(summary = "Find all account groups")
     @GetMapping
@@ -70,6 +75,25 @@ public class AccountGroupController {
         return SingleResponse.<AccountGroupResponse>builder()
             .code(HttpStatus.OK.value())
             .data(accountGroupResponseMapper.toResponse(accountGroup))
+            .build();
+    }
+
+    @Operation(summary = "Leave group")
+    @PostMapping("{accountGroupId}/leave")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<AccountGroupResponse> leaveGroup(
+        @PathVariable("accountGroupId") UUID accountGroupId,
+        @RequestBody AccountGroupLeaveRequest request)
+    {
+        accountGroupLeaveCmd.withRequest(AccountGroupLeaveCmd.Request.builder()
+                .accountGroupId(accountGroupId)
+                .leaveRequest(request)
+                .build())
+            .execute();
+
+        return SingleResponse.<AccountGroupResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message("You have successfully left the group.")
             .build();
     }
 }
