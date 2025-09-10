@@ -46,6 +46,10 @@
     </dependency>
     <dependency>
       <groupId>com.kernotec</groupId>
+      <artifactId>core-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.kernotec</groupId>
       <artifactId>core-test</artifactId>
     </dependency>
 
@@ -94,12 +98,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-
-    <!-- remove when deciding whether to continue using keycloak or not -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
   </dependencies>
 

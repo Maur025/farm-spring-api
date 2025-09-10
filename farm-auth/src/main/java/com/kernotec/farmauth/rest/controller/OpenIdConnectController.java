@@ -1,8 +1,8 @@
 package com.kernotec.farmauth.rest.controller;
 
 import com.kernotec.farmauth.jpa.enums.GrantTypeEnum;
-import com.kernotec.farmauth.jpa.enums.TokenTypeEnum;
 import com.kernotec.farmauth.rest.ApiSpec.OpenIdConnectSpec;
+import com.kernotec.farmauth.rest.command.ConnectionTokenCmd;
 import com.kernotec.farmauth.rest.dto.request.OpenIdConnectTokenRequest;
 import com.kernotec.farmauth.rest.dto.response.OpenIdConnectTokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,24 +24,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class OpenIdConnectController {
 
+    private final ConnectionTokenCmd connectionTokenCmd;
+
     @Operation(summary = "OpenID Connect Endpoint to get token")
     @PostMapping("token")
     @ResponseStatus(HttpStatus.OK)
     public OpenIdConnectTokenResponse getTokenByGrantType(
         @RequestParam("grant_type") GrantTypeEnum grantType,
-        @RequestBody OpenIdConnectTokenRequest request)
+        @RequestBody(required = false) OpenIdConnectTokenRequest request)
     {
-        log.info("GRANT TYPE: {}", grantType);
-        log.info("REQUEST username: {}", request.getUsername());
-        log.info("REQUEST password: {}", request.getPassword());
-
-        return OpenIdConnectTokenResponse.builder()
-            .accessToken("token test")
-            .refreshToken("refresh token test")
-            .tokenType(TokenTypeEnum.bearer)
-            .expiresIn(3600L)
-            .refreshExpiresIn(1800L)
-            .scope("openid email profile")
-            .build();
+        return connectionTokenCmd.withRequest(ConnectionTokenCmd.Request.builder()
+                .grantType(grantType)
+                .tokenRequest(request)
+                .build())
+            .execute();
     }
 }
