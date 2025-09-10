@@ -1,8 +1,8 @@
 package com.kernotec.farm.activity.jpa.entity;
 
-import com.kernotec.core.jpa.entity.BaseAuditEntity;
-import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.audit.user.DataBaseAuditEntity;
+import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "activities")
-public class Activity extends BaseAuditEntity {
+public class Activity extends DataBaseAuditEntity {
 
     @Column(name = "link", nullable = false, length = 2000)
     private String link;

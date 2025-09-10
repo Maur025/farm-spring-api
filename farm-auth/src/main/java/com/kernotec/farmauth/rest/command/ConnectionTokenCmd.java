@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -18,6 +19,7 @@ public class ConnectionTokenCmd extends
 {
 
     private final AuthLoginWithPasswordCmd authLoginWithPasswordCmd;
+    private final GenerateAccessFromRefreshTokenCmd generateAccessFromRefreshTokenCmd;
 
     @Override
     protected OpenIdConnectTokenResponse run(Request request) {
@@ -28,7 +30,11 @@ public class ConnectionTokenCmd extends
                         .authRequest(request.getTokenRequest())
                         .build())
                 .execute();
-            case refresh_token -> null;
+            case refresh_token -> generateAccessFromRefreshTokenCmd.withRequest(
+                    GenerateAccessFromRefreshTokenCmd.Request.builder()
+                        .refreshToken(request.getRefreshToken())
+                        .build())
+                .execute();
         };
     }
 
@@ -38,5 +44,6 @@ public class ConnectionTokenCmd extends
 
         private final GrantTypeEnum grantType;
         private final OpenIdConnectTokenRequest tokenRequest;
+        private final String refreshToken;
     }
 }

@@ -1,5 +1,6 @@
 package com.kernotec.farmauth.config;
 
+import com.kernotec.farmauth.jpa.enums.RefreshTokenSecureEnum;
 import com.kernotec.farmauth.jpa.enums.TimeMeasureEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,4 +19,5 @@ public class AuthConfigProperties {
     private TimeMeasureEnum authTokenTypeExp;
     private Integer refreshTokenExp;
     private TimeMeasureEnum refreshTokenTypeExp;
+    private RefreshTokenSecureEnum refreshTokenSecure;
 }
