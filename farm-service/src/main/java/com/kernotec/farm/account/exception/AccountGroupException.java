@@ -1,4 +1,4 @@
-package com.kernotec.farm.activity.exception;
+package com.kernotec.farm.account.exception;
 
 import com.kernotec.core.exception.custom.base.ApiException;
 

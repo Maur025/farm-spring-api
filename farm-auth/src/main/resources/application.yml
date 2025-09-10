@@ -78,3 +78,6 @@ springdoc:
 logging:
   level:
     root: ${LOGGING_LEVEL:INFO}
+
+oauth2-config:
+  secret-key: ${OAUTH2_JWT_SECRET:secret-key}

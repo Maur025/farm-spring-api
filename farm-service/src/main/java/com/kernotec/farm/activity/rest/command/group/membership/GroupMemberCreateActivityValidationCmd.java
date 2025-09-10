@@ -6,7 +6,7 @@ import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.account.jpa.service.AccountGroupService;
 import com.kernotec.farm.activity.command.group.GroupGetDtoCmd;
-import com.kernotec.farm.activity.exception.AccountGroupException;
+import com.kernotec.farm.account.exception.AccountGroupException;
 import com.kernotec.farm.activity.jpa.dto.entity.GroupDto;
 import com.kernotec.farm.activity.jpa.enums.GroupActionEnum;
 import com.kernotec.farm.parametric.jpa.entity.GroupState;
