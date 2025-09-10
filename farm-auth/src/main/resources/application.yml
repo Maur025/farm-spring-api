@@ -86,3 +86,4 @@ oauth2-config:
   auth-token-type-exp: ${OAUTH2_JWT_AUTH_TOKEN_TYPE_EXP:seconds}
   refresh-token-exp: ${OAUTH2_JWT_REFRESH_TOKEN_EXP:86400}
   refresh-token-type-exp: ${OAUTH2_JWT_REFRESH_TOKEN_TYPE_EXP:seconds}
+  refresh-token-secure: ${OAUTH2_JWT_REFRESH_TOKEN_SECURE:dev}

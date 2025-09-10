@@ -1,6 +1,7 @@
 package com.kernotec.farmauth.rest.command;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
+import com.kernotec.farmauth.command.TokenCreateCmd;
 import com.kernotec.farmauth.config.AuthConfigProperties;
 import com.kernotec.farmauth.config.FarmAppProperties;
 import com.kernotec.farmauth.jpa.entity.User;
@@ -17,7 +18,9 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +45,7 @@ public class AuthLoginWithPasswordCmd extends
     private final PasswordEncoder passwordEncoder;
     private final AuthConfigProperties authConfigProperties;
     private final FarmAppProperties farmAppProperties;
+    private final TokenCreateCmd tokenCreateCmd;
 
     @Override
     protected OpenIdConnectTokenResponse run(Request request) {
@@ -70,6 +74,19 @@ public class AuthLoginWithPasswordCmd extends
 
         String accessToken = generateToken(claimsSetOfAccessToken);
         String refreshToken = generateToken(claimsSetOfRefreshToken);
+
+        tokenCreateCmd.withRequest(TokenCreateCmd.Request.builder()
+                .clientId("farm-frontend-app")
+                .tokenHash(refreshToken)
+                .tokenId(refreshTokenId)
+                .issuedAt(ZonedDateTime.now())
+                .expiresAt(ZonedDateTime.now()
+                    .plus(Duration.ofMillis(refreshExp)))
+                .expiresIn(refreshExp / 1000)
+                .revoked(false)
+                .userId(user.getId())
+                .build())
+            .execute();
 
         return OpenIdConnectTokenResponse.builder()
             .accessToken(accessToken)

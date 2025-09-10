@@ -26,6 +26,9 @@ public class Token extends BaseAuditEntity {
     @Column(name = "token_hash", nullable = false)
     private String tokenHash;
 
+    @Column(name = "token_id", nullable = false)
+    private UUID tokenId;
+
     @Column(name = "issued_at", nullable = false)
     private ZonedDateTime issuedAt;
 
