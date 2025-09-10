@@ -81,3 +81,8 @@ logging:
 
 oauth2-config:
   secret-key: ${OAUTH2_JWT_SECRET:secret-key}
+  audience: ${OAUTH2_JWT_AUDIENCE:farm-audience}
+  auth-token-exp: ${OAUTH2_JWT_AUTH_TOKEN_EXP:3600}
+  auth-token-type-exp: ${OAUTH2_JWT_AUTH_TOKEN_TYPE_EXP:seconds}
+  refresh-token-exp: ${OAUTH2_JWT_REFRESH_TOKEN_EXP:86400}
+  refresh-token-type-exp: ${OAUTH2_JWT_REFRESH_TOKEN_TYPE_EXP:seconds}

@@ -18,9 +18,11 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AccountGroupLeaveCmd extends
@@ -36,8 +38,6 @@ public class AccountGroupLeaveCmd extends
 
     @Override
     protected Void run(Request request) {
-        AccountGroupLeaveRequest leaveRequest = request.getLeaveRequest();
-
         AccountGroupDto accountGroupDto = accountGroupGetDtoCmd.withRequest(
                 AccountGroupGetDtoCmd.Request.builder()
                     .accountGroupId(request.getAccountGroupId())
@@ -53,6 +53,8 @@ public class AccountGroupLeaveCmd extends
                 .getName() + "'", HttpStatus.CONFLICT.value()
             );
         }
+
+        AccountGroupLeaveRequest leaveRequest = request.getLeaveRequest();
 
         accountGroupUpdateInLeaveCmd.withRequest(AccountGroupUpdateInLeaveCmd.Request.builder()
                 .action(GroupActionEnum.LEAVE)

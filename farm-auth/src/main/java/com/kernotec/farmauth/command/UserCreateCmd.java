@@ -10,6 +10,7 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class UserCreateCmd extends
 {
 
     private final UserService userService;
-    private final UserGetPasswordHashCmd userGetPasswordHashCmd;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     protected UUID run(Request request) {
@@ -28,10 +29,7 @@ public class UserCreateCmd extends
         user.setName(request.getName());
         user.setLastName(request.getLastName());
         user.setUsername(request.getUsername());
-        user.setPassword(userGetPasswordHashCmd.withRequest(UserGetPasswordHashCmd.Request.builder()
-                .password(request.getPassword())
-                .build())
-            .execute());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setCreatedOn(ZonedDateTime.now());
 
         user = userService.save(user);
