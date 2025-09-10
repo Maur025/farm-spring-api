@@ -66,6 +66,12 @@ spring:
       minimum-idle: 5
       maximum-pool-size: 50
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: ${OAUTH2_JWT_SECRET:secret-key}
+
 # SWAGGER
 springdoc:
   api-docs:
@@ -80,3 +86,6 @@ springdoc:
 logging:
   level:
     root: ${LOGGING_LEVEL:INFO}
+
+oauth2-config:
+  secret-key: ${OAUTH2_JWT_SECRET:secret-key}

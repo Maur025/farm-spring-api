@@ -33,13 +33,13 @@ public class OpenIdConfigurationController {
 
         return OpenIdConfigurationResponse.builder()
             .issuer(serverHost + realm)
-            .authorization_endpoint(serverHost + realm + "/protocol/openid-connect/auth")
-            .token_endpoint(serverHost + realm + "/protocol/openid-connect/token")
-            .userinfo_endpoint(serverHost + realm + "/protocol/openid-connect/userinfo")
-            .jwks_uri(serverHost + realm + "/protocol/openid-connect/certs")
-            .response_types_supported(List.of("code", "token", "id_token"))
-            .subject_types_supported(List.of("public"))
-            .id_token_signing_alg_values_supported(List.of("RS256"))
+            .authorizationEndpoint(serverHost + realm + "/protocol/openid-connect/auth")
+            .tokenEndpoint(serverHost + realm + "/protocol/openid-connect/token")
+            .userinfoEndpoint(serverHost + realm + "/protocol/openid-connect/userinfo")
+            .jwksUri(serverHost + realm + "/protocol/openid-connect/certs")
+            .responseTypesSupported(List.of("code", "token", "id_token"))
+            .subjectTypesSupported(List.of("public"))
+            .idTokenSigningAlgValuesSupported(List.of("RS256"))
             .build();
     }
 }
