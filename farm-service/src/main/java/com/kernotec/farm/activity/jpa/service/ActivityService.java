@@ -4,9 +4,9 @@ import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.activity.jpa.entity.Activity;
-import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.activity.jpa.repository.ActivityRepository;
 import com.kernotec.farm.activity.rest.dto.request.activity.ActivityFindAllFilterRequest;
+import com.kernotec.farm.inventory.jpa.entity.Device;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -58,9 +58,11 @@ public class ActivityService extends BaseServiceImpl<Activity, UUID> {
                         cb.equal(accountDeviceJoin.get("id"), filterRequest.getDeviceId()));
                 }
 
-                if (filterRequest.getAccountId() != null) {
-                    predicateList.add(
-                        cb.equal(root.get("accountId"), filterRequest.getAccountId()));
+                if (filterRequest.getAccountIds() != null && !filterRequest.getAccountIds()
+                    .isEmpty())
+                {
+                    predicateList.add(root.get("accountId")
+                        .in(filterRequest.getAccountIds()));
                 }
 
                 return cb.and(predicateList.toArray(Predicate[]::new));

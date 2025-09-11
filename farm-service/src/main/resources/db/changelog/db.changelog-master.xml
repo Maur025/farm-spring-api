@@ -118,11 +118,18 @@
 
   <include file="db/changelog/2025/09/04-01-changelog-120.xml"/>
   <include file="db/changelog/2025/09/04-01-changelog-121.xml"/>
-  <include file="db/changelog/2025/09/09-01-changelog-122.xml"/>
-  <include file="db/changelog/2025/09/10-01-changelog-123.xml"/>
 
   <!-- region seeder update2 - remove varios, add global -->
   <changeSet id="1757028478394-1" author="Maur025">
     <sqlFile path="data/region/region_seeder_update2.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/09/09-01-changelog-122.xml"/>
+  <include file="db/changelog/2025/09/10-01-changelog-123.xml"/>
+
+  <!-- request state update1 - update aprovado for aprobado-->
+  <changeSet id="1757567985404-1" author="Maur025">
+    <sqlFile path="data/request/state/request_state_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
   </changeSet>
 </databaseChangeLog>
