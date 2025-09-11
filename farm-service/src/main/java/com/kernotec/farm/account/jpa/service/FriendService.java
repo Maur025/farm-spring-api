@@ -6,6 +6,7 @@ import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.Friend;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.repository.FriendRepository;
+import com.kernotec.farm.activity.exception.FriendException;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -71,5 +72,12 @@ public class FriendService extends BaseServiceImpl<Friend, UUID> {
     {
         return repository.findByAccountIdAndFriendAccountIdAndFriendStateId(
             accountId, friendAccountId, friendStateId);
+    }
+
+    public Friend findByAccountIdAndFriendAccountIdAndFriendStateIdThrow(UUID accountId,
+        UUID friendAccountId, UUID friendStateId)
+    {
+        return findByAccountIdAndFriendAccountIdAndFriendStateId(
+            accountId, friendAccountId, friendStateId).orElseThrow(() -> new FriendException(""));
     }
 }

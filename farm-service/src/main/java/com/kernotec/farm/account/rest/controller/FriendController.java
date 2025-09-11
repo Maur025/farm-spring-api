@@ -8,6 +8,8 @@ import com.kernotec.farm.account.jpa.entity.Friend;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.service.FriendService;
 import com.kernotec.farm.account.rest.ApiSpec.FriendSpec;
+import com.kernotec.farm.account.rest.command.friend.FriendBreakRelationshipCmd;
+import com.kernotec.farm.account.rest.dto.request.friend.FriendBreakRelationshipRequest;
 import com.kernotec.farm.account.rest.dto.response.friend.FriendResponse;
 import com.kernotec.farm.account.rest.mapper.friend.FriendResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -32,6 +36,7 @@ public class FriendController {
 
     private final FriendService friendService;
     private final FriendResponseMapper friendResponseMapper;
+    private final FriendBreakRelationshipCmd friendBreakRelationshipCmd;
 
     @Operation(summary = "Find all friends")
     @GetMapping
@@ -67,6 +72,24 @@ public class FriendController {
         return SingleResponse.<FriendResponse>builder()
             .code(HttpStatus.OK.value())
             .data(friendResponseMapper.toResponse(friend))
+            .build();
+    }
+
+    @Operation(summary = "Break friendship by id")
+    @PostMapping("{friendId}/break-relationship")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<FriendResponse> breakRelationship(@PathVariable("friendId") UUID friendId,
+        @RequestBody FriendBreakRelationshipRequest request)
+    {
+        friendBreakRelationshipCmd.withRequest(FriendBreakRelationshipCmd.Request.builder()
+                .friendId(friendId)
+                .breakRequest(request)
+                .build())
+            .execute();
+
+        return SingleResponse.<FriendResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message("Friendship broken successfully")
             .build();
     }
 }
