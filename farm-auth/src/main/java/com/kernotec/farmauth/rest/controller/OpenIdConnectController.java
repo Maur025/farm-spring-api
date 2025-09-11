@@ -1,12 +1,15 @@
 package com.kernotec.farmauth.rest.controller;
 
+import com.kernotec.core.rest.dto.response.MessageResponse;
 import com.kernotec.farmauth.config.AuthConfigProperties;
 import com.kernotec.farmauth.jpa.enums.GrantTypeEnum;
 import com.kernotec.farmauth.jpa.enums.RefreshTokenSecureEnum;
 import com.kernotec.farmauth.rest.ApiSpec.OpenIdConnectSpec;
 import com.kernotec.farmauth.rest.command.ConnectionTokenCmd;
+import com.kernotec.farmauth.rest.command.UserInfoGetDataCmd;
 import com.kernotec.farmauth.rest.dto.request.OpenIdConnectTokenRequest;
 import com.kernotec.farmauth.rest.dto.response.OpenIdConnectTokenResponse;
+import com.kernotec.farmauth.rest.dto.response.OpenIdConnectUserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
@@ -15,8 +18,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,6 +36,7 @@ public class OpenIdConnectController {
 
     private final ConnectionTokenCmd connectionTokenCmd;
     private final AuthConfigProperties authConfigProperties;
+    private final UserInfoGetDataCmd userInfoGetDataCmd;
 
     @Operation(summary = "OpenID Connect Endpoint to get token")
     @PostMapping("token")
@@ -65,5 +71,28 @@ public class OpenIdConnectController {
         }
 
         return openIdConnectTokenResponse;
+    }
+
+    @Operation(summary = "OpenId Connect userinfo endpoint")
+    @GetMapping("userinfo")
+    @ResponseStatus(HttpStatus.OK)
+    public OpenIdConnectUserInfoResponse getUserInfoData(
+        @RequestHeader("Authorization") String authorizationHeader)
+    {
+        String token = authorizationHeader.substring("Bearer ".length());
+
+        return userInfoGetDataCmd.withRequest(UserInfoGetDataCmd.Request.builder()
+                .accessToken(token)
+                .build())
+            .execute();
+    }
+
+    @Operation(summary = "OpenId Connect logout endpoint")
+    @PostMapping("logout")
+    @ResponseStatus(HttpStatus.OK)
+    public MessageResponse userLogout() {
+        return MessageResponse.builder()
+            .message("Successfully logged out")
+            .build();
     }
 }
