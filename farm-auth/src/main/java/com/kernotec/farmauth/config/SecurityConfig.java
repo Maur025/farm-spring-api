@@ -40,9 +40,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource getCorsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(farmAppProperties.getAllowedOriginsList());
+        configuration.setAllowedOriginPatterns(farmAppProperties.getAllowedOriginsList());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Content-Type", "Authorization"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(List.of("*"));
 

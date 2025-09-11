@@ -12,11 +12,13 @@ import com.kernotec.farmauth.rest.dto.response.OpenIdConnectTokenResponse;
 import com.kernotec.farmauth.rest.dto.response.OpenIdConnectUserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,16 +60,19 @@ public class OpenIdConnectController {
         if (grantType.equals(GrantTypeEnum.password) && openIdConnectTokenResponse != null
             && openIdConnectTokenResponse.getRefreshToken() != null)
         {
-            Cookie refreshTokenCookie = new Cookie(
-                "refresh_token", openIdConnectTokenResponse.getRefreshToken());
-            refreshTokenCookie.setHttpOnly(true);
-            refreshTokenCookie.setSecure(
-                RefreshTokenSecureEnum.prod.equals(authConfigProperties.getRefreshTokenSecure()));
-            refreshTokenCookie.setPath("/");
-            refreshTokenCookie.setMaxAge(
-                Math.toIntExact(openIdConnectTokenResponse.getRefreshExpiresIn()));
+            ResponseCookie refreshTokenCookie = ResponseCookie.from(
+                    "refresh_token",
+                    openIdConnectTokenResponse.getRefreshToken()
+                )
+                .httpOnly(true)
+                .secure(RefreshTokenSecureEnum.prod.equals(
+                    authConfigProperties.getRefreshTokenSecure()))
+                .path("/")
+                .maxAge(Duration.ofSeconds(openIdConnectTokenResponse.getRefreshExpiresIn()))
+                .sameSite("None")
+                .build();
 
-            response.addCookie(refreshTokenCookie);
+            response.setHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
         }
 
         return openIdConnectTokenResponse;
