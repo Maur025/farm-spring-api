@@ -12,6 +12,7 @@ import com.kernotec.farm.account.rest.command.friend.FriendBreakRelationshipCmd;
 import com.kernotec.farm.account.rest.dto.request.friend.FriendBreakRelationshipRequest;
 import com.kernotec.farm.account.rest.dto.response.friend.FriendResponse;
 import com.kernotec.farm.account.rest.mapper.friend.FriendResponseMapper;
+import com.kernotec.farm.parametric.jpa.enums.FriendStateCodeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
@@ -47,11 +48,12 @@ public class FriendController {
         @RequestParam(defaultValue = "true") boolean descending,
         @RequestParam(required = false) UUID accountId,
         @RequestParam(required = false) UUID socialNetworkId,
-        @RequestParam(required = false) AccountTypeEnum friendAccountType)
+        @RequestParam(required = false) AccountTypeEnum friendAccountType,
+        @RequestParam(required = false) FriendStateCodeEnum friendStateCode)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
         Page<Friend> friendPage = friendService.findAllWithFilters(
-            accountId, socialNetworkId, friendAccountType, pageable);
+            accountId, socialNetworkId, friendAccountType, friendStateCode, pageable);
 
         return PageResponse.<FriendResponse>builder()
             .code(HttpStatus.OK.value())
