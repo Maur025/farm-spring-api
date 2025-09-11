@@ -5,6 +5,7 @@ import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.account.jpa.entity.Friend;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.service.FriendService;
 import com.kernotec.farm.account.rest.ApiSpec.FriendSpec;
 import com.kernotec.farm.account.rest.dto.response.friend.FriendResponse;
@@ -40,11 +41,12 @@ public class FriendController {
         @RequestParam(defaultValue = "createdAt") String sortBy,
         @RequestParam(defaultValue = "true") boolean descending,
         @RequestParam(required = false) UUID accountId,
-        @RequestParam(required = false) UUID socialNetworkId)
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) AccountTypeEnum friendAccountType)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
         Page<Friend> friendPage = friendService.findAllWithFilters(
-            accountId, socialNetworkId, pageable);
+            accountId, socialNetworkId, friendAccountType, pageable);
 
         return PageResponse.<FriendResponse>builder()
             .code(HttpStatus.OK.value())

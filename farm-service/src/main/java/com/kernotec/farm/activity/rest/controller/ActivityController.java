@@ -54,19 +54,32 @@ public class ActivityController {
     public PageResponse<ActivityResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "10") Integer size,
         @RequestParam(defaultValue = "activityDate") String sortBy,
-        @RequestParam(defaultValue = "true") boolean descending,
-        @RequestParam(required = false) UUID accountId,
-        @RequestParam(required = false) UUID socialNetworkId,
-        @RequestParam(required = false) UUID deviceId)
+        @RequestParam(defaultValue = "true") boolean descending)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Activity> activityPage = activityService.findAllWithFilters(
-            ActivityFindAllFilterRequest.builder()
-                .accountId(accountId)
-                .socialNetworkId(socialNetworkId)
-                .deviceId(deviceId)
-                .build(), pageable
-        );
+        Page<Activity> activityPage = activityService.findAll(pageable);
+
+        return PageResponse.<ActivityResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(activityResponseMapper.toResponse(activityPage.getContent()))
+            .pagination(PaginationResponse.builder()
+                .pages(activityPage.getTotalPages())
+                .count(activityPage.getTotalElements())
+                .build())
+            .build();
+    }
+
+    @Operation(summary = "Find all Activities with filters")
+    @PostMapping("filter")
+    @ResponseStatus(HttpStatus.OK)
+    public PageResponse<ActivityResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
+        @RequestParam(defaultValue = "10") Integer size,
+        @RequestParam(defaultValue = "activityDate") String sortBy,
+        @RequestParam(defaultValue = "true") boolean descending,
+        @RequestBody ActivityFindAllFilterRequest request)
+    {
+        Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
+        Page<Activity> activityPage = activityService.findAllWithFilters(request, pageable);
 
         return PageResponse.<ActivityResponse>builder()
             .code(HttpStatus.OK.value())

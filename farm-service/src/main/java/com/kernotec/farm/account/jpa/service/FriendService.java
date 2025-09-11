@@ -4,6 +4,7 @@ import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.Friend;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.repository.FriendRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -34,7 +35,8 @@ public class FriendService extends BaseServiceImpl<Friend, UUID> {
         return repository;
     }
 
-    public Page<Friend> findAllWithFilters(UUID accountId, UUID socialNetworkId, Pageable pageable)
+    public Page<Friend> findAllWithFilters(UUID accountId, UUID socialNetworkId,
+        AccountTypeEnum friendAccountType, Pageable pageable)
     {
         return repository.findAll(
             (Specification<Friend>) (root, query, cb) -> {
@@ -49,6 +51,13 @@ public class FriendService extends BaseServiceImpl<Friend, UUID> {
 
                     predicateList.add(
                         cb.equal(accountJoin.get("socialNetworkId"), socialNetworkId));
+                }
+
+                if (friendAccountType != null) {
+                    Join<Friend, Account> friendAccountJoin = root.join(
+                        "friendAccount", JoinType.INNER);
+
+                    predicateList.add(cb.equal(friendAccountJoin.get("type"), friendAccountType));
                 }
 
                 query.distinct(true);
