@@ -13,6 +13,15 @@ import org.springframework.context.annotation.Configuration;
 public class FarmAppProperties {
 
     private List<Server> servers;
+    private String allowedOrigins;
+
+    public List<String> getAllowedOriginsList() {
+        if (allowedOrigins == null || allowedOrigins.isBlank()) {
+            return List.of();
+        }
+
+        return List.of(allowedOrigins.split(","));
+    }
 
     @Getter
     @Setter

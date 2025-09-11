@@ -1,7 +1,9 @@
 package com.kernotec.farmauth.rest.command;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
+import com.kernotec.farmauth.command.TokenBuildClaimsSetCmd;
 import com.kernotec.farmauth.command.TokenCreateCmd;
+import com.kernotec.farmauth.command.TokenGenerateNewCmd;
 import com.kernotec.farmauth.config.AuthConfigProperties;
 import com.kernotec.farmauth.config.FarmAppProperties;
 import com.kernotec.farmauth.jpa.entity.User;
@@ -10,20 +12,10 @@ import com.kernotec.farmauth.jpa.service.UserService;
 import com.kernotec.farmauth.rest.dto.request.OpenIdConnectTokenRequest;
 import com.kernotec.farmauth.rest.dto.response.OpenIdConnectTokenResponse;
 import com.kernotec.farmauth.util.TimeMeasureUtil;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +38,8 @@ public class AuthLoginWithPasswordCmd extends
     private final AuthConfigProperties authConfigProperties;
     private final FarmAppProperties farmAppProperties;
     private final TokenCreateCmd tokenCreateCmd;
+    private final TokenGenerateNewCmd tokenGenerateNewCmd;
+    private final TokenBuildClaimsSetCmd tokenBuildClaimsSetCmd;
 
     @Override
     protected OpenIdConnectTokenResponse run(Request request) {
@@ -68,12 +62,30 @@ public class AuthLoginWithPasswordCmd extends
 
         UUID refreshTokenId = UUID.randomUUID();
 
-        JWTClaimsSet claimsSetOfAccessToken = getClaimsSet(user, accessExp, null);
-        JWTClaimsSet claimsSetOfRefreshToken = getClaimsSet(
-            user, refreshExp, refreshTokenId.toString());
+        JWTClaimsSet claimsSetOfAccessToken = tokenBuildClaimsSetCmd.withRequest(
+                TokenBuildClaimsSetCmd.Request.builder()
+                    .user(user)
+                    .tokenExp(accessExp)
+                    .build())
+            .execute();
 
-        String accessToken = generateToken(claimsSetOfAccessToken);
-        String refreshToken = generateToken(claimsSetOfRefreshToken);
+        JWTClaimsSet claimsSetOfRefreshToken = tokenBuildClaimsSetCmd.withRequest(
+                TokenBuildClaimsSetCmd.Request.builder()
+                    .user(user)
+                    .tokenExp(refreshExp)
+                    .refreshTokenId(refreshTokenId.toString())
+                    .build())
+            .execute();
+
+        String accessToken = tokenGenerateNewCmd.withRequest(TokenGenerateNewCmd.Request.builder()
+                .claimsSet(claimsSetOfAccessToken)
+                .build())
+            .execute();
+
+        String refreshToken = tokenGenerateNewCmd.withRequest(TokenGenerateNewCmd.Request.builder()
+                .claimsSet(claimsSetOfRefreshToken)
+                .build())
+            .execute();
 
         tokenCreateCmd.withRequest(TokenCreateCmd.Request.builder()
                 .clientId("farm-frontend-app")
@@ -96,49 +108,6 @@ public class AuthLoginWithPasswordCmd extends
             .refreshExpiresIn(refreshExp / 1000)
             .scope("openid profile email")
             .build();
-    }
-
-    private JWTClaimsSet getClaimsSet(User user, long tokenExp, String refreshTokenId)
-    {
-        String hostUrl = farmAppProperties.getServers()
-            .get(0)
-            .getUrl();
-
-        return new JWTClaimsSet.Builder().subject(user.getId()
-                .toString())
-            .claim("preferred_username", user.getUsername())
-            .claim("name", user.getName() + " " + user.getLastName())
-            .claim("realm_access", Map.of("roles", List.of("ADMIN")))
-            .jwtID(refreshTokenId != null ? refreshTokenId : UUID.randomUUID()
-                .toString())
-            .claim(
-                "auth_time", Instant.now()
-                    .getEpochSecond()
-            )
-            .claim("azp", "farm-frontend-app")
-            .claim("scope", "openid profile email")
-            .issueTime(new Date())
-            .expirationTime(new Date(System.currentTimeMillis() + tokenExp))
-            .issuer(hostUrl)
-            .audience(authConfigProperties.getAudience())
-            .notBeforeTime(new Date())
-            .build();
-    }
-
-    private String generateToken(JWTClaimsSet claimsSet) {
-        try {
-            JWSSigner signer = new MACSigner(authConfigProperties.getSecretKey()
-                .getBytes());
-
-            SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
-
-            signedJWT.sign(signer);
-
-            return signedJWT.serialize();
-        } catch (JOSEException e) {
-            log.error("Error generating token: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
-        }
     }
 
     @Builder
