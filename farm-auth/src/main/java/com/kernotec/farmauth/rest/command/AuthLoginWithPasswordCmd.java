@@ -5,7 +5,6 @@ import com.kernotec.farmauth.command.TokenBuildClaimsSetCmd;
 import com.kernotec.farmauth.command.TokenCreateCmd;
 import com.kernotec.farmauth.command.TokenGenerateNewCmd;
 import com.kernotec.farmauth.config.AuthConfigProperties;
-import com.kernotec.farmauth.config.FarmAppProperties;
 import com.kernotec.farmauth.jpa.entity.User;
 import com.kernotec.farmauth.jpa.enums.TokenTypeEnum;
 import com.kernotec.farmauth.jpa.service.UserService;
@@ -36,7 +35,6 @@ public class AuthLoginWithPasswordCmd extends
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final AuthConfigProperties authConfigProperties;
-    private final FarmAppProperties farmAppProperties;
     private final TokenCreateCmd tokenCreateCmd;
     private final TokenGenerateNewCmd tokenGenerateNewCmd;
     private final TokenBuildClaimsSetCmd tokenBuildClaimsSetCmd;
