@@ -132,4 +132,6 @@
     <sqlFile path="data/request/state/request_state_seeder_update1.sql"
       relativeToChangelogFile="true"/>
   </changeSet>
+
+  <include file="db/changelog/2025/09/12-01-changelog-124.xml"/>
 </databaseChangeLog>

@@ -25,6 +25,7 @@ public class ActivityCreateCmd extends
 
         activity.setLink(request.getLink());
         activity.setActivityDate(request.getActivityDate());
+        activity.setSystemActivity(request.getIsSystemActivity());
         activity.setAccountId(request.getAccountId());
         activity.setActivityTypeId(request.getActivityTypeId());
 
@@ -40,6 +41,7 @@ public class ActivityCreateCmd extends
         private final String link;
         @NotNull
         private final ZonedDateTime activityDate;
+        private final Boolean isSystemActivity;
         @NotNull
         private final UUID accountId;
         @NotNull

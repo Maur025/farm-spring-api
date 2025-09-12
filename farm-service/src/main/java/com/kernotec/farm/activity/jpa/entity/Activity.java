@@ -30,6 +30,9 @@ public class Activity extends DataBaseAuditEntity {
     @Column(name = "activity_date", nullable = false)
     private ZonedDateTime activityDate;
 
+    @Column(name = "is_system_activity", columnDefinition = "boolean default false")
+    private boolean isSystemActivity = false;
+
     @Column(name = "account_id", nullable = false)
     private UUID accountId;
 

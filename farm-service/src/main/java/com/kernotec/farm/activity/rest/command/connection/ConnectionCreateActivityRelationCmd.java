@@ -44,7 +44,12 @@ public class ConnectionCreateActivityRelationCmd extends
             return null;
         }
 
-        UUID requestStateId = getRequestStateIdByAction(connectionRequest.getAction());
+        UUID approveOrPendingReqStateId = getRequestStateIdByAction(connectionRequest.getAction());
+        UUID nothingRequestStateId = requestStateGetIdByCodeCmd.withRequest(
+                RequestStateGetIdByCodeCmd.Request.builder()
+                    .code(RequestStateCodeEnum.NOTHING_WAS_REQUESTED)
+                    .build())
+            .execute();
 
         AccountDto accountDto = accountGetDtoCmd.withRequest(AccountGetDtoCmd.Request.builder()
                 .accountId(request.getAccountId())
@@ -75,6 +80,8 @@ public class ConnectionCreateActivityRelationCmd extends
                     .accountUsername(accountDto.getUsername())
                     .potentialFriendAccountId(potentialAccountId)
                     .potentialFriendAccountUsername(accountPotentialDto.getUsername())
+                    .accountType(accountPotentialDto.getType())
+                    .action(connectionRequest.getAction())
                     .build())
             .execute();
 
@@ -91,15 +98,17 @@ public class ConnectionCreateActivityRelationCmd extends
                 .potentialFriendAccountId(potentialAccountId)
                 .action(connectionRequest.getAction())
                 .type(ConnectionTypeEnum.fromValue(accountPotentialDto.getType()))
-                .requestStateId(requestStateId)
+                .requestStateId(isShouldBehaveAsSocialNetwork(
+                    accountPotentialDto.getType(),
+                    connectionRequest.getAction()
+                ) ? nothingRequestStateId : approveOrPendingReqStateId)
                 .activityId(request.getActivityId())
                 .activityTypeId(request.getActivityTypeId())
                 .build())
             .execute();
 
-        if (AccountTypeEnum.INTERNAL.equals(accountPotentialDto.getType())
-            && !ConnectionActionEnum.INCOMING_FRIEND_REQUEST_AND_CONFIRMED.equals(
-            connectionRequest.getAction()))
+        if (isShouldBehaveAsSocialNetwork(
+            accountPotentialDto.getType(), connectionRequest.getAction()))
         {
             UUID activityMirrorId = activityCreateCmd.withRequest(
                     ActivityCreateCmd.Request.builder()
@@ -107,16 +116,15 @@ public class ConnectionCreateActivityRelationCmd extends
                         .activityDate(request.getActivityDate())
                         .accountId(potentialAccountId)
                         .activityTypeId(request.getActivityTypeId())
+                        .isSystemActivity(true)
                         .build())
                 .execute();
 
             connectionCreateCmd.withRequest(ConnectionCreateCmd.Request.builder()
                     .potentialFriendAccountId(request.getAccountId())
-                    .action(ConnectionActionEnum.INCOMING_FRIEND_REQUEST.equals(
-                        connectionRequest.getAction()) ? ConnectionActionEnum.OUTGOING_FRIEND_REQUEST
-                        : ConnectionActionEnum.INCOMING_FRIEND_REQUEST)
+                    .action(ConnectionActionEnum.INCOMING_FRIEND_REQUEST)
                     .type(ConnectionTypeEnum.fromValue(accountDto.getType()))
-                    .requestStateId(requestStateId)
+                    .requestStateId(approveOrPendingReqStateId)
                     .activityId(activityMirrorId)
                     .activityTypeId(request.getActivityTypeId())
                     .build())
@@ -139,6 +147,14 @@ public class ConnectionCreateActivityRelationCmd extends
                 .code(RequestStateCodeEnum.PENDING)
                 .build())
             .execute();
+    }
+
+    public boolean isShouldBehaveAsSocialNetwork(AccountTypeEnum accountType,
+        ConnectionActionEnum action)
+    {
+
+        return AccountTypeEnum.INTERNAL.equals(accountType)
+            && ConnectionActionEnum.OUTGOING_FRIEND_REQUEST.equals(action);
     }
 
     @Builder

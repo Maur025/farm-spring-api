@@ -2,8 +2,11 @@ package com.kernotec.farm.activity.rest.command.connection;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.account.jpa.entity.Friend;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.service.FriendService;
+import com.kernotec.farm.activity.exception.ActivityException;
 import com.kernotec.farm.activity.exception.FriendException;
+import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
 import com.kernotec.farm.parametric.jpa.entity.FriendState;
 import com.kernotec.farm.parametric.jpa.enums.FriendStateCodeEnum;
 import com.kernotec.farm.parametric.jpa.service.FriendStateService;
@@ -41,6 +44,18 @@ public class ConnectionCreateActivityValidationCmd extends
             );
         }
 
+        if (ConnectionActionEnum.INCOMING_FRIEND_REQUEST.equals(request.getAction())
+            || ConnectionActionEnum.INCOMING_FRIEND_REQUEST_AND_CONFIRMED.equals(
+            request.getAction()) && AccountTypeEnum.INTERNAL.equals(request.getAccountType()))
+        {
+            throw new ActivityException(
+                "", String.format(
+                "action -> %s in type -> %s", request.getAction(),
+                request.getAccountType()
+            ), HttpStatus.BAD_REQUEST.value()
+            );
+        }
+
         return null;
     }
 
@@ -56,5 +71,10 @@ public class ConnectionCreateActivityValidationCmd extends
         private final UUID potentialFriendAccountId;
         @NotNull
         private final String potentialFriendAccountUsername;
+
+        @NotNull
+        private final AccountTypeEnum accountType;
+        @NotNull
+        private final ConnectionActionEnum action;
     }
 }
