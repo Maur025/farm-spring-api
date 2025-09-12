@@ -46,6 +46,8 @@ public class ActivityService extends BaseServiceImpl<Activity, UUID> {
                 Join<Account, Device> accountDeviceJoin = accountJoin.join(
                     "devices", JoinType.INNER);
 
+                predicateList.add(cb.isFalse(root.get("isSystemActivity")));
+
                 if (filterRequest.getSocialNetworkId() != null) {
                     predicateList.add(cb.equal(
                         accountJoin.get("socialNetworkId"),
