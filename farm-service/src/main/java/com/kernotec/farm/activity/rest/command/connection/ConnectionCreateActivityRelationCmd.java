@@ -5,6 +5,7 @@ import com.kernotec.farm.account.command.account.AccountCreateCmd;
 import com.kernotec.farm.account.command.account.AccountGetDtoCmd;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.activity.command.activity.ActivityCreateCmd;
 import com.kernotec.farm.activity.command.connection.ConnectionCreateCmd;
 import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
 import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
@@ -32,6 +33,7 @@ public class ConnectionCreateActivityRelationCmd extends
     private final ConnectionCreateCmd connectionCreateCmd;
     private final ConnectionCreateActivityValidationCmd connectionCreateActivityValidationCmd;
     private final ConnectionCreateDirectConnectionCmd connectionCreateDirectConnectionCmd;
+    private final ActivityCreateCmd activityCreateCmd;
 
     @Override
     protected Void run(Request request) {
@@ -94,6 +96,32 @@ public class ConnectionCreateActivityRelationCmd extends
                 .activityTypeId(request.getActivityTypeId())
                 .build())
             .execute();
+
+        if (AccountTypeEnum.INTERNAL.equals(accountPotentialDto.getType())
+            && !ConnectionActionEnum.INCOMING_FRIEND_REQUEST_AND_CONFIRMED.equals(
+            connectionRequest.getAction()))
+        {
+            UUID activityMirrorId = activityCreateCmd.withRequest(
+                    ActivityCreateCmd.Request.builder()
+                        .link("N/A")
+                        .activityDate(request.getActivityDate())
+                        .accountId(potentialAccountId)
+                        .activityTypeId(request.getActivityTypeId())
+                        .build())
+                .execute();
+
+            connectionCreateCmd.withRequest(ConnectionCreateCmd.Request.builder()
+                    .potentialFriendAccountId(request.getAccountId())
+                    .action(ConnectionActionEnum.INCOMING_FRIEND_REQUEST.equals(
+                        connectionRequest.getAction()) ? ConnectionActionEnum.OUTGOING_FRIEND_REQUEST
+                        : ConnectionActionEnum.INCOMING_FRIEND_REQUEST)
+                    .type(ConnectionTypeEnum.fromValue(accountDto.getType()))
+                    .requestStateId(requestStateId)
+                    .activityId(activityMirrorId)
+                    .activityTypeId(request.getActivityTypeId())
+                    .build())
+                .execute();
+        }
 
         return null;
     }
