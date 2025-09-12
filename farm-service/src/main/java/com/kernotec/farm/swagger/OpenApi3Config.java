@@ -2,9 +2,6 @@ package com.kernotec.farm.swagger;
 
 import com.kernotec.farm.swagger.KernotecApiDefinition.OpenApiInfo;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.security.OAuthFlow;
-import io.swagger.v3.oas.annotations.security.OAuthFlows;
-import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -19,12 +16,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties(KernotecApiDefinition.class)
-@SecurityScheme(name = "oauth2Password", type = SecuritySchemeType.OAUTH2, flows = @OAuthFlows(
-    password = @OAuthFlow(
-        tokenUrl = "${oauth2-config.host}/realms/${oauth2-config.realm}/protocol/openid-connect/token",
-        refreshUrl = "${oauth2-config.host}/realms/${oauth2-config.realm}/protocol/openid-connect/token",
-        scopes = {@OAuthScope(name = "openid", description = "openid"),
-            @OAuthScope(name = "profile", description = "profile")})))
+@SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer",
+                bearerFormat = "JWT")
 public class OpenApi3Config {
 
     @Bean
@@ -35,7 +28,7 @@ public class OpenApi3Config {
         OpenAPI openAPI = new OpenAPI().info(new Info().title(openApiInfo.getTitle())
                 .description(openApiInfo.getDescription())
                 .version(openApiInfo.getVersion()))
-            .security(List.of(new SecurityRequirement().addList("oauth2Password")));
+            .security(List.of(new SecurityRequirement().addList("bearerAuth")));
 
         kernotecApiDefinition.getServers()
             .forEach(openApiServer -> {
