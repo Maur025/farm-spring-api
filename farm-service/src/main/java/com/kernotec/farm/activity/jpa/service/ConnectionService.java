@@ -3,8 +3,11 @@ package com.kernotec.farm.activity.jpa.service;
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.activity.exception.FriendException;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Connection;
+import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
+import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
 import com.kernotec.farm.activity.jpa.repository.ConnectionRepository;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionFindAllFilterRequest;
 import com.kernotec.farm.parametric.jpa.entity.RequestState;
@@ -13,11 +16,13 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -77,5 +82,25 @@ public class ConnectionService extends BaseServiceImpl<Connection, UUID> {
                 return cb.and(predicateList.toArray(Predicate[]::new));
             }, pageable
         );
+    }
+
+    public Optional<Connection> findByPotentialFriendAccountIdAndActionAndRequestStateIdAndType(
+        UUID potentialFriendAccountId, ConnectionActionEnum action, UUID requestStateId,
+        ConnectionTypeEnum type)
+    {
+        return repository.findByPotentialFriendAccountIdAndActionAndRequestStateIdAndType(
+            potentialFriendAccountId, action, requestStateId, type);
+    }
+
+    public Connection findByPotentialFriendAccountIdAndActionAndRequestStateIdAndTypeThrow(
+        UUID potentialFriendAccountId, ConnectionActionEnum action, UUID requestStateId,
+        ConnectionTypeEnum type)
+    {
+        return findByPotentialFriendAccountIdAndActionAndRequestStateIdAndType(
+            potentialFriendAccountId, action, requestStateId, type).orElseThrow(
+            () -> new FriendException(
+                "connection.not.found", "'" + potentialFriendAccountId + "'",
+                HttpStatus.CONFLICT.value()
+            ));
     }
 }

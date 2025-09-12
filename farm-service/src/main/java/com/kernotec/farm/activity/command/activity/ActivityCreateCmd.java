@@ -25,7 +25,8 @@ public class ActivityCreateCmd extends
 
         activity.setLink(request.getLink());
         activity.setActivityDate(request.getActivityDate());
-        activity.setSystemActivity(request.getIsSystemActivity());
+        activity.setSystemActivity(
+            request.getIsSystemActivity() != null && request.getIsSystemActivity());
         activity.setAccountId(request.getAccountId());
         activity.setActivityTypeId(request.getActivityTypeId());
 
