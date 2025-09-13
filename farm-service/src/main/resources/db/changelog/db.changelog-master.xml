@@ -134,4 +134,20 @@
   </changeSet>
 
   <include file="db/changelog/2025/09/12-01-changelog-124.xml"/>
+
+  <!-- activity type update2 - add type and review grammatical errors -->
+  <changeSet id="1757776535097-1" author="maur025">
+    <sqlFile path="data/activity/type/activity_type_seeder_update2.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- publishing type update1 - update name texto to Capitalize -->
+  <changeSet id="1757776851196-1" author="maur025">
+    <sqlFile path="data/publishing/type/publishing_type_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- socialNetwork actions update1 - add new relation and remove useless relation -->
+  <changeSet id="1757777356010-1" author="maur025">
+    <sqlFile path="data/social/network/action/social_network_action_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
 </databaseChangeLog>
