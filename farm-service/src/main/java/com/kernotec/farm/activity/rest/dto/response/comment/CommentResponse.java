@@ -16,7 +16,7 @@ import lombok.Setter;
 public class CommentResponse extends EntityResponse {
 
     private String comment;
-    private Boolean isAgreeComment;
+    private boolean isAgreeComment;
 
     private UUID publishingContextId;
     private PublishingContextResponse publishingContext;

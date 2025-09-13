@@ -54,10 +54,11 @@ public class ActivityController {
     public PageResponse<ActivityResponse> findAll(@RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "10") Integer size,
         @RequestParam(defaultValue = "activityDate") String sortBy,
-        @RequestParam(defaultValue = "true") boolean descending)
+        @RequestParam(defaultValue = "true") boolean descending,
+        @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Activity> activityPage = activityService.findAll(pageable);
+        Page<Activity> activityPage = activityService.findAllByKeyword(keyword, pageable);
 
         return PageResponse.<ActivityResponse>builder()
             .code(HttpStatus.OK.value())

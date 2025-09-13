@@ -3,6 +3,7 @@ package com.kernotec.farm.activity.jpa.service;
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.account.jpa.entity.Person;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.repository.ActivityRepository;
 import com.kernotec.farm.activity.rest.dto.request.activity.ActivityFindAllFilterRequest;
@@ -65,6 +66,29 @@ public class ActivityService extends BaseServiceImpl<Activity, UUID> {
                 {
                     predicateList.add(root.get("accountId")
                         .in(filterRequest.getAccountIds()));
+                }
+
+                return cb.and(predicateList.toArray(Predicate[]::new));
+            }, pageable
+        );
+    }
+
+    public Page<Activity> findAllByKeyword(String keyword, Pageable pageable) {
+        final String pattern =
+            keyword == null || keyword.isBlank() ? null : "%" + keyword.toLowerCase() + "%";
+
+        return repository.findAll(
+            (Specification<Activity>) (root, query, cb) -> {
+                List<Predicate> predicateList = new ArrayList<>();
+                Join<Activity, Account> accountJoin = root.join("account", JoinType.INNER);
+                Join<Account, Person> personJoin = accountJoin.join("person", JoinType.LEFT);
+
+                if (pattern != null) {
+                    predicateList.add(cb.or(
+                        cb.like(cb.lower(accountJoin.get("username")), pattern),
+                        cb.like(cb.lower(personJoin.get("name")), pattern),
+                        cb.like(cb.lower(personJoin.get("lastName")), pattern)
+                    ));
                 }
 
                 return cb.and(predicateList.toArray(Predicate[]::new));
