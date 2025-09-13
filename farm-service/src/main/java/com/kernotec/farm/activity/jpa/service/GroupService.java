@@ -2,11 +2,11 @@ package com.kernotec.farm.activity.jpa.service;
 
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
-import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.activity.jpa.entity.GroupMembership;
-import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.activity.jpa.repository.GroupRepository;
+import com.kernotec.farm.parametric.jpa.entity.ActivityType;
+import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -36,7 +36,7 @@ public class GroupService extends BaseServiceImpl<Group, UUID> {
     }
 
     public Page<Group> searchByName(String name, UUID socialNetworkId, Pageable pageable) {
-        String pattern = name == null || name.isBlank() ? null : name.toLowerCase() + "%";
+        String pattern = name == null || name.isBlank() ? null : "%" + name.toLowerCase() + "%";
 
         return repository.findAll(
             (Specification<Group>) (root, query, cb) -> {
