@@ -68,7 +68,7 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
         UUID ignoreAccountId, Pageable pageable)
     {
         String usernamePattern =
-            username == null || username.isBlank() ? null : username.toLowerCase() + "%";
+            username == null || username.isBlank() ? null : "%" + username.toLowerCase() + "%";
 
         return repository.findAll(
             (Specification<Account>) (root, query, cb) -> {
