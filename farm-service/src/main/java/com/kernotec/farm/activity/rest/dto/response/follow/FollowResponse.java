@@ -17,7 +17,7 @@ import lombok.Setter;
 public class FollowResponse extends EntityResponse {
 
     private String name;
-    private Boolean isFollowing;
+    private boolean isFollowing;
 
     private UUID publishingContextId;
     private PublishingContextResponse publishingContext;
