@@ -12,6 +12,7 @@ import com.kernotec.farmauth.rest.dto.response.OpenIdConnectTokenResponse;
 import com.kernotec.farmauth.rest.dto.response.OpenIdConnectUserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = OpenIdConnectSpec.BASE_PATH)
 @AllArgsConstructor
 @RestController
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true",
+             exposedHeaders = "Set-Cookie")
 public class OpenIdConnectController {
 
     private final ConnectionTokenCmd connectionTokenCmd;
@@ -46,9 +50,12 @@ public class OpenIdConnectController {
     public OpenIdConnectTokenResponse getTokenByGrantType(
         @RequestParam("grant_type") GrantTypeEnum grantType,
         @RequestBody(required = false) OpenIdConnectTokenRequest request,
-        HttpServletResponse response,
-        @CookieValue(value = "refresh_token", required = false) String refreshToken)
+        HttpServletResponse httpResponse,
+        @CookieValue(value = "refresh_token", required = false) String refreshToken,
+        HttpServletRequest httpRequest)
     {
+        log.info("refreshTokenSecure: {}", refreshToken);
+
         OpenIdConnectTokenResponse openIdConnectTokenResponse = connectionTokenCmd.withRequest(
                 ConnectionTokenCmd.Request.builder()
                     .grantType(grantType)
@@ -60,6 +67,7 @@ public class OpenIdConnectController {
         if (grantType.equals(GrantTypeEnum.password) && openIdConnectTokenResponse != null
             && openIdConnectTokenResponse.getRefreshToken() != null)
         {
+            log.info("Setting refresh token cookie in logging");
             ResponseCookie refreshTokenCookie = ResponseCookie.from(
                     "refresh_token",
                     openIdConnectTokenResponse.getRefreshToken()
@@ -69,10 +77,12 @@ public class OpenIdConnectController {
                     authConfigProperties.getRefreshTokenSecure()))
                 .path("/")
                 .maxAge(Duration.ofSeconds(openIdConnectTokenResponse.getRefreshExpiresIn()))
-                .sameSite("None")
+                .sameSite(
+                    RefreshTokenSecureEnum.prod.equals(authConfigProperties.getRefreshTokenSecure())
+                        ? "None" : "Lax")
                 .build();
 
-            response.setHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+            httpResponse.setHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
         }
 
         return openIdConnectTokenResponse;
