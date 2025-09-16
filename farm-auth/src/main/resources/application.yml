@@ -1,0 +1,90 @@
+# SERVER
+server:
+  port: ${AUTH_SERVER_PORT:7784}
+
+# FARM AUTH
+kernotec:
+  info:
+    title: ${APP_TITLE:FARM AUTH API}
+    description: ${APP_DESCRIPTION:Farm authentication API}
+    version: ${APP_VERSION:local}
+  servers:
+    - url: ${APP_SERVER_URL_AUTH:http://localhost:7784}
+      description: ${APP_SERVER_DESCRIPTION:API of Farm Auth application}
+  allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:4200}
+
+# SPRING
+spring:
+  profiles:
+    active: '@spring.profiles.active@'
+  application:
+    name: farm-auth
+
+  # SERVLET
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  # LIQUIBASE
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    default-schema: ${DB_SCHEMA:public}
+
+  # JPA
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+    properties:
+      hibernate:
+        default_schema: ${DB_SCHEMA:public}
+        type:
+          json_format_mapper: com.kernotec.core.config.HibernateFormatMapper
+        format_sql: false
+        dialect: com.kernotec.core.config.PGDialect
+        jdbc:
+          time_zone: UTC
+        connection:
+          characterEncoding: UTF-8
+          charSet: UTF-8
+          useUnicode: true
+
+  # DATASOURCE
+  datasource:
+    url: jdbc:postgresql://${DB_HOST_AUTH:localhost}:${DB_PORT_AUTH:54323}/${DB_NAME_AUTH:farm_auth_db}
+    username: ${DB_USERNAME_AUTH:dbusr}
+    password: ${DB_PASSWORD_AUTH:dbpass}
+    hikari:
+      connection-timeout: 30000
+      idle-timeout: 30000
+      max-lifetime: 60000
+      minimum-idle: 5
+      maximum-pool-size: 50
+
+# SWAGGER
+springdoc:
+  api-docs:
+    path: /${spring.application.name}/v3/api-docs
+  swagger-ui:
+    path: /${spring.application.name}/swagger-ui.html
+    enabled: true
+    doc-expansion: none
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL:INFO}
+
+oauth2-config:
+  secret-key: ${OAUTH2_JWT_SECRET:secret-key}
+  audience: ${OAUTH2_JWT_AUDIENCE:farm-audience}
+  auth-token-exp: ${OAUTH2_JWT_AUTH_TOKEN_EXP:3600}
+  auth-token-type-exp: ${OAUTH2_JWT_AUTH_TOKEN_TYPE_EXP:seconds}
+  refresh-token-exp: ${OAUTH2_JWT_REFRESH_TOKEN_EXP:86400}
+  refresh-token-type-exp: ${OAUTH2_JWT_REFRESH_TOKEN_TYPE_EXP:seconds}
+  refresh-token-secure: ${OAUTH2_JWT_REFRESH_TOKEN_SECURE:dev}

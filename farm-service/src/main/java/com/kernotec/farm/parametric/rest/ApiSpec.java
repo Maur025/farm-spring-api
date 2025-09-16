@@ -1,0 +1,76 @@
+package com.kernotec.farm.parametric.rest;
+
+import com.kernotec.farm.ApiSpecMain;
+
+public class ApiSpec {
+
+    public static final class SocialNetworkSpec {
+
+        public static final String BASE_PATH = ApiSpecMain.ROOT_PATH + "/social-networks";
+        public static final String TAG_NAME = "SOCIAL NETWORK";
+        public static final String TAG_DESCRIPTION = "Social Network management";
+
+        private SocialNetworkSpec() {
+        }
+    }
+
+    public static final class PublishingContextSpec {
+
+        public static final String BASE_PATH = ApiSpecMain.ROOT_PATH + "/publishing-contexts";
+        public static final String TAG_NAME = "PUBLISHING CONTEXT";
+        public static final String TAG_DESCRIPTION = "Publishing Context management";
+
+        private PublishingContextSpec() {
+        }
+    }
+
+    public static final class PublishingTypeSpec {
+
+        public static final String BASE_PATH = ApiSpecMain.ROOT_PATH + "/publishing-types";
+        public static final String TAG_NAME = "PUBLISHING TYPE";
+        public static final String TAG_DESCRIPTION = "Publishing Type management";
+
+        private PublishingTypeSpec() {
+        }
+    }
+
+    public static final class ActivityTypeSpec {
+
+        public static final String BASE_PATH = ApiSpecMain.ROOT_PATH + "/activity-types";
+        public static final String TAG_NAME = "ACTIVITY TYPE";
+        public static final String TAG_DESCRIPTION = "Activity Type management";
+
+        private ActivityTypeSpec() {
+        }
+    }
+
+    public static final class ReactionTypeSpec {
+
+        public static final String BASE_PATH = ApiSpecMain.ROOT_PATH + "/reaction-types";
+        public static final String TAG_NAME = "REACTION TYPE";
+        public static final String TAG_DESCRIPTION = "Reaction Type management";
+
+        private ReactionTypeSpec() {
+        }
+    }
+
+    public static final class DataImportSpec {
+
+        public static final String BASE_PATH = ApiSpecMain.ROOT_PATH + "/data-imports";
+        public static final String TAG_NAME = "DATA IMPORT";
+        public static final String TAG_DESCRIPTION = "Data Import management";
+
+        private DataImportSpec() {
+        }
+    }
+
+    public static final class RegionSpec {
+
+        public static final String BASE_PATH = ApiSpecMain.ROOT_PATH + "/regions";
+        public static final String TAG_NAME = "REGION";
+        public static final String TAG_DESCRIPTION = "Region management";
+
+        private RegionSpec() {
+        }
+    }
+}

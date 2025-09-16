@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.kernotec</groupId>
+    <artifactId>core-boot-3</artifactId>
+    <version>develop</version>
+  </parent>
+
+  <groupId>com.kernotec.farm</groupId>
+  <artifactId>farm</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>farm-service</module>
+  </modules>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>nexus</id>
+      <name>maven-snapshots</name>
+      <url>https://registry.kernotec.com/repository/maven-snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>nexus</id>
+      <url>https://registry.kernotec.com/repository/maven-releases</url>
+    </repository>
+  </distributionManagement>
+
+  <properties>
+    <java.version>17</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF8</project.reporting.outputEncoding>
+  </properties>
+
+</project>

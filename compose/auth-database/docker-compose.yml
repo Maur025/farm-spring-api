@@ -1,0 +1,25 @@
+services:
+
+  farm-auth-db:
+    image: ${POSTGRESQL_IMAGE}
+    restart: always
+    hostname: farm-auth-db
+    container_name: farm-auth-db
+    ports:
+      - "5533:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - farm-auth-db:/var/lib/postgresql/data
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+      - ./dumps:/dumps
+    networks:
+      - compose-net
+
+volumes:
+  farm-auth-db:
+    name: farm-auth-db
+
+networks:
+  compose-net:
+    external: true

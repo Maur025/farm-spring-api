@@ -1,0 +1,87 @@
+# SERVER
+server:
+  port: ${SERVER_PORT_FARM:7783}
+
+# FARM
+kernotec:
+  info:
+    title: ${APP_TITLE:FARM API}
+    description: ${APP_DESCRIPTION:Farm operational API}
+    version: ${APP_VERSION:local}
+  servers:
+    - url: ${APP_SERVER_URL:http://localhost:7783}
+      description: ${APP_SERVER_DESCRIPTION:API of Farm application}
+
+# SPRING
+spring:
+  # PROFILES
+  profiles:
+    active: '@spring.profiles.active@'
+  application:
+    name: farm-service
+
+  # SERVLET
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  # LIQUIBASE
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    default-schema: ${DB_SCHEMA:public}
+
+  # JPA
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+    properties:
+      hibernate:
+        default_schema: ${DB_SCHEMA:public}
+        type:
+          json_format_mapper: com.kernotec.core.config.HibernateFormatMapper
+        format_sql: false
+        dialect: com.kernotec.core.config.PGDialect
+        jdbc:
+          time_zone: UTC
+        connection:
+          characterEncoding: UTF-8
+          charSet: UTF-8
+          useUnicode: true
+
+
+  # DATASOURCE
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:54323}/${DB_NAME:farm_db}
+    username: ${DB_USERNAME:dbusr}
+    password: ${DB_PASSWORD:dbpass}
+    hikari:
+      connection-timeout: 30000
+      idle-timeout: 30000
+      max-lifetime: 60000
+      minimum-idle: 5
+      maximum-pool-size: 50
+
+# SWAGGER
+springdoc:
+  api-docs:
+    path: /${spring.application.name}/v3/api-docs
+  swagger-ui:
+    path: /${spring.application.name}/swagger-ui.html
+    enabled: true
+    doc-expansion: none
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL:INFO}
+
+oauth2-config:
+  host: ${APP_SERVER_URL_AUTH:http://localhost:7784}
+  realm: ${APP_OAUTH2_REALM:farm-auth}
+  secret-key: ${OAUTH2_JWT_SECRET:secret-key}

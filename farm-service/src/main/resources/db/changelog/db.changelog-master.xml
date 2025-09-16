@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+  <include file="db/changelog/2025/08/26-01-changelog-101.xml"/>
+  <include file="db/changelog/2025/08/27-01-changelog-102.xml"/>
+  <include file="db/changelog/2025/08/27-01-changelog-103.xml"/>
+  <include file="db/changelog/2025/08/27-01-changelog-104.xml"/>
+  <include file="db/changelog/2025/08/28-01-changelog-105.xml"/>
+
+  <!-- social networks seeder -->
+  <changeSet id="1756391003974-1" author="Maur025">
+    <sqlFile path="data/social/network/social_network_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- activity type seeder -->
+  <changeSet id="1756391104630-1" author="Maur025">
+    <sqlFile path="data/activity/type/activity_type_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- publishing context seeder -->
+  <changeSet id="1756391165924-1" author="Maur025">
+    <sqlFile path="data/publishing/context/publishing_context_seeder.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- publishing type seeder -->
+  <changeSet id="1756391219003-1" author="Maur025">
+    <sqlFile path="data/publishing/type/publishing_type_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/08/28-01-changelog-106.xml"/>
+  <include file="db/changelog/2025/08/28-01-changelog-107.xml"/>
+
+  <!-- activity type seeder update 1-->
+  <changeSet id="1756401402062-1" author="Maur025">
+    <sqlFile path="data/activity/type/activity_type_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- social network action seeder-->
+  <changeSet id="1756402665182-1" author="Maur025">
+    <sqlFile path="data/social/network/action/social_network_actions_seeder.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/08/28-01-changelog-108.xml"/>
+
+  <!-- social network seeder update 1 -->
+  <changeSet id="1756411249294-1" author="Maur025">
+    <sqlFile path="data/social/network/social_network_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- reaction type seeder -->
+  <changeSet id="1756411934763-1" author="Maur025">
+    <sqlFile path="data/reaction/type/reaction_type_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/08/29-01-changelog-109.xml"/>
+  <include file="db/changelog/2025/08/29-01-changelog-110.xml"/>
+
+  <!-- operator seeder -->
+  <changeSet id="1756495720220-1" author="Maur025">
+    <sqlFile path="data/operator/operator_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/08/29-01-changelog-111.xml"/>
+
+  <!-- region seeder -->
+  <changeSet id="1756530852605-1" author="Maur025">
+    <sqlFile path="data/region/region_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/09/01-01-changelog-112.xml"/>
+  <include file="db/changelog/2025/09/02-01-changelog-113.xml"/>
+
+  <!-- request states seeder -->
+  <changeSet id="1756821165239-1" author="Maur025">
+    <sqlFile path="data/request/state/request_state_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <!-- social network seeder update 2 - add icons -->
+  <changeSet id="1756821752802-1" author="Maur025">
+    <sqlFile path="data/social/network/social_network_seeder_update2.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/09/02-01-changelog-114.xml"/>
+
+  <!-- social network seeder update 3 - add colors -->
+  <changeSet id="1756825981012-1" author="Maur025">
+    <sqlFile path="data/social/network/social_network_seeder_update3.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/09/02-01-changelog-115.xml"/>
+  <include file="db/changelog/2025/09/02-01-changelog-116.xml"/>
+  <include file="db/changelog/2025/09/03-01-changelog-117.xml"/>
+  <include file="db/changelog/2025/09/04-01-changelog-118.xml"/>
+  <include file="db/changelog/2025/09/04-01-changelog-119.xml"/>
+
+  <!-- publishing context seeder update1 - add more contexts -->
+  <changeSet id="1756999567227-1" author="Maur025">
+    <sqlFile path="data/publishing/context/publishing_context_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- region seeder update1 - add wildcard option -->
+  <changeSet id="1756999979012-1" author="Maur025">
+    <sqlFile path="data/region/region_seeder_update1.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- group state seeder -->
+  <changeSet id="1757000298536-1" author="Maur025">
+    <sqlFile path="data/group/state/group_state_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- friend state seeder -->
+  <changeSet id="1757000783381-1" author="Maur025">
+    <sqlFile path="data/friend/state/friend_state_seeder.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/09/04-01-changelog-120.xml"/>
+  <include file="db/changelog/2025/09/04-01-changelog-121.xml"/>
+
+  <!-- region seeder update2 - remove varios, add global -->
+  <changeSet id="1757028478394-1" author="Maur025">
+    <sqlFile path="data/region/region_seeder_update2.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/09/09-01-changelog-122.xml"/>
+  <include file="db/changelog/2025/09/10-01-changelog-123.xml"/>
+
+  <!-- request state update1 - update aprovado for aprobado-->
+  <changeSet id="1757567985404-1" author="Maur025">
+    <sqlFile path="data/request/state/request_state_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2025/09/12-01-changelog-124.xml"/>
+
+  <!-- activity type update2 - add type and review grammatical errors -->
+  <changeSet id="1757776535097-1" author="maur025">
+    <sqlFile path="data/activity/type/activity_type_seeder_update2.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- publishing type update1 - update name texto to Capitalize -->
+  <changeSet id="1757776851196-1" author="maur025">
+    <sqlFile path="data/publishing/type/publishing_type_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+  <!-- socialNetwork actions update1 - add new relation and remove useless relation -->
+  <changeSet id="1757777356010-1" author="maur025">
+    <sqlFile path="data/social/network/action/social_network_action_seeder_update1.sql"
+      relativeToChangelogFile="true"/>
+  </changeSet>
+</databaseChangeLog>
