@@ -14,6 +14,7 @@ public interface DeviceResponseForActivityMapper {
     @Mapping(target = "chips", ignore = true)
     @Mapping(target = "accounts", ignore = true)
     @Mapping(target = "deviceImeis", ignore = true)
+    @Mapping(target = "deviceConnections", ignore = true)
     DeviceResponse toResponse(Device device);
 
     DeviceResponse toResponse(UUID id);
