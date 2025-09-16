@@ -63,4 +63,8 @@ public class Device extends BaseAuditEntity {
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
     @Where(clause = "deleted is false")
     private Set<DeviceImei> deviceImeis;
+
+    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
+    @Where(clause = "deleted is false")
+    private Set<DeviceConnection> deviceConnections;
 }
