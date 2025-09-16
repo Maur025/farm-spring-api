@@ -7,19 +7,24 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.kernotec.core.test.unit.test.util.AbstractMapperTest;
 import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeResponse;
-import com.kernotec.farm.parametric.rest.mapper.activity.type.ActivityTypeResponseMapperImpl;
+import com.kernotec.farm.parametric.rest.mapper.social.network.SocialNetworkResponseFlatMapper;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 class ActivityTypeResponseMapperTest extends
     AbstractMapperTest<ActivityType, ActivityTypeResponse>
 {
 
+    @Mock
+    private SocialNetworkResponseFlatMapper socialNetworkResponseFlatMapper;
+
     @InjectMocks
     private ActivityTypeResponseMapperImpl activityTypeResponseMapper;
+
 
     private ActivityType activityType;
 

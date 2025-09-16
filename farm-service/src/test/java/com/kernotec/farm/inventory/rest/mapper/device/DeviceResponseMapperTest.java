@@ -3,20 +3,32 @@ package com.kernotec.farm.inventory.rest.mapper.device;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.when;
 
 import com.kernotec.core.test.unit.test.util.AbstractMapperTest;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.inventory.jpa.entity.Chip;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.entity.Farm;
+import com.kernotec.farm.inventory.rest.dto.response.chip.ChipResponse;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
+import com.kernotec.farm.inventory.rest.dto.response.device.imei.DeviceImeiResponse;
+import com.kernotec.farm.inventory.rest.mapper.chip.ChipResponseToDeviceMapper;
+import com.kernotec.farm.inventory.rest.mapper.device.imei.DeviceImeiResponseFlatMapper;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 class DeviceResponseMapperTest extends AbstractMapperTest<Device, DeviceResponse> {
+
+    @Mock
+    private ChipResponseToDeviceMapper chipResponseToDeviceMapper;
+    @Mock
+    private DeviceImeiResponseFlatMapper deviceImeiResponseFlatMapper;
 
     @InjectMocks
     private DeviceResponseMapperImpl deviceResponseMapper;
@@ -44,6 +56,14 @@ class DeviceResponseMapperTest extends AbstractMapperTest<Device, DeviceResponse
         device.setAccounts(Set.of(new Account()));
 
         setInputObject(device);
+    }
+
+    @Override
+    protected void commonSuccessMocks() {
+        when(chipResponseToDeviceMapper.toResponse(anySet())).thenReturn(
+            Set.of(new ChipResponse()));
+        when(deviceImeiResponseFlatMapper.toResponse(anySet())).thenReturn(
+            Set.of(new DeviceImeiResponse()));
     }
 
     @Override

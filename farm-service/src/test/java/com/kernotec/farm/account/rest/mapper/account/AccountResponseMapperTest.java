@@ -3,21 +3,34 @@ package com.kernotec.farm.account.rest.mapper.account;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import com.kernotec.core.test.unit.test.util.AbstractMapperTest;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.Person;
 import com.kernotec.farm.account.rest.dto.response.account.AccountResponse;
-import com.kernotec.farm.account.rest.mapper.account.AccountResponseMapperImpl;
 import com.kernotec.farm.inventory.jpa.entity.Device;
+import com.kernotec.farm.inventory.rest.mapper.chip.ChipResponseFlatMapper;
+import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseFlatMapper;
 import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
+import com.kernotec.farm.parametric.rest.dto.response.social.network.SocialNetworkResponse;
+import com.kernotec.farm.parametric.rest.mapper.social.network.SocialNetworkResponseFlatMapper;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 class AccountResponseMapperTest extends AbstractMapperTest<Account, AccountResponse> {
+
+    @Mock
+    private SocialNetworkResponseFlatMapper socialNetworkResponseFlatMapper;
+    @Mock
+    private DeviceResponseFlatMapper deviceResponseFlatMapper;
+    @Mock
+    private ChipResponseFlatMapper chipResponseFlatMapper;
 
     @InjectMocks
     private AccountResponseMapperImpl accountResponseMapper;
@@ -43,6 +56,13 @@ class AccountResponseMapperTest extends AbstractMapperTest<Account, AccountRespo
         account.setDevices(Set.of(new Device()));
 
         setInputObject(account);
+    }
+
+
+    @Override
+    protected void commonSuccessMocks() {
+        when(socialNetworkResponseFlatMapper.toResponse(any(SocialNetwork.class))).thenReturn(
+            new SocialNetworkResponse());
     }
 
     @Override
