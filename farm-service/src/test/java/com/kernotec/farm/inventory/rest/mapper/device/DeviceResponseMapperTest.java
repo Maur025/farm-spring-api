@@ -15,6 +15,7 @@ import com.kernotec.farm.inventory.rest.dto.response.chip.ChipResponse;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
 import com.kernotec.farm.inventory.rest.dto.response.device.imei.DeviceImeiResponse;
 import com.kernotec.farm.inventory.rest.mapper.chip.ChipResponseToDeviceMapper;
+import com.kernotec.farm.inventory.rest.mapper.device.connection.DeviceConnectionResponseFlatMapper;
 import com.kernotec.farm.inventory.rest.mapper.device.imei.DeviceImeiResponseFlatMapper;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +30,8 @@ class DeviceResponseMapperTest extends AbstractMapperTest<Device, DeviceResponse
     private ChipResponseToDeviceMapper chipResponseToDeviceMapper;
     @Mock
     private DeviceImeiResponseFlatMapper deviceImeiResponseFlatMapper;
+    @Mock
+    private DeviceConnectionResponseFlatMapper deviceConnectionResponseFlatMapper;
 
     @InjectMocks
     private DeviceResponseMapperImpl deviceResponseMapper;
