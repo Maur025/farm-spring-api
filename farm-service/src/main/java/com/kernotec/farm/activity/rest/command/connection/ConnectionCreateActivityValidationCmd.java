@@ -44,16 +44,14 @@ public class ConnectionCreateActivityValidationCmd extends
             );
         }
 
-        if ((ConnectionActionEnum.INCOMING_FRIEND_REQUEST.equals(request.getAction())
-            || ConnectionActionEnum.INCOMING_FRIEND_REQUEST_AND_CONFIRMED.equals(
-            request.getAction())) && AccountTypeEnum.INTERNAL.equals(request.getAccountType()))
+        if (ConnectionActionEnum.INCOMING_FRIEND_REQUEST.equals(request.getAction())
+            && AccountTypeEnum.INTERNAL.equals(request.getAccountType()))
         {
             throw new ActivityException(
                 "action.not.supported",
                 String.format(
-                    "action -> %s in type -> %s", request.getAction(),
-                    request.getAccountType()
-                ), HttpStatus.BAD_REQUEST.value()
+                    "action -> %s in type -> %s", request.getAction(), request.getAccountType()),
+                HttpStatus.BAD_REQUEST.value()
             );
         }
 
