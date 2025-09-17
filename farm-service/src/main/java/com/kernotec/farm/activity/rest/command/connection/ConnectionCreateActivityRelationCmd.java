@@ -7,11 +7,8 @@ import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.activity.command.activity.ActivityCreateCmd;
 import com.kernotec.farm.activity.command.connection.ConnectionCreateCmd;
-import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
-import com.kernotec.farm.activity.jpa.enums.ConnectionTypeEnum;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
 import com.kernotec.farm.parametric.command.request.state.RequestStateGetIdByCodeCmd;
-import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
@@ -34,6 +31,8 @@ public class ConnectionCreateActivityRelationCmd extends
     private final ConnectionCreateActivityValidationCmd connectionCreateActivityValidationCmd;
     private final ConnectionCreateDirectConnectionCmd connectionCreateDirectConnectionCmd;
     private final ActivityCreateCmd activityCreateCmd;
+    private final ConnectionHandleExternalCmd connectionHandleExternalCmd;
+    private final ConnectionHandleInternalCmd connectionHandleInternalCmd;
 
     @Override
     protected Void run(Request request) {
@@ -44,118 +43,79 @@ public class ConnectionCreateActivityRelationCmd extends
             return null;
         }
 
-        UUID approveOrPendingReqStateId = getRequestStateIdByAction(connectionRequest.getAction());
-        UUID nothingRequestStateId = requestStateGetIdByCodeCmd.withRequest(
+        /*UUID nothingRequestStateId = requestStateGetIdByCodeCmd.withRequest(
                 RequestStateGetIdByCodeCmd.Request.builder()
                     .code(RequestStateCodeEnum.NOTHING_WAS_REQUESTED)
                     .build())
+            .execute();*/
+
+        AccountDto sourceAccountDto = accountGetDtoCmd.withRequest(
+                AccountGetDtoCmd.Request.builder()
+                    .accountId(request.getAccountId())
+                    .build())
             .execute();
 
-        AccountDto accountDto = accountGetDtoCmd.withRequest(AccountGetDtoCmd.Request.builder()
-                .accountId(request.getAccountId())
-                .build())
-            .execute();
+        UUID targetAccountId = connectionRequest.getPotentialFriendAccountId();
 
-        UUID potentialAccountId = connectionRequest.getPotentialFriendAccountId();
-
-        if (connectionRequest.getIsNewAccount() && potentialAccountId == null) {
-            potentialAccountId = accountCreateCmd.withRequest(AccountCreateCmd.Request.builder()
+        if (connectionRequest.getIsNewAccount() && targetAccountId == null) {
+            targetAccountId = accountCreateCmd.withRequest(AccountCreateCmd.Request.builder()
                     .username(connectionRequest.getFriendUsername())
                     .password("N/A")
-                    .socialNetworkId(accountDto.getSocialNetworkId())
+                    .socialNetworkId(sourceAccountDto.getSocialNetworkId())
                     .type(AccountTypeEnum.EXTERNAL)
                     .build())
                 .execute();
         }
 
-        AccountDto accountPotentialDto = accountGetDtoCmd.withRequest(
+        AccountDto targetAccountDto = accountGetDtoCmd.withRequest(
                 AccountGetDtoCmd.Request.builder()
-                    .accountId(potentialAccountId)
+                    .accountId(targetAccountId)
                     .build())
             .execute();
 
         connectionCreateActivityValidationCmd.withRequest(
                 ConnectionCreateActivityValidationCmd.Request.builder()
                     .accountId(request.getAccountId())
-                    .accountUsername(accountDto.getUsername())
-                    .potentialFriendAccountId(potentialAccountId)
-                    .potentialFriendAccountUsername(accountPotentialDto.getUsername())
-                    .accountType(accountPotentialDto.getType())
+                    .accountUsername(sourceAccountDto.getUsername())
+                    .potentialFriendAccountId(targetAccountId)
+                    .potentialFriendAccountUsername(targetAccountDto.getUsername())
+                    .accountType(targetAccountDto.getType())
                     .action(connectionRequest.getAction())
                     .build())
             .execute();
 
-        connectionCreateDirectConnectionCmd.withRequest(
-                ConnectionCreateDirectConnectionCmd.Request.builder()
-                    .accountDto(accountDto)
-                    .accountFriendDto(accountPotentialDto)
-                    .action(connectionRequest.getAction())
-                    .activityDate(request.getActivityDate())
-                    .build())
-            .execute();
-
-        connectionCreateCmd.withRequest(ConnectionCreateCmd.Request.builder()
-                .potentialFriendAccountId(potentialAccountId)
+        connectionHandleExternalCmd.withRequest(ConnectionHandleExternalCmd.Request.builder()
+                .targetAccountType(targetAccountDto.getType())
                 .action(connectionRequest.getAction())
-                .type(ConnectionTypeEnum.fromValue(accountPotentialDto.getType()))
-                .requestStateId(isShouldBehaveAsSocialNetwork(
-                    accountPotentialDto.getType(),
-                    connectionRequest.getAction()
-                ) ? nothingRequestStateId : approveOrPendingReqStateId)
+                .targetAccountDto(targetAccountDto)
                 .activityId(request.getActivityId())
                 .activityTypeId(request.getActivityTypeId())
                 .build())
             .execute();
 
-        if (isShouldBehaveAsSocialNetwork(
-            accountPotentialDto.getType(), connectionRequest.getAction()))
-        {
-            UUID activityMirrorId = activityCreateCmd.withRequest(
-                    ActivityCreateCmd.Request.builder()
-                        .link("N/A")
-                        .activityDate(request.getActivityDate())
-                        .accountId(potentialAccountId)
-                        .activityTypeId(request.getActivityTypeId())
-                        .isSystemActivity(true)
-                        .build())
-                .execute();
+        connectionHandleInternalCmd.withRequest(ConnectionHandleInternalCmd.Request.builder()
+                .targetAccountType(targetAccountDto.getType())
+                .action(connectionRequest.getAction())
+                .targetAccountDto(targetAccountDto)
+                .sourceAccountDto(sourceAccountDto)
+                .sourceActivityId(request.getActivityId())
+                .sourceActivityTypeId(request.getActivityTypeId())
+                .activityDate(request.getActivityDate())
+                .build())
+            .execute();
 
-            connectionCreateCmd.withRequest(ConnectionCreateCmd.Request.builder()
-                    .potentialFriendAccountId(request.getAccountId())
-                    .action(ConnectionActionEnum.INCOMING_FRIEND_REQUEST)
-                    .type(ConnectionTypeEnum.fromValue(accountDto.getType()))
-                    .requestStateId(approveOrPendingReqStateId)
-                    .activityId(activityMirrorId)
-                    .activityTypeId(request.getActivityTypeId())
+        connectionCreateDirectConnectionCmd.withRequest(
+                ConnectionCreateDirectConnectionCmd.Request.builder()
+                    .accountDto(sourceAccountDto)
+                    .accountFriendDto(targetAccountDto)
+                    .action(connectionRequest.getAction())
+                    .activityDate(request.getActivityDate())
                     .build())
-                .execute();
-        }
+            .execute();
 
         return null;
     }
 
-    private UUID getRequestStateIdByAction(ConnectionActionEnum action) {
-        if (action.equals(ConnectionActionEnum.INCOMING_FRIEND_REQUEST_AND_CONFIRMED)) {
-            return requestStateGetIdByCodeCmd.withRequest(
-                    RequestStateGetIdByCodeCmd.Request.builder()
-                        .code(RequestStateCodeEnum.APPROVED)
-                        .build())
-                .execute();
-        }
-
-        return requestStateGetIdByCodeCmd.withRequest(RequestStateGetIdByCodeCmd.Request.builder()
-                .code(RequestStateCodeEnum.PENDING)
-                .build())
-            .execute();
-    }
-
-    public boolean isShouldBehaveAsSocialNetwork(AccountTypeEnum accountType,
-        ConnectionActionEnum action)
-    {
-
-        return AccountTypeEnum.INTERNAL.equals(accountType)
-            && ConnectionActionEnum.OUTGOING_FRIEND_REQUEST.equals(action);
-    }
 
     @Builder
     @Getter
