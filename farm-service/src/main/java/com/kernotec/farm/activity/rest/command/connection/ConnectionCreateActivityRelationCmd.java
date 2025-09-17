@@ -5,10 +5,7 @@ import com.kernotec.farm.account.command.account.AccountCreateCmd;
 import com.kernotec.farm.account.command.account.AccountGetDtoCmd;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
-import com.kernotec.farm.activity.command.activity.ActivityCreateCmd;
-import com.kernotec.farm.activity.command.connection.ConnectionCreateCmd;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
-import com.kernotec.farm.parametric.command.request.state.RequestStateGetIdByCodeCmd;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
@@ -24,13 +21,10 @@ public class ConnectionCreateActivityRelationCmd extends
     AbstractTransactionalRequiredCommand<ConnectionCreateActivityRelationCmd.Request, Void>
 {
 
-    private final RequestStateGetIdByCodeCmd requestStateGetIdByCodeCmd;
     private final AccountGetDtoCmd accountGetDtoCmd;
     private final AccountCreateCmd accountCreateCmd;
-    private final ConnectionCreateCmd connectionCreateCmd;
     private final ConnectionCreateActivityValidationCmd connectionCreateActivityValidationCmd;
     private final ConnectionCreateDirectConnectionCmd connectionCreateDirectConnectionCmd;
-    private final ActivityCreateCmd activityCreateCmd;
     private final ConnectionHandleExternalCmd connectionHandleExternalCmd;
     private final ConnectionHandleInternalCmd connectionHandleInternalCmd;
 
@@ -42,12 +36,6 @@ public class ConnectionCreateActivityRelationCmd extends
             log.debug("No connection request provided, skipping activity relation creation.");
             return null;
         }
-
-        /*UUID nothingRequestStateId = requestStateGetIdByCodeCmd.withRequest(
-                RequestStateGetIdByCodeCmd.Request.builder()
-                    .code(RequestStateCodeEnum.NOTHING_WAS_REQUESTED)
-                    .build())
-            .execute();*/
 
         AccountDto sourceAccountDto = accountGetDtoCmd.withRequest(
                 AccountGetDtoCmd.Request.builder()

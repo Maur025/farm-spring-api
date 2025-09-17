@@ -14,12 +14,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
@@ -69,4 +71,12 @@ public class Account extends BaseAuditEntity {
                inverseJoinColumns = @JoinColumn(name = "observation_id",
                                                 referencedColumnName = "id"))
     private Set<Observation> observations;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @Where(clause = "deleted is false")
+    private Set<Friend> friends;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @Where(clause = "deleted is false")
+    private Set<AccountGroup> accountGroups;
 }
