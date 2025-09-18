@@ -1,15 +1,20 @@
 package com.kernotec.farm.report.jpa.service;
 
+import com.kernotec.farm.account.command.account.AccountGetDtoCmd;
+import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.account.jpa.entity.Friend;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.parametric.jpa.entity.FriendState;
 import com.kernotec.farm.parametric.jpa.entity.GroupState;
+import com.kernotec.farm.parametric.jpa.entity.Region;
 import com.kernotec.farm.parametric.jpa.enums.FriendStateCodeEnum;
 import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
 import com.kernotec.farm.report.rest.dto.response.account.ActivitySummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.FriendSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.account.GroupRegionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.GroupSummaryResponse;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -30,6 +35,7 @@ import org.springframework.stereotype.Service;
 public class AccountReportService {
 
     private final EntityManager entityManager;
+    private final AccountGetDtoCmd accountGetDtoCmd;
     private CriteriaBuilder cb;
 
     @PostConstruct
@@ -40,13 +46,24 @@ public class AccountReportService {
     public ActivitySummaryResponse getActivitySummaryByAccountId(UUID accountId,
         UUID socialNetworkId)
     {
+        AccountDto accountDto = accountGetDtoCmd.withRequest(AccountGetDtoCmd.Request.builder()
+                .accountId(accountId)
+                .build())
+            .execute();
 
         FriendSummaryResponse friendSummary = getFriendSummary(accountId, socialNetworkId);
-        GroupSummaryResponse groupSummary = getGroupSummary(accountId, socialNetworkId);
 
         return ActivitySummaryResponse.builder()
+            .accountId(accountId)
+            .accountName(accountDto.getUsername())
+            .socialNetworkId(socialNetworkId)
+            .socialNetworkName(accountDto.getSocialNetwork()
+                .getName())
             .friendSummary(friendSummary)
-            .groupSummary(groupSummary)
+            .groupSummary(GroupSummaryResponse.builder()
+                .totalGroups(getTotalGroups(accountId, socialNetworkId))
+                .totalsByRegion(getTotalGroupsByRegion(accountId, socialNetworkId))
+                .build())
             .build();
     }
 
@@ -99,21 +116,64 @@ public class AccountReportService {
             .getSingleResult();
     }
 
-    private GroupSummaryResponse getGroupSummary(UUID accountId, UUID socialNetworkId) {
-        CriteriaQuery<GroupSummaryResponse> query = cb.createQuery(GroupSummaryResponse.class);
-        Root<Account> accountRoot = query.from(Account.class);
+    private Long getTotalGroups(UUID accountId, UUID socialNetworkId) {
+        CriteriaQuery<Long> queryOfTotal = cb.createQuery(Long.class);
+        Root<Account> accountRoot = queryOfTotal.from(Account.class);
 
         Join<Account, AccountGroup> accountGroupJoin = accountRoot.join(
             "accountGroups", JoinType.INNER);
         Join<AccountGroup, GroupState> groupStateJoin = accountGroupJoin.join(
             "groupState", JoinType.INNER);
 
-        query.select(cb.construct(
-            GroupSummaryResponse.class,
-            /* totalGroups */
-            cb.countDistinct(accountGroupJoin.get("id"))
+        queryOfTotal.select(cb.countDistinct(accountGroupJoin.get("id")));
+
+        queryOfTotal.where(cb.and(
+            getPredicatesOfGroups(accountRoot, accountId, socialNetworkId, groupStateJoin).toArray(
+                Predicate[]::new)));
+
+        return entityManager.createQuery(queryOfTotal)
+            .getSingleResult();
+    }
+
+    private List<GroupRegionSummaryResponse> getTotalGroupsByRegion(UUID accountId,
+        UUID socialNetworkId)
+    {
+        CriteriaQuery<GroupRegionSummaryResponse> queryOfDetail = cb.createQuery(
+            GroupRegionSummaryResponse.class);
+        Root<Account> accountRoot = queryOfDetail.from(Account.class);
+
+        Join<Account, AccountGroup> accountGroupJoin = accountRoot.join(
+            "accountGroups", JoinType.INNER);
+
+        Join<AccountGroup, Group> groupJoin = accountGroupJoin.join("group", JoinType.INNER);
+        Join<Group, Region> regionJoin = groupJoin.join("region", JoinType.INNER);
+
+        Join<AccountGroup, GroupState> groupStateJoin = accountGroupJoin.join(
+            "groupState", JoinType.INNER);
+
+        queryOfDetail.select(cb.construct(
+            GroupRegionSummaryResponse.class,
+            /* regionName */
+            regionJoin.get("name"),
+            /* regionId */
+            regionJoin.get("id"),
+            /* totalGroupsByRegion */
+            cb.countDistinct(accountGroupJoin)
         ));
 
+        queryOfDetail.where(cb.and(
+            getPredicatesOfGroups(accountRoot, accountId, socialNetworkId, groupStateJoin).toArray(
+                Predicate[]::new)));
+
+        queryOfDetail.groupBy(regionJoin.get("id"), regionJoin.get("name"));
+
+        return entityManager.createQuery(queryOfDetail)
+            .getResultList();
+    }
+
+    private List<Predicate> getPredicatesOfGroups(Root<Account> accountRoot, UUID accountId,
+        UUID socialNetworkId, Join<?, ?> groupStateJoin)
+    {
         List<Predicate> predicateList = getCommonPredicates(
             accountRoot, accountId, socialNetworkId);
 
@@ -122,10 +182,7 @@ public class AccountReportService {
                 cb.equal(groupStateJoin.get("code"), GroupStateCodeEnum.JOINED.toString()));
         }
 
-        query.where(cb.and(predicateList.toArray(Predicate[]::new)));
-
-        return entityManager.createQuery(query)
-            .getSingleResult();
+        return predicateList;
     }
 
     private List<Predicate> getCommonPredicates(Root<Account> root, UUID accountId,
