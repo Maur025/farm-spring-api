@@ -135,6 +135,7 @@
 
   <include file="db/changelog/2025/09/12-01-changelog-124.xml"/>
   <include file="db/changelog/2025/09/18-01-changelog-125.xml"/>
+  <include file="db/changelog/2025/09/18-01-changelog-126.xml"/>
 
   <!-- activity type update2 - add type and review grammatical errors -->
   <changeSet id="1757776535097-1" author="maur025">

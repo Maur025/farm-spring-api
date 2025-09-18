@@ -4,6 +4,7 @@ import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.activity.jpa.entity.Profile;
 import com.kernotec.farm.activity.jpa.repository.ProfileRepository;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,5 +23,9 @@ public class ProfileService extends BaseServiceImpl<Profile, UUID> {
     @Override
     protected BaseRepository<Profile, UUID> repository() {
         return repository;
+    }
+
+    public Optional<Profile> findByName(String name) {
+        return repository.findByName(name);
     }
 }

@@ -103,6 +103,8 @@ public class ProcessActivityCreateRequestCmd extends
                     .followRequest(activityRequest.getFollow())
                     .activityId(activityId)
                     .activityTypeId(activityRequest.getActivityTypeId())
+                    .activityDate(activityRequest.getActivityDate())
+                    .accountId(activityRequest.getAccountId())
                     .build())
             .execute();
 
