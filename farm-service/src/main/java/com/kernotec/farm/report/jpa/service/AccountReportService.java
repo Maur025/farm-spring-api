@@ -3,10 +3,13 @@ package com.kernotec.farm.report.jpa.service;
 import com.kernotec.farm.account.command.account.AccountGetDtoCmd;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.account.jpa.entity.AccountFollowProfile;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.account.jpa.entity.Friend;
+import com.kernotec.farm.account.jpa.enums.AccountFollowProfileStateEnum;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.activity.jpa.entity.Group;
+import com.kernotec.farm.activity.jpa.entity.Profile;
 import com.kernotec.farm.parametric.jpa.entity.FriendState;
 import com.kernotec.farm.parametric.jpa.entity.GroupState;
 import com.kernotec.farm.parametric.jpa.entity.Region;
@@ -16,6 +19,8 @@ import com.kernotec.farm.report.rest.dto.response.account.ActivitySummaryRespons
 import com.kernotec.farm.report.rest.dto.response.account.FriendSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.GroupRegionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.GroupSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.account.PageRegionSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.account.PageSummaryResponse;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -64,18 +69,23 @@ public class AccountReportService {
                 .totalGroups(getTotalGroups(accountId, socialNetworkId))
                 .totalsByRegion(getTotalGroupsByRegion(accountId, socialNetworkId))
                 .build())
+            .pageSummary(PageSummaryResponse.builder()
+                .totalPages(getTotalPages(accountId, socialNetworkId))
+                .totalsByRegion(getTotalPagesByRegion(accountId, socialNetworkId))
+                .build())
             .build();
     }
 
     private FriendSummaryResponse getFriendSummary(UUID accountId, UUID socialNetworkId) {
-        CriteriaQuery<FriendSummaryResponse> query = cb.createQuery(FriendSummaryResponse.class);
-        Root<Account> root = query.from(Account.class);
+        CriteriaQuery<FriendSummaryResponse> queryFriendSummary = cb.createQuery(
+            FriendSummaryResponse.class);
+        Root<Account> root = queryFriendSummary.from(Account.class);
 
         Join<Account, Friend> friendJoin = root.join("friends", JoinType.INNER);
         Join<Friend, FriendState> friendStateJoin = friendJoin.join("friendState", JoinType.INNER);
         Join<Friend, Account> targetAccountJoin = friendJoin.join("friendAccount", JoinType.INNER);
 
-        query.select(cb.construct(
+        queryFriendSummary.select(cb.construct(
             FriendSummaryResponse.class,
             /* totalFriends */
             cb.countDistinct(friendJoin.get("id")),
@@ -110,37 +120,37 @@ public class AccountReportService {
                 cb.equal(friendStateJoin.get("code"), FriendStateCodeEnum.ACTIVE.toString()));
         }
 
-        query.where(cb.and(predicateList.toArray(Predicate[]::new)));
+        queryFriendSummary.where(cb.and(predicateList.toArray(Predicate[]::new)));
 
-        return entityManager.createQuery(query)
+        return entityManager.createQuery(queryFriendSummary)
             .getSingleResult();
     }
 
     private Long getTotalGroups(UUID accountId, UUID socialNetworkId) {
-        CriteriaQuery<Long> queryOfTotal = cb.createQuery(Long.class);
-        Root<Account> accountRoot = queryOfTotal.from(Account.class);
+        CriteriaQuery<Long> queryOfTotalGroups = cb.createQuery(Long.class);
+        Root<Account> accountRoot = queryOfTotalGroups.from(Account.class);
 
         Join<Account, AccountGroup> accountGroupJoin = accountRoot.join(
             "accountGroups", JoinType.INNER);
         Join<AccountGroup, GroupState> groupStateJoin = accountGroupJoin.join(
             "groupState", JoinType.INNER);
 
-        queryOfTotal.select(cb.countDistinct(accountGroupJoin.get("id")));
+        queryOfTotalGroups.select(cb.countDistinct(accountGroupJoin.get("id")));
 
-        queryOfTotal.where(cb.and(
+        queryOfTotalGroups.where(cb.and(
             getPredicatesOfGroups(accountRoot, accountId, socialNetworkId, groupStateJoin).toArray(
                 Predicate[]::new)));
 
-        return entityManager.createQuery(queryOfTotal)
+        return entityManager.createQuery(queryOfTotalGroups)
             .getSingleResult();
     }
 
     private List<GroupRegionSummaryResponse> getTotalGroupsByRegion(UUID accountId,
         UUID socialNetworkId)
     {
-        CriteriaQuery<GroupRegionSummaryResponse> queryOfDetail = cb.createQuery(
+        CriteriaQuery<GroupRegionSummaryResponse> queryGroupsByRegion = cb.createQuery(
             GroupRegionSummaryResponse.class);
-        Root<Account> accountRoot = queryOfDetail.from(Account.class);
+        Root<Account> accountRoot = queryGroupsByRegion.from(Account.class);
 
         Join<Account, AccountGroup> accountGroupJoin = accountRoot.join(
             "accountGroups", JoinType.INNER);
@@ -151,7 +161,7 @@ public class AccountReportService {
         Join<AccountGroup, GroupState> groupStateJoin = accountGroupJoin.join(
             "groupState", JoinType.INNER);
 
-        queryOfDetail.select(cb.construct(
+        queryGroupsByRegion.select(cb.construct(
             GroupRegionSummaryResponse.class,
             /* regionName */
             regionJoin.get("name"),
@@ -161,13 +171,13 @@ public class AccountReportService {
             cb.countDistinct(accountGroupJoin)
         ));
 
-        queryOfDetail.where(cb.and(
+        queryGroupsByRegion.where(cb.and(
             getPredicatesOfGroups(accountRoot, accountId, socialNetworkId, groupStateJoin).toArray(
                 Predicate[]::new)));
 
-        queryOfDetail.groupBy(regionJoin.get("id"), regionJoin.get("name"));
+        queryGroupsByRegion.groupBy(regionJoin.get("id"), regionJoin.get("name"));
 
-        return entityManager.createQuery(queryOfDetail)
+        return entityManager.createQuery(queryGroupsByRegion)
             .getResultList();
     }
 
@@ -181,6 +191,70 @@ public class AccountReportService {
             predicateList.add(
                 cb.equal(groupStateJoin.get("code"), GroupStateCodeEnum.JOINED.toString()));
         }
+
+        return predicateList;
+    }
+
+    private Long getTotalPages(UUID accountId, UUID socialNetworkId) {
+        CriteriaQuery<Long> queryOfTotalPages = cb.createQuery(Long.class);
+        Root<Account> accountRoot = queryOfTotalPages.from(Account.class);
+
+        Join<Account, AccountFollowProfile> accountFollowProfileJoin = accountRoot.join(
+            "accountFollowProfiles", JoinType.INNER);
+
+        queryOfTotalPages.select(cb.countDistinct(accountFollowProfileJoin.get("id")));
+
+        queryOfTotalPages.where(cb.and(getPredicatesOfPages(
+            accountRoot, accountId, socialNetworkId,
+            accountFollowProfileJoin
+        ).toArray(Predicate[]::new)));
+
+        return entityManager.createQuery(queryOfTotalPages)
+            .getSingleResult();
+    }
+
+    private List<PageRegionSummaryResponse> getTotalPagesByRegion(UUID accountId,
+        UUID socialNetworkId)
+    {
+        CriteriaQuery<PageRegionSummaryResponse> queryPagesByRegion = cb.createQuery(
+            PageRegionSummaryResponse.class);
+        Root<Account> accountRoot = queryPagesByRegion.from(Account.class);
+
+        Join<Account, AccountFollowProfile> accountFollowProfileJoin = accountRoot.join(
+            "accountFollowProfiles", JoinType.INNER);
+        Join<AccountFollowProfile, Profile> profileJoin = accountFollowProfileJoin.join(
+            "profile", JoinType.INNER);
+        Join<Profile, Region> regionJoin = profileJoin.join("region", JoinType.INNER);
+
+        queryPagesByRegion.select(cb.construct(
+            PageRegionSummaryResponse.class,
+            /* regionName */
+            regionJoin.get("name"),
+            /* regionId */
+            regionJoin.get("id"),
+            /* totalPagesByRegion */
+            cb.countDistinct(accountFollowProfileJoin.get("id"))
+        ));
+
+        queryPagesByRegion.where(cb.and(
+            getPredicatesOfPages(
+                accountRoot, accountId, socialNetworkId, accountFollowProfileJoin).toArray(
+                Predicate[]::new)));
+
+        queryPagesByRegion.groupBy(regionJoin.get("id"), regionJoin.get("name"));
+
+        return entityManager.createQuery(queryPagesByRegion)
+            .getResultList();
+    }
+
+    private List<Predicate> getPredicatesOfPages(Root<Account> accountRoot, UUID accountId,
+        UUID socialNetworkId, Join<?, ?> accountFollowProfileJoin)
+    {
+        List<Predicate> predicateList = getCommonPredicates(
+            accountRoot, accountId, socialNetworkId);
+
+        cb.equal(
+            accountFollowProfileJoin.get("followState"), AccountFollowProfileStateEnum.FOLLOWING);
 
         return predicateList;
     }

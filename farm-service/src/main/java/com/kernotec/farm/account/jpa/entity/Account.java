@@ -79,4 +79,8 @@ public class Account extends BaseAuditEntity {
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     @Where(clause = "deleted is false")
     private Set<AccountGroup> accountGroups;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @Where(clause = "deleted is false")
+    private Set<AccountFollowProfile> accountFollowProfiles;
 }
