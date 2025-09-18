@@ -59,4 +59,12 @@ public class Follow extends BaseAuditEntity {
     @JoinColumn(name = "activity_type_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private ActivityType activityType;
+
+    @Column(name = "profile_id")
+    private UUID profileId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", referencedColumnName = "id", insertable = false,
+                updatable = false)
+    private Profile profile;
 }

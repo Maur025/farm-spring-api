@@ -28,6 +28,7 @@ public class FollowCreateCmd extends
         follow.setRegionId(request.getRegionId());
         follow.setActivityId(request.getActivityId());
         follow.setActivityTypeId(request.getActivityTypeId());
+        follow.setProfileId(request.getProfileId());
 
         follow = followService.save(follow);
         return follow.getId();
@@ -49,5 +50,6 @@ public class FollowCreateCmd extends
         private final UUID activityId;
         @NotNull
         private final UUID activityTypeId;
+        private final UUID profileId;
     }
 }
