@@ -5,7 +5,8 @@ import lombok.Builder;
 
 @Builder
 public record PublishingSummaryResponse(Long totalPublications,
-                                        List<PublishingContextSummaryResponse> totalsByContext)
+                                        List<PublishingContextSummaryResponse> totalsByContext,
+                                        List<AccountSummaryTableResponse> publications)
 {
 
 }

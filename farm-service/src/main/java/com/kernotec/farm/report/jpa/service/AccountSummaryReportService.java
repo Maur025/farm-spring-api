@@ -17,6 +17,7 @@ import com.kernotec.farm.activity.jpa.entity.Reaction;
 import com.kernotec.farm.parametric.jpa.entity.FriendState;
 import com.kernotec.farm.parametric.jpa.entity.GroupState;
 import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
+import com.kernotec.farm.parametric.jpa.entity.PublishingType;
 import com.kernotec.farm.parametric.jpa.entity.ReactionType;
 import com.kernotec.farm.parametric.jpa.entity.Region;
 import com.kernotec.farm.parametric.jpa.enums.FriendStateCodeEnum;
@@ -69,6 +70,7 @@ public class AccountSummaryReportService {
             .execute();
 
         FriendSummaryResponse friendSummary = getFriendSummary(accountId, socialNetworkId);
+        CommentSummaryResponse commentSummary = getCommentSummary(accountId, socialNetworkId);
 
         return ActivitySummaryResponse.builder()
             .accountId(accountId)
@@ -91,12 +93,14 @@ public class AccountSummaryReportService {
             .publishingSummary(PublishingSummaryResponse.builder()
                 .totalPublications(getTotalPublications(accountId, socialNetworkId))
                 .totalsByContext(getTotalPublicationsByContext(accountId, socialNetworkId))
+                .publications(getPublicationsOfResult(accountId, socialNetworkId))
                 .build())
             .reactionSummary(ReactionSummaryResponse.builder()
                 .totalReactions(getTotalReactions(accountId, socialNetworkId))
                 .totalsByType(getTotalReactionsByType(accountId, socialNetworkId))
                 .build())
-            .commentSummary(getCommentSummary(accountId, socialNetworkId))
+            .commentSummary(
+                commentSummary.withComments(getCommentsOfResult(accountId, socialNetworkId)))
             .build();
     }
 
@@ -161,8 +165,9 @@ public class AccountSummaryReportService {
             /* name -> username */
             targetAccountJoin.get("username"),
             /* detail -> accountType */
-            targetAccountJoin.get("type")
-                .as(String.class)
+            cb.selectCase()
+                .when(cb.equal(targetAccountJoin.get("type"), AccountTypeEnum.EXTERNAL), "Externo")
+                .otherwise("Interno")
         ));
 
         queryFriendsOfResult.where(cb.and(
@@ -364,9 +369,8 @@ public class AccountSummaryReportService {
 
         queryPagesByRegion.where(cb.and(
             getPredicatesOfPages(
-                accountRoot, accountId, socialNetworkId,
-                accountFollowProfileJoin
-            ).toArray(Predicate[]::new)));
+                accountRoot, accountId, socialNetworkId, accountFollowProfileJoin).toArray(
+                Predicate[]::new)));
 
         queryPagesByRegion.groupBy(regionJoin.get("id"), regionJoin.get("name"));
 
@@ -401,6 +405,38 @@ public class AccountSummaryReportService {
 
         return entityManager.createQuery(queryOfTotalPublications)
             .getSingleResult();
+    }
+
+    private List<AccountSummaryTableResponse> getPublicationsOfResult(UUID accountId,
+        UUID socialNetworkId)
+    {
+        CriteriaQuery<AccountSummaryTableResponse> queryPublicationsOfResult = cb.createQuery(
+            AccountSummaryTableResponse.class);
+        Root<Activity> activityRoot = queryPublicationsOfResult.from(Activity.class);
+
+        Join<Activity, Publishing> publishingJoin = activityRoot.join(
+            "publishings", JoinType.INNER);
+        Join<Publishing, PublishingType> publishingTypeJoin = publishingJoin.join(
+            "publishingType", JoinType.LEFT);
+        Join<Publishing, PublishingContext> publishingContextJoin = publishingJoin.join(
+            "publishingContext", JoinType.LEFT);
+
+        queryPublicationsOfResult.select(cb.construct(
+            AccountSummaryTableResponse.class,
+            /* id -> publishingId */
+            publishingJoin.get("id"),
+            /* name -> publishinTypeName */
+            publishingTypeJoin.get("name"),
+            /* detail -> publishinContextName */
+            publishingContextJoin.get("name")
+        ));
+
+        queryPublicationsOfResult.where(cb.and(
+            getCommonActivityPredicates(activityRoot, accountId, socialNetworkId).toArray(
+                Predicate[]::new)));
+
+        return entityManager.createQuery(queryPublicationsOfResult)
+            .getResultList();
     }
 
     private List<PublishingContextSummaryResponse> getTotalPublicationsByContext(UUID accountId,
@@ -517,6 +553,37 @@ public class AccountSummaryReportService {
 
         return entityManager.createQuery(queryCommentSummary)
             .getSingleResult();
+    }
+
+    private List<AccountSummaryTableResponse> getCommentsOfResult(UUID accountId,
+        UUID socialNetworkId)
+    {
+        CriteriaQuery<AccountSummaryTableResponse> queryCommentsOfResult = cb.createQuery(
+            AccountSummaryTableResponse.class);
+        Root<Activity> activityRoot = queryCommentsOfResult.from(Activity.class);
+
+        Join<Activity, Comment> commentJoin = activityRoot.join("comments", JoinType.INNER);
+        Join<Comment, PublishingContext> publishingContextJoin = commentJoin.join(
+            "publishingContext", JoinType.LEFT);
+
+        queryCommentsOfResult.select(cb.construct(
+            AccountSummaryTableResponse.class,
+            /* id -> commentId */
+            commentJoin.get("id"),
+            /* name -> publishingContextName */
+            publishingContextJoin.get("name"),
+            /* detail -> isAgreeComment */
+            cb.selectCase()
+                .when(cb.isTrue(commentJoin.get("isAgreeComment")), "Positivo")
+                .otherwise("Negativo")
+        ));
+
+        queryCommentsOfResult.where(cb.and(
+            getCommonActivityPredicates(activityRoot, accountId, socialNetworkId).toArray(
+                Predicate[]::new)));
+
+        return entityManager.createQuery(queryCommentsOfResult)
+            .getResultList();
     }
 
     private List<Predicate> getCommonAccountPredicates(Root<Account> root, UUID accountId,
