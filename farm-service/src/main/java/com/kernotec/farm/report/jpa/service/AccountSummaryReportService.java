@@ -8,20 +8,25 @@ import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.account.jpa.entity.Friend;
 import com.kernotec.farm.account.jpa.enums.AccountFollowProfileStateEnum;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
-import com.kernotec.farm.activity.jpa.dto.entity.ProfileDto;
+import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.activity.jpa.entity.Profile;
+import com.kernotec.farm.activity.jpa.entity.Publishing;
 import com.kernotec.farm.parametric.jpa.entity.FriendState;
 import com.kernotec.farm.parametric.jpa.entity.GroupState;
+import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
 import com.kernotec.farm.parametric.jpa.entity.Region;
 import com.kernotec.farm.parametric.jpa.enums.FriendStateCodeEnum;
 import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
+import com.kernotec.farm.report.rest.dto.response.account.AccountSummaryTableResponse;
 import com.kernotec.farm.report.rest.dto.response.account.ActivitySummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.FriendSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.GroupRegionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.GroupSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.PageRegionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.PageSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.account.PublishingContextSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.account.PublishingSummaryResponse;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -38,7 +43,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class AccountReportService {
+public class AccountSummaryReportService {
 
     private final EntityManager entityManager;
     private final AccountGetDtoCmd accountGetDtoCmd;
@@ -74,6 +79,10 @@ public class AccountReportService {
                 .totalPages(getTotalPages(accountId, socialNetworkId))
                 .totalsByRegion(getTotalPagesByRegion(accountId, socialNetworkId))
                 .profiles(getPagesOfResult(accountId, socialNetworkId))
+                .build())
+            .publishingSummary(PublishingSummaryResponse.builder()
+                .totalPublications(getTotalPublications(accountId, socialNetworkId))
+                .totalsByContext(getTotalPublicationsByContext(accountId, socialNetworkId))
                 .build())
             .build();
     }
@@ -115,7 +124,8 @@ public class AccountReportService {
             )
         ));
 
-        List<Predicate> predicateList = getCommonPredicates(root, accountId, socialNetworkId);
+        List<Predicate> predicateList = getCommonAccountPredicates(
+            root, accountId, socialNetworkId);
 
         if (friendStateJoin != null) {
             predicateList.add(
@@ -186,7 +196,7 @@ public class AccountReportService {
     private List<Predicate> getPredicatesOfGroups(Root<Account> accountRoot, UUID accountId,
         UUID socialNetworkId, Join<?, ?> groupStateJoin)
     {
-        List<Predicate> predicateList = getCommonPredicates(
+        List<Predicate> predicateList = getCommonAccountPredicates(
             accountRoot, accountId, socialNetworkId);
 
         if (groupStateJoin != null) {
@@ -215,8 +225,10 @@ public class AccountReportService {
             .getSingleResult();
     }
 
-    private List<ProfileDto> getPagesOfResult(UUID accountId, UUID socialNetworkId) {
-        CriteriaQuery<ProfileDto> getPagesQuery = cb.createQuery(ProfileDto.class);
+    private List<AccountSummaryTableResponse> getPagesOfResult(UUID accountId, UUID socialNetworkId)
+    {
+        CriteriaQuery<AccountSummaryTableResponse> getPagesQuery = cb.createQuery(
+            AccountSummaryTableResponse.class);
         Root<Account> accountRoot = getPagesQuery.from(Account.class);
 
         Join<Account, AccountFollowProfile> accountFollowProfileJoin = accountRoot.join(
@@ -226,7 +238,7 @@ public class AccountReportService {
         Join<Profile, Region> regionJoin = profileJoin.join("region", JoinType.LEFT);
 
         getPagesQuery.select(cb.construct(
-            ProfileDto.class,
+            AccountSummaryTableResponse.class,
             /* profileId */
             profileJoin.get("id"),
             /* profileName */
@@ -281,7 +293,7 @@ public class AccountReportService {
     private List<Predicate> getPredicatesOfPages(Root<Account> accountRoot, UUID accountId,
         UUID socialNetworkId, Join<?, ?> accountFollowProfileJoin)
     {
-        List<Predicate> predicateList = getCommonPredicates(
+        List<Predicate> predicateList = getCommonAccountPredicates(
             accountRoot, accountId, socialNetworkId);
 
         cb.equal(
@@ -290,12 +302,74 @@ public class AccountReportService {
         return predicateList;
     }
 
-    private List<Predicate> getCommonPredicates(Root<Account> root, UUID accountId,
+    private Long getTotalPublications(UUID accountId, UUID socialNetworkId) {
+        CriteriaQuery<Long> queryOfTotalPublications = cb.createQuery(Long.class);
+        Root<Activity> activityRoot = queryOfTotalPublications.from(Activity.class);
+
+        Join<Activity, Publishing> publishingJoin = activityRoot.join(
+            "publishings", JoinType.INNER);
+
+        queryOfTotalPublications.select(cb.countDistinct(publishingJoin.get("id")));
+
+        queryOfTotalPublications.where(
+            getCommonActivityPredicates(activityRoot, accountId, socialNetworkId).toArray(
+                Predicate[]::new));
+
+        return entityManager.createQuery(queryOfTotalPublications)
+            .getSingleResult();
+    }
+
+    private List<PublishingContextSummaryResponse> getTotalPublicationsByContext(UUID accountId,
+        UUID socialNetworkId)
+    {
+        CriteriaQuery<PublishingContextSummaryResponse> queryPublicationsByContext = cb.createQuery(
+            PublishingContextSummaryResponse.class);
+        Root<Activity> activityRoot = queryPublicationsByContext.from(Activity.class);
+
+        Join<Activity, Publishing> publishingJoin = activityRoot.join(
+            "publishings", JoinType.INNER);
+        Join<Publishing, PublishingContext> publishingContextJoin = publishingJoin.join(
+            "publishingContext", JoinType.INNER);
+
+        queryPublicationsByContext.select(cb.construct(
+            PublishingContextSummaryResponse.class,
+            /* publishingContextId */
+            publishingContextJoin.get("id"),
+            /* publishingContextName */
+            publishingContextJoin.get("name"),
+            /* totalPublicationsByContext */
+            cb.countDistinct(publishingJoin.get("id"))
+        ));
+
+        queryPublicationsByContext.where(cb.and(
+            getCommonActivityPredicates(activityRoot, accountId, socialNetworkId).toArray(
+                Predicate[]::new)));
+
+        queryPublicationsByContext.groupBy(
+            publishingContextJoin.get("id"), publishingContextJoin.get("name"));
+
+        return entityManager.createQuery(queryPublicationsByContext)
+            .getResultList();
+    }
+
+    private List<Predicate> getCommonAccountPredicates(Root<Account> root, UUID accountId,
         UUID socialNetworkId)
     {
         List<Predicate> predicateList = new ArrayList<>();
         predicateList.add(cb.equal(root.get("id"), accountId));
         predicateList.add(cb.equal(root.get("socialNetworkId"), socialNetworkId));
+
+        return predicateList;
+    }
+
+    private List<Predicate> getCommonActivityPredicates(Root<Activity> activityRoot, UUID accountId,
+        UUID socialNetworkId)
+    {
+        Join<Activity, Account> accountJoin = activityRoot.join("account");
+
+        List<Predicate> predicateList = new ArrayList<>();
+        predicateList.add(cb.equal(activityRoot.get("accountId"), accountId));
+        predicateList.add(cb.equal(accountJoin.get("socialNetworkId"), socialNetworkId));
 
         return predicateList;
     }

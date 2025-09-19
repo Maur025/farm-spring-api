@@ -1,7 +1,7 @@
 package com.kernotec.farm.report.rest.controller;
 
 import com.kernotec.core.rest.dto.response.SingleResponse;
-import com.kernotec.farm.report.jpa.service.AccountReportService;
+import com.kernotec.farm.report.jpa.service.AccountSummaryReportService;
 import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.response.account.ActivitySummaryResponse;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ReportController {
 
-    private final AccountReportService accountReportService;
+    private final AccountSummaryReportService accountSummaryReportService;
 
     @Operation(summary = "Get activity summary by account")
     @PostMapping("account/{accountId}/activities/summary")
@@ -34,7 +34,7 @@ public class ReportController {
     {
         return SingleResponse.<ActivitySummaryResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(accountReportService.getActivitySummaryByAccountId(
+            .data(accountSummaryReportService.getActivitySummaryByAccountId(
                 accountId,
                 request.getSocialNetworkId()
             ))

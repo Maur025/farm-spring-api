@@ -2,6 +2,7 @@ package com.kernotec.farm.account.jpa.entity;
 
 import com.kernotec.core.jpa.entity.BaseAuditEntity;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.inventory.jpa.entity.Chip;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
@@ -83,4 +84,8 @@ public class Account extends BaseAuditEntity {
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     @Where(clause = "deleted is false")
     private Set<AccountFollowProfile> accountFollowProfiles;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @Where(clause = "deleted is false")
+    private Set<Activity> activities;
 }

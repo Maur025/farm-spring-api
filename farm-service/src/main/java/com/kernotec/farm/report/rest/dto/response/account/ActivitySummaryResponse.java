@@ -21,4 +21,7 @@ public class ActivitySummaryResponse extends EntityResponse {
     private final FriendSummaryResponse friendSummary;
     private final GroupSummaryResponse groupSummary;
     private final PageSummaryResponse pageSummary;
+    private final PublishingSummaryResponse publishingSummary;
+    private final ReactionSummaryResponse reactionSummary;
+    private final CommentSummaryResponse commentSummary;
 }
