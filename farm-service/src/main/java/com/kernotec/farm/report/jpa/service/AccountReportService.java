@@ -8,6 +8,7 @@ import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.account.jpa.entity.Friend;
 import com.kernotec.farm.account.jpa.enums.AccountFollowProfileStateEnum;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.activity.jpa.dto.entity.ProfileDto;
 import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.activity.jpa.entity.Profile;
 import com.kernotec.farm.parametric.jpa.entity.FriendState;
@@ -72,6 +73,7 @@ public class AccountReportService {
             .pageSummary(PageSummaryResponse.builder()
                 .totalPages(getTotalPages(accountId, socialNetworkId))
                 .totalsByRegion(getTotalPagesByRegion(accountId, socialNetworkId))
+                .profiles(getPagesOfResult(accountId, socialNetworkId))
                 .build())
             .build();
     }
@@ -211,6 +213,35 @@ public class AccountReportService {
 
         return entityManager.createQuery(queryOfTotalPages)
             .getSingleResult();
+    }
+
+    private List<ProfileDto> getPagesOfResult(UUID accountId, UUID socialNetworkId) {
+        CriteriaQuery<ProfileDto> getPagesQuery = cb.createQuery(ProfileDto.class);
+        Root<Account> accountRoot = getPagesQuery.from(Account.class);
+
+        Join<Account, AccountFollowProfile> accountFollowProfileJoin = accountRoot.join(
+            "accountFollowProfiles", JoinType.INNER);
+        Join<AccountFollowProfile, Profile> profileJoin = accountFollowProfileJoin.join(
+            "profile", JoinType.INNER);
+        Join<Profile, Region> regionJoin = profileJoin.join("region", JoinType.LEFT);
+
+        getPagesQuery.select(cb.construct(
+            ProfileDto.class,
+            /* profileId */
+            profileJoin.get("id"),
+            /* profileName */
+            profileJoin.get("name"),
+            /* regionName */
+            regionJoin.get("name")
+        ));
+
+        getPagesQuery.where(cb.and(getPredicatesOfPages(
+            accountRoot, accountId, socialNetworkId,
+            accountFollowProfileJoin
+        ).toArray(Predicate[]::new)));
+
+        return entityManager.createQuery(getPagesQuery)
+            .getResultList();
     }
 
     private List<PageRegionSummaryResponse> getTotalPagesByRegion(UUID accountId,
