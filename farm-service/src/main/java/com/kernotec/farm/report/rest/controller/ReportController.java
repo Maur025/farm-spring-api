@@ -5,6 +5,7 @@ import com.kernotec.farm.report.jpa.service.AccountSummaryReportService;
 import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.response.account.ActivitySummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.account.FriendSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
@@ -38,6 +39,20 @@ public class ReportController {
                 accountId,
                 request.getSocialNetworkId()
             ))
+            .build();
+    }
+
+    @Operation(summary = "Get friend summary by account")
+    @PostMapping("account/{accountId}/friends/summary")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<FriendSummaryResponse> getFriendSummaryByAccount(
+        @PathVariable("accountId") UUID accountId,
+        @RequestBody ActivitySummaryByAccountRequest request)
+    {
+        return SingleResponse.<FriendSummaryResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(FriendSummaryResponse.builder()
+                .build())
             .build();
     }
 }
