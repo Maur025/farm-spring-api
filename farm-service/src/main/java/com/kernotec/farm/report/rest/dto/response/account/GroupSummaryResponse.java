@@ -5,7 +5,8 @@ import lombok.Builder;
 
 @Builder
 public record GroupSummaryResponse(Long totalGroups,
-                                   List<GroupRegionSummaryResponse> totalsByRegion)
+                                   List<GroupRegionSummaryResponse> totalsByRegion,
+                                   List<AccountSummaryTableResponse> groups)
 {
 
 }
