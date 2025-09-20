@@ -2,6 +2,7 @@ package com.kernotec.farm.report.rest.controller;
 
 import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.report.jpa.service.AccountSummaryReportService;
+import com.kernotec.farm.report.jpa.service.FriendSummaryService;
 import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.response.account.ActivitySummaryResponse;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportController {
 
     private final AccountSummaryReportService accountSummaryReportService;
+    private final FriendSummaryService friendSummaryService;
 
     @Operation(summary = "Get activity summary by account")
     @PostMapping("account/{accountId}/activities/summary")
@@ -35,10 +38,7 @@ public class ReportController {
     {
         return SingleResponse.<ActivitySummaryResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(accountSummaryReportService.getActivitySummaryByAccountId(
-                accountId,
-                request.getSocialNetworkId()
-            ))
+            .data(accountSummaryReportService.getActivitySummaryByAccountId(accountId, request))
             .build();
     }
 
@@ -47,12 +47,15 @@ public class ReportController {
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<FriendSummaryResponse> getFriendSummaryByAccount(
         @PathVariable("accountId") UUID accountId,
-        @RequestBody ActivitySummaryByAccountRequest request)
+        @RequestBody ActivitySummaryByAccountRequest request,
+        @RequestParam(defaultValue = "0") Integer page,
+        @RequestParam(defaultValue = "20") Integer size,
+        @RequestParam(defaultValue = "name") String sortBy,
+        @RequestParam(defaultValue = "true") String descending)
     {
         return SingleResponse.<FriendSummaryResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(FriendSummaryResponse.builder()
-                .build())
+            .data(friendSummaryService.getFriendSummary(accountId, request))
             .build();
     }
 }
