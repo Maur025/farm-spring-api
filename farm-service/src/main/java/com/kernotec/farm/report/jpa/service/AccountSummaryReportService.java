@@ -5,27 +5,23 @@ import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.AccountFollowProfile;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
-import com.kernotec.farm.account.jpa.entity.Friend;
 import com.kernotec.farm.account.jpa.enums.AccountFollowProfileStateEnum;
-import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Comment;
 import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.activity.jpa.entity.Profile;
 import com.kernotec.farm.activity.jpa.entity.Publishing;
 import com.kernotec.farm.activity.jpa.entity.Reaction;
-import com.kernotec.farm.parametric.jpa.entity.FriendState;
 import com.kernotec.farm.parametric.jpa.entity.GroupState;
 import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
 import com.kernotec.farm.parametric.jpa.entity.PublishingType;
 import com.kernotec.farm.parametric.jpa.entity.ReactionType;
 import com.kernotec.farm.parametric.jpa.entity.Region;
-import com.kernotec.farm.parametric.jpa.enums.FriendStateCodeEnum;
 import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
+import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.response.account.AccountSummaryTableResponse;
 import com.kernotec.farm.report.rest.dto.response.account.ActivitySummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.CommentSummaryResponse;
-import com.kernotec.farm.report.rest.dto.response.account.FriendSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.GroupRegionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.GroupSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.PageRegionSummaryResponse;
@@ -54,6 +50,8 @@ public class AccountSummaryReportService {
 
     private final EntityManager entityManager;
     private final AccountGetDtoCmd accountGetDtoCmd;
+    private final FriendSummaryService friendSummaryService;
+    private final CommonPredicateToSummary commonPredicateToSummary;
     private CriteriaBuilder cb;
 
     @PostConstruct
@@ -62,14 +60,15 @@ public class AccountSummaryReportService {
     }
 
     public ActivitySummaryResponse getActivitySummaryByAccountId(UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
+        UUID socialNetworkId = filterRequest.getSocialNetworkId();
+
         AccountDto accountDto = accountGetDtoCmd.withRequest(AccountGetDtoCmd.Request.builder()
                 .accountId(accountId)
                 .build())
             .execute();
 
-        FriendSummaryResponse friendSummary = getFriendSummary(accountId, socialNetworkId);
         CommentSummaryResponse commentSummary = getCommentSummary(accountId, socialNetworkId);
 
         return ActivitySummaryResponse.builder()
@@ -78,8 +77,7 @@ public class AccountSummaryReportService {
             .socialNetworkId(socialNetworkId)
             .socialNetworkName(accountDto.getSocialNetwork()
                 .getName())
-            .friendSummary(
-                friendSummary.withFriends(getFriendsOfResult(accountId, socialNetworkId)))
+            .friendSummary(friendSummaryService.getFriendSummary(accountId, filterRequest))
             .groupSummary(GroupSummaryResponse.builder()
                 .totalGroups(getTotalGroups(accountId, socialNetworkId))
                 .totalsByRegion(getTotalGroupsByRegion(accountId, socialNetworkId))
@@ -102,96 +100,6 @@ public class AccountSummaryReportService {
             .commentSummary(
                 commentSummary.withComments(getCommentsOfResult(accountId, socialNetworkId)))
             .build();
-    }
-
-    private FriendSummaryResponse getFriendSummary(UUID accountId, UUID socialNetworkId) {
-        CriteriaQuery<FriendSummaryResponse> queryFriendSummary = cb.createQuery(
-            FriendSummaryResponse.class);
-        Root<Account> root = queryFriendSummary.from(Account.class);
-
-        Join<Account, Friend> friendJoin = root.join("friends", JoinType.INNER);
-        Join<Friend, Account> targetAccountJoin = friendJoin.join("friendAccount", JoinType.INNER);
-
-        queryFriendSummary.select(cb.construct(
-            FriendSummaryResponse.class,
-            /* totalFriends */
-            cb.countDistinct(friendJoin.get("id")),
-            /* totalInternalFriends */
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.and(
-                            cb.equal(friendJoin.get("accountId"), accountId),
-                            cb.equal(targetAccountJoin.get("type"), AccountTypeEnum.INTERNAL)
-                        ), 1L
-                    )
-                    .otherwise(0L)), 0L
-            ),
-            /* totalExternalFriends */
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.and(
-                            cb.equal(friendJoin.get("accountId"), accountId),
-                            cb.equal(targetAccountJoin.get("type"), AccountTypeEnum.EXTERNAL)
-                        ), 1L
-                    )
-                    .otherwise(0L)), 0L
-            )
-        ));
-
-        queryFriendSummary.where(cb.and(
-            getPredicatesOfFriends(root, accountId, socialNetworkId, friendJoin).toArray(
-                Predicate[]::new)));
-
-        return entityManager.createQuery(queryFriendSummary)
-            .getSingleResult();
-    }
-
-    private List<AccountSummaryTableResponse> getFriendsOfResult(UUID accountId,
-        UUID socialNetworkId)
-    {
-        CriteriaQuery<AccountSummaryTableResponse> queryFriendsOfResult = cb.createQuery(
-            AccountSummaryTableResponse.class);
-        Root<Account> accountRoot = queryFriendsOfResult.from(Account.class);
-
-        Join<Account, Friend> friendJoin = accountRoot.join("friends", JoinType.INNER);
-        Join<Friend, Account> targetAccountJoin = friendJoin.join("friendAccount", JoinType.LEFT);
-
-        queryFriendsOfResult.select(cb.construct(
-            AccountSummaryTableResponse.class,
-            /* id -> accountId */
-            targetAccountJoin.get("id"),
-            /* name -> username */
-            targetAccountJoin.get("username"),
-            /* detail -> accountType */
-            cb.selectCase()
-                .when(cb.equal(targetAccountJoin.get("type"), AccountTypeEnum.EXTERNAL), "Externo")
-                .otherwise("Interno")
-        ));
-
-        queryFriendsOfResult.where(cb.and(
-            getPredicatesOfFriends(accountRoot, accountId, socialNetworkId, friendJoin).toArray(
-                Predicate[]::new)));
-
-        return entityManager.createQuery(queryFriendsOfResult)
-            .getResultList();
-    }
-
-    private List<Predicate> getPredicatesOfFriends(Root<Account> accountRoot, UUID accountId,
-        UUID socialNetworkId, Join<Account, Friend> friendJoin)
-    {
-        Join<Friend, FriendState> friendStateJoin = friendJoin.join("friendState", JoinType.INNER);
-
-        List<Predicate> predicateList = getCommonAccountPredicates(
-            accountRoot, accountId, socialNetworkId);
-
-        if (friendStateJoin != null) {
-            predicateList.add(
-                cb.equal(friendStateJoin.get("code"), FriendStateCodeEnum.ACTIVE.toString()));
-        }
-
-        return predicateList;
     }
 
     private Long getTotalGroups(UUID accountId, UUID socialNetworkId) {
@@ -284,7 +192,7 @@ public class AccountSummaryReportService {
     private List<Predicate> getPredicatesOfGroups(Root<Account> accountRoot, UUID accountId,
         UUID socialNetworkId, Join<?, ?> groupStateJoin)
     {
-        List<Predicate> predicateList = getCommonAccountPredicates(
+        List<Predicate> predicateList = commonPredicateToSummary.getCommonAccountPredicates(
             accountRoot, accountId, socialNetworkId);
 
         if (groupStateJoin != null) {
@@ -381,7 +289,7 @@ public class AccountSummaryReportService {
     private List<Predicate> getPredicatesOfPages(Root<Account> accountRoot, UUID accountId,
         UUID socialNetworkId, Join<?, ?> accountFollowProfileJoin)
     {
-        List<Predicate> predicateList = getCommonAccountPredicates(
+        List<Predicate> predicateList = commonPredicateToSummary.getCommonAccountPredicates(
             accountRoot, accountId, socialNetworkId);
 
         cb.equal(
@@ -584,16 +492,6 @@ public class AccountSummaryReportService {
 
         return entityManager.createQuery(queryCommentsOfResult)
             .getResultList();
-    }
-
-    private List<Predicate> getCommonAccountPredicates(Root<Account> root, UUID accountId,
-        UUID socialNetworkId)
-    {
-        List<Predicate> predicateList = new ArrayList<>();
-        predicateList.add(cb.equal(root.get("id"), accountId));
-        predicateList.add(cb.equal(root.get("socialNetworkId"), socialNetworkId));
-
-        return predicateList;
     }
 
     private List<Predicate> getCommonActivityPredicates(Root<Activity> activityRoot, UUID accountId,
