@@ -85,6 +85,10 @@ public class CommonPredicateToSummary {
         ZonedDateTime fromStartOfDay = from.toLocalDate()
             .atStartOfDay(userZone);
 
+        log.info("Applying time lapse filter from {} to {}", fromStartOfDay, toEndOfDay);
+
+        log.info("Applying time lapse filter to {}", zonedDateTimeToCompare);
+
         predicateList.add(cb.between(zonedDateTimeToCompare, fromStartOfDay, toEndOfDay));
     }
 }
