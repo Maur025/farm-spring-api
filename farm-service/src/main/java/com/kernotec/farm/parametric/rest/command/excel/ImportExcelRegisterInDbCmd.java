@@ -93,6 +93,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .deviceId(deviceDto.getId())
                         .accountType(AccountTypeEnum.INTERNAL)
                         .observation(excelDataDto.getFacebookObservation())
+                        .referenceEmail(excelDataDto.getEmailUsername())
                         .build())
                 .execute();
         }
@@ -108,6 +109,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .deviceId(deviceDto.getId())
                         .accountType(AccountTypeEnum.INTERNAL)
                         .observation(excelDataDto.getTiktokObservation())
+                        .referenceEmail(excelDataDto.getEmailUsername())
                         .build())
                 .execute();
         }
@@ -122,6 +124,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .socialNetworkCode(SocialNetworkEnum.X)
                         .deviceId(deviceDto.getId())
                         .accountType(AccountTypeEnum.INTERNAL)
+                        .referenceEmail(excelDataDto.getEmailUsername())
                         .build())
                 .execute();
         }

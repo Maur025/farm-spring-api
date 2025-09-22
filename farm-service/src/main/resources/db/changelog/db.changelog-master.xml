@@ -154,4 +154,6 @@
   </changeSet>
 
   <include file="db/changelog/2025/09/22-01-changelog-127.xml"/>
+  <include file="db/changelog/2025/09/22-01-changelog-128.xml"/>
+  <include file="db/changelog/2025/09/22-01-changelog-129.xml"/>
 </databaseChangeLog>

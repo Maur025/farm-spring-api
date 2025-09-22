@@ -16,6 +16,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.Set;
 import java.util.UUID;
@@ -88,4 +89,7 @@ public class Account extends BaseAuditEntity {
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     @Where(clause = "deleted is false")
     private Set<Activity> activities;
+
+    @OneToOne(mappedBy = "account")
+    private AccountExtension accountExtension;
 }
