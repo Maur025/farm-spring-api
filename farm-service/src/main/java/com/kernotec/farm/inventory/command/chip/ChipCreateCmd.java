@@ -40,7 +40,6 @@ public class ChipCreateCmd extends
         private final String phoneNumber;
         @NotNull
         private final boolean isDeviceInside;
-        @NotNull
         private final UUID operatorId;
         @NotNull
         private final UUID registrationPersonId;

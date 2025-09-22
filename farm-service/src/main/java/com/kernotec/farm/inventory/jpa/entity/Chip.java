@@ -29,10 +29,10 @@ public class Chip extends BaseAuditEntity {
     @Column(name = "is_device_inside", nullable = false, columnDefinition = "boolean default false")
     private boolean isDeviceInside = false;
 
-    @Column(name = "operator_id", nullable = false)
+    @Column(name = "operator_id")
     private UUID operatorId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operator_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private Operator operator;
