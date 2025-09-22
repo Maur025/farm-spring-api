@@ -43,13 +43,16 @@ public class CommonPredicateToSummary {
     }
 
     public List<Predicate> getCommonActivityPredicates(Root<Activity> activityRoot, UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
         Join<Activity, Account> accountJoin = activityRoot.join("account");
 
         List<Predicate> predicateList = new ArrayList<>();
         predicateList.add(cb.equal(activityRoot.get("accountId"), accountId));
-        predicateList.add(cb.equal(accountJoin.get("socialNetworkId"), socialNetworkId));
+        predicateList.add(
+            cb.equal(accountJoin.get("socialNetworkId"), filterRequest.getSocialNetworkId()));
+
+        addTimeLapsePredicate(filterRequest, predicateList, activityRoot.get("activityDate"));
 
         return predicateList;
     }
