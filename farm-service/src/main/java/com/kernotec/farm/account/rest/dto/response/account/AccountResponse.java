@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.account.rest.dto.response.account.extension.AccountExtensionResponse;
 import com.kernotec.farm.account.rest.dto.response.observation.ObservationResponse;
 import com.kernotec.farm.account.rest.dto.response.person.PersonResponse;
 import com.kernotec.farm.inventory.rest.dto.response.chip.ChipResponse;
@@ -34,4 +35,6 @@ public class AccountResponse extends EntityResponse {
     private Set<ChipResponse> chips;
 
     private Set<ObservationResponse> observations;
+
+    private AccountExtensionResponse accountExtension;
 }

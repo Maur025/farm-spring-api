@@ -37,12 +37,12 @@ public class ReactionSummaryService {
         ActivitySummaryByAccountRequest filterRequest)
     {
         return ReactionSummaryResponse.builder()
-            .totalReactions(getTotalReactions(accountId, filterRequest.getSocialNetworkId()))
-            .totalsByType(getTotalReactionsByType(accountId, filterRequest.getSocialNetworkId()))
+            .totalReactions(getTotalReactions(accountId, filterRequest))
+            .totalsByType(getTotalReactionsByType(accountId, filterRequest))
             .build();
     }
 
-    private Long getTotalReactions(UUID accountId, UUID socialNetworkId) {
+    private Long getTotalReactions(UUID accountId, ActivitySummaryByAccountRequest filterRequest) {
         CriteriaQuery<Long> queryOfTotalReactions = cb.createQuery(Long.class);
         Root<Activity> activityRoot = queryOfTotalReactions.from(Activity.class);
 
@@ -53,7 +53,7 @@ public class ReactionSummaryService {
         queryOfTotalReactions.where(
             commonPredicateToSummary.getCommonActivityPredicates(
                     activityRoot, accountId,
-                    socialNetworkId
+                    filterRequest
                 )
                 .toArray(Predicate[]::new));
 
@@ -62,7 +62,7 @@ public class ReactionSummaryService {
     }
 
     private List<ReactionTypeSummaryResponse> getTotalReactionsByType(UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<ReactionTypeSummaryResponse> queryReactionsByType = cb.createQuery(
             ReactionTypeSummaryResponse.class);
@@ -87,7 +87,7 @@ public class ReactionSummaryService {
         queryReactionsByType.where(cb.and(
             commonPredicateToSummary.getCommonActivityPredicates(
                     activityRoot, accountId,
-                    socialNetworkId
+                    filterRequest
                 )
                 .toArray(Predicate[]::new)));
 

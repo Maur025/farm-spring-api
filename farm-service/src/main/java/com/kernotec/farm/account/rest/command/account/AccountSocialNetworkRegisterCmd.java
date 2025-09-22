@@ -2,6 +2,7 @@ package com.kernotec.farm.account.rest.command.account;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.account.command.account.AccountCreateCmd;
+import com.kernotec.farm.account.command.account.extension.AccountExtensionCreateCmd;
 import com.kernotec.farm.account.command.account.observation.AccountObservationCreateCmd;
 import com.kernotec.farm.account.command.assigned.chip.AssignedChipCreateCmd;
 import com.kernotec.farm.account.command.device.account.DeviceAccountCreateCmd;
@@ -31,6 +32,7 @@ public class AccountSocialNetworkRegisterCmd extends
     private final AssignedChipCreateCmd assignedChipCreateCmd;
     private final ObservationCreateCmd observationCreateCmd;
     private final AccountObservationCreateCmd accountObservationCreateCmd;
+    private final AccountExtensionCreateCmd accountExtensionCreateCmd;
 
     @Override
     protected Void run(Request request) {
@@ -58,6 +60,16 @@ public class AccountSocialNetworkRegisterCmd extends
                 .accountId(accountId)
                 .build())
             .execute();
+
+        if (request.getReferenceEmail() != null && !request.getReferenceEmail()
+            .isBlank())
+        {
+            accountExtensionCreateCmd.withRequest(AccountExtensionCreateCmd.Request.builder()
+                    .accountId(accountId)
+                    .referenceEmail(request.getReferenceEmail())
+                    .build())
+                .execute();
+        }
 
         if (request.getObservation() == null || request.getObservation()
             .isBlank())
@@ -98,5 +110,6 @@ public class AccountSocialNetworkRegisterCmd extends
         @NotNull
         private final AccountTypeEnum accountType;
         private final String observation;
+        private final String referenceEmail;
     }
 }

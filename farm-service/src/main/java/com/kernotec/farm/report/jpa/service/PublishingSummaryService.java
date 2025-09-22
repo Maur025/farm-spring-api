@@ -39,14 +39,14 @@ public class PublishingSummaryService {
         ActivitySummaryByAccountRequest filterRequest)
     {
         return PublishingSummaryResponse.builder()
-            .totalPublications(getTotalPublications(accountId, filterRequest.getSocialNetworkId()))
-            .totalsByContext(
-                getTotalPublicationsByContext(accountId, filterRequest.getSocialNetworkId()))
-            .publications(getPublicationsOfResult(accountId, filterRequest.getSocialNetworkId()))
+            .totalPublications(getTotalPublications(accountId, filterRequest))
+            .totalsByContext(getTotalPublicationsByContext(accountId, filterRequest))
+            .publications(getPublicationsOfResult(accountId, filterRequest))
             .build();
     }
 
-    private Long getTotalPublications(UUID accountId, UUID socialNetworkId) {
+    private Long getTotalPublications(UUID accountId, ActivitySummaryByAccountRequest filterRequest)
+    {
         CriteriaQuery<Long> queryOfTotalPublications = cb.createQuery(Long.class);
         Root<Activity> activityRoot = queryOfTotalPublications.from(Activity.class);
 
@@ -58,7 +58,7 @@ public class PublishingSummaryService {
         queryOfTotalPublications.where(
             commonPredicateToSummary.getCommonActivityPredicates(
                     activityRoot, accountId,
-                    socialNetworkId
+                    filterRequest
                 )
                 .toArray(Predicate[]::new));
 
@@ -67,7 +67,7 @@ public class PublishingSummaryService {
     }
 
     private List<AccountSummaryTableResponse> getPublicationsOfResult(UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<AccountSummaryTableResponse> queryPublicationsOfResult = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -93,7 +93,7 @@ public class PublishingSummaryService {
         queryPublicationsOfResult.where(cb.and(
             commonPredicateToSummary.getCommonActivityPredicates(
                     activityRoot, accountId,
-                    socialNetworkId
+                    filterRequest
                 )
                 .toArray(Predicate[]::new)));
 
@@ -102,7 +102,7 @@ public class PublishingSummaryService {
     }
 
     private List<PublishingContextSummaryResponse> getTotalPublicationsByContext(UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<PublishingContextSummaryResponse> queryPublicationsByContext = cb.createQuery(
             PublishingContextSummaryResponse.class);
@@ -126,7 +126,7 @@ public class PublishingSummaryService {
         queryPublicationsByContext.where(cb.and(
             commonPredicateToSummary.getCommonActivityPredicates(
                     activityRoot, accountId,
-                    socialNetworkId
+                    filterRequest
                 )
                 .toArray(Predicate[]::new)));
 
