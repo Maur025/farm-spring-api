@@ -7,9 +7,8 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class GroupSummaryResponse extends EntityResponse {
+public class ReactionSummaryResponse extends EntityResponse {
 
-    private Long totalGroups;
-    private List<GroupRegionSummaryResponse> totalsByRegion;
-    private List<AccountSummaryTableResponse> groups;
+    private Long totalReactions;
+    private List<ReactionTypeSummaryResponse> totalsByType;
 }

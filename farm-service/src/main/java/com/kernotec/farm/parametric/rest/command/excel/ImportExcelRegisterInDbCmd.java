@@ -139,6 +139,20 @@ public class ImportExcelRegisterInDbCmd extends
                 .execute();
         }
 
+        if (excelDataDto.getEmailUsername() != null) {
+            accountSocialNetworkRegisterCmd.withRequest(
+                    AccountSocialNetworkRegisterCmd.Request.builder()
+                        .username(excelDataDto.getEmailUsername())
+                        .password(excelDataDto.getEmailPassword())
+                        .chipId(chipDto.getId())
+                        .personId(personFakeDto.getId())
+                        .socialNetworkCode(SocialNetworkEnum.CORREO)
+                        .deviceId(deviceDto.getId())
+                        .accountType(AccountTypeEnum.INTERNAL)
+                        .build())
+                .execute();
+        }
+
         return null;
     }
 
