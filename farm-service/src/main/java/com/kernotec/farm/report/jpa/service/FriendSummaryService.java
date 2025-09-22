@@ -39,13 +39,14 @@ public class FriendSummaryService {
         ActivitySummaryByAccountRequest filterRequest)
     {
         FriendSummaryResponse totalsOfFriendSummary = getTotalsOfFriendSummary(
-            accountId, filterRequest.getSocialNetworkId());
+            accountId, filterRequest);
 
-        return totalsOfFriendSummary.withFriends(
-            getFriendsOfResult(accountId, filterRequest.getSocialNetworkId()));
+        return totalsOfFriendSummary.withFriends(getFriendsOfResult(accountId, filterRequest));
     }
 
-    private FriendSummaryResponse getTotalsOfFriendSummary(UUID accountId, UUID socialNetworkId) {
+    private FriendSummaryResponse getTotalsOfFriendSummary(UUID accountId,
+        ActivitySummaryByAccountRequest filterRequest)
+    {
         CriteriaQuery<FriendSummaryResponse> queryFriendSummary = cb.createQuery(
             FriendSummaryResponse.class);
         Root<Account> root = queryFriendSummary.from(Account.class);
@@ -82,7 +83,7 @@ public class FriendSummaryService {
         ));
 
         queryFriendSummary.where(cb.and(
-            getPredicatesOfFriends(root, accountId, socialNetworkId, friendJoin).toArray(
+            getPredicatesOfFriends(root, accountId, filterRequest, friendJoin).toArray(
                 Predicate[]::new)));
 
         return entityManager.createQuery(queryFriendSummary)
@@ -90,7 +91,7 @@ public class FriendSummaryService {
     }
 
     private List<AccountSummaryTableResponse> getFriendsOfResult(UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<AccountSummaryTableResponse> queryFriendsOfResult = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -112,7 +113,7 @@ public class FriendSummaryService {
         ));
 
         queryFriendsOfResult.where(cb.and(
-            getPredicatesOfFriends(accountRoot, accountId, socialNetworkId, friendJoin).toArray(
+            getPredicatesOfFriends(accountRoot, accountId, filterRequest, friendJoin).toArray(
                 Predicate[]::new)));
 
         return entityManager.createQuery(queryFriendsOfResult)
@@ -120,12 +121,15 @@ public class FriendSummaryService {
     }
 
     private List<Predicate> getPredicatesOfFriends(Root<Account> accountRoot, UUID accountId,
-        UUID socialNetworkId, Join<Account, Friend> friendJoin)
+        ActivitySummaryByAccountRequest filterRequest, Join<Account, Friend> friendJoin)
     {
         Join<Friend, FriendState> friendStateJoin = friendJoin.join("friendState", JoinType.INNER);
 
         List<Predicate> predicateList = commonPredicateToSummary.getCommonAccountPredicates(
-            accountRoot, accountId, socialNetworkId);
+            accountRoot, accountId, filterRequest.getSocialNetworkId());
+
+        commonPredicateToSummary.addTimeLapsePredicate(
+            filterRequest, predicateList, friendJoin.get("acceptedAt"));
 
         if (friendStateJoin != null) {
             predicateList.add(
