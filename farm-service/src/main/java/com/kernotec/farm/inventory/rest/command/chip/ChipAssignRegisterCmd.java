@@ -28,8 +28,14 @@ public class ChipAssignRegisterCmd extends
 
     @Override
     protected ChipDto run(Request request) {
-        Operator operator = operatorService.findByCodeThrow(
-            OperatorCodeEnum.fromValue(request.getOperatorCode()));
+        UUID operatorId = null;
+
+        if (request.getOperatorCode() != null) {
+            Operator operator = operatorService.findByCodeThrow(
+                OperatorCodeEnum.fromValue(request.getOperatorCode()));
+
+            operatorId = operator.getId();
+        }
 
         UUID registrationPersonId = registrationPersonCreateCmd.withRequest(
                 RegistrationPersonCreateCmd.Request.builder()
@@ -43,7 +49,7 @@ public class ChipAssignRegisterCmd extends
                 .phoneNumber(request.getPhoneNumber())
                 .isDeviceInside(
                     request.getIsDeviceInside() == null ? Boolean.FALSE : request.getIsDeviceInside())
-                .operatorId(operator.getId())
+                .operatorId(operatorId)
                 .registrationPersonId(registrationPersonId)
                 .deviceId(request.getDeviceId())
                 .build())

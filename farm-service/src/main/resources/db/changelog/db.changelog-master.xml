@@ -152,4 +152,6 @@
     <sqlFile path="data/social/network/action/social_network_action_seeder_update1.sql"
       relativeToChangelogFile="true"/>
   </changeSet>
+
+  <include file="db/changelog/2025/09/22-01-changelog-127.xml"/>
 </databaseChangeLog>
