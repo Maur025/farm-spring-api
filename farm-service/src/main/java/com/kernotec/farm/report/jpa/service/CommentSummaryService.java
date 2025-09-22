@@ -37,13 +37,14 @@ public class CommentSummaryService {
         ActivitySummaryByAccountRequest filterRequest)
     {
         CommentSummaryResponse commentSummaryResponse = getTotalsOfCommentSummary(
-            accountId, filterRequest.getSocialNetworkId());
+            accountId, filterRequest);
 
-        return commentSummaryResponse.withComments(
-            getCommentsOfResult(accountId, filterRequest.getSocialNetworkId()));
+        return commentSummaryResponse.withComments(getCommentsOfResult(accountId, filterRequest));
     }
 
-    private CommentSummaryResponse getTotalsOfCommentSummary(UUID accountId, UUID socialNetworkId) {
+    private CommentSummaryResponse getTotalsOfCommentSummary(UUID accountId,
+        ActivitySummaryByAccountRequest filterRequest)
+    {
         CriteriaQuery<CommentSummaryResponse> queryCommentSummary = cb.createQuery(
             CommentSummaryResponse.class);
         Root<Activity> activityRoot = queryCommentSummary.from(Activity.class);
@@ -71,7 +72,7 @@ public class CommentSummaryService {
         queryCommentSummary.where(cb.and(
             commonPredicateToSummary.getCommonActivityPredicates(
                     activityRoot, accountId,
-                    socialNetworkId
+                    filterRequest
                 )
                 .toArray(Predicate[]::new)));
 
@@ -80,7 +81,7 @@ public class CommentSummaryService {
     }
 
     private List<AccountSummaryTableResponse> getCommentsOfResult(UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<AccountSummaryTableResponse> queryCommentsOfResult = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -105,7 +106,7 @@ public class CommentSummaryService {
         queryCommentsOfResult.where(cb.and(
             commonPredicateToSummary.getCommonActivityPredicates(
                     activityRoot, accountId,
-                    socialNetworkId
+                    filterRequest
                 )
                 .toArray(Predicate[]::new)));
 
