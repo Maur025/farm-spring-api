@@ -1,13 +1,21 @@
 package com.kernotec.farm.report.rest.dto.response.account;
 
+import com.kernotec.core.rest.dto.response.data.EntityResponse;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
-public record CommentSummaryResponse(Long totalComments, Long totalPositiveComments,
-                                     Long totalNegativeComments,
-                                     List<AccountSummaryTableResponse> comments)
-{
+@Getter
+@AllArgsConstructor
+public class CommentSummaryResponse extends EntityResponse {
+
+    private Long totalComments;
+    private Long totalPositiveComments;
+    private Long totalNegativeComments;
+    private List<AccountSummaryTableResponse> comments;
+
 
     public CommentSummaryResponse(Long totalComments, Long totalPositiveComments,
         Long totalNegativeComments)
