@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+  objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+  <changeSet id="1758214982580-1" author="mmoya@PragmaInvest.com">
+    <addColumn tableName="follows">
+      <column name="profile_id" type="UUID"/>
+    </addColumn>
+  </changeSet>
+  <changeSet id="1758214982580-2" author="mmoya@PragmaInvest.com">
+    <addForeignKeyConstraint baseColumnNames="profile_id" baseTableName="follows"
+      constraintName="FK_FOLLOWS_ON_PROFILE" referencedColumnNames="id"
+      referencedTableName="profiles"/>
+  </changeSet>
+
+</databaseChangeLog>
