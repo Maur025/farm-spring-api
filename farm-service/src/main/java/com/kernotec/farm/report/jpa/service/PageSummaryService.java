@@ -40,13 +40,13 @@ public class PageSummaryService {
         ActivitySummaryByAccountRequest filterRequest)
     {
         return PageSummaryResponse.builder()
-            .totalPages(getTotalPages(accountId, filterRequest.getSocialNetworkId()))
-            .totalsByRegion(getTotalPagesByRegion(accountId, filterRequest.getSocialNetworkId()))
-            .profiles(getProfilesOfResult(accountId, filterRequest.getSocialNetworkId()))
+            .totalPages(getTotalPages(accountId, filterRequest))
+            .totalsByRegion(getTotalPagesByRegion(accountId, filterRequest))
+            .profiles(getProfilesOfResult(accountId, filterRequest))
             .build();
     }
 
-    private Long getTotalPages(UUID accountId, UUID socialNetworkId) {
+    private Long getTotalPages(UUID accountId, ActivitySummaryByAccountRequest filterRequest) {
         CriteriaQuery<Long> queryOfTotalPages = cb.createQuery(Long.class);
         Root<Account> accountRoot = queryOfTotalPages.from(Account.class);
 
@@ -56,7 +56,7 @@ public class PageSummaryService {
         queryOfTotalPages.select(cb.countDistinct(accountFollowProfileJoin.get("id")));
 
         queryOfTotalPages.where(cb.and(getPredicatesOfPages(
-            accountRoot, accountId, socialNetworkId,
+            accountRoot, accountId, filterRequest,
             accountFollowProfileJoin
         ).toArray(Predicate[]::new)));
 
@@ -64,7 +64,8 @@ public class PageSummaryService {
             .getSingleResult();
     }
 
-    private List<AccountSummaryTableResponse> getProfilesOfResult(UUID accountId, UUID socialNetworkId)
+    private List<AccountSummaryTableResponse> getProfilesOfResult(UUID accountId,
+        ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<AccountSummaryTableResponse> getPagesQuery = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -87,7 +88,7 @@ public class PageSummaryService {
         ));
 
         getPagesQuery.where(cb.and(getPredicatesOfPages(
-            accountRoot, accountId, socialNetworkId,
+            accountRoot, accountId, filterRequest,
             accountFollowProfileJoin
         ).toArray(Predicate[]::new)));
 
@@ -96,7 +97,7 @@ public class PageSummaryService {
     }
 
     private List<PageRegionSummaryResponse> getTotalPagesByRegion(UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<PageRegionSummaryResponse> queryPagesByRegion = cb.createQuery(
             PageRegionSummaryResponse.class);
@@ -118,10 +119,10 @@ public class PageSummaryService {
             cb.countDistinct(accountFollowProfileJoin.get("id"))
         ));
 
-        queryPagesByRegion.where(cb.and(
-            getPredicatesOfPages(
-                accountRoot, accountId, socialNetworkId, accountFollowProfileJoin).toArray(
-                Predicate[]::new)));
+        queryPagesByRegion.where(cb.and(getPredicatesOfPages(
+            accountRoot, accountId, filterRequest,
+            accountFollowProfileJoin
+        ).toArray(Predicate[]::new)));
 
         queryPagesByRegion.groupBy(regionJoin.get("id"), regionJoin.get("name"));
 
@@ -130,10 +131,13 @@ public class PageSummaryService {
     }
 
     private List<Predicate> getPredicatesOfPages(Root<Account> accountRoot, UUID accountId,
-        UUID socialNetworkId, Join<?, ?> accountFollowProfileJoin)
+        ActivitySummaryByAccountRequest filterRequest, Join<?, ?> accountFollowProfileJoin)
     {
         List<Predicate> predicateList = commonPredicateToSummary.getCommonAccountPredicates(
-            accountRoot, accountId, socialNetworkId);
+            accountRoot, accountId, filterRequest.getSocialNetworkId());
+
+        commonPredicateToSummary.addTimeLapsePredicate(
+            filterRequest, predicateList, accountFollowProfileJoin.get("followedAt"));
 
         cb.equal(
             accountFollowProfileJoin.get("followState"), AccountFollowProfileStateEnum.FOLLOWING);

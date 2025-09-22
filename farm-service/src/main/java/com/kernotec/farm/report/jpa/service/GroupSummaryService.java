@@ -41,14 +41,14 @@ public class GroupSummaryService {
         ActivitySummaryByAccountRequest filterRequest)
     {
         return GroupSummaryResponse.builder()
-            .totalGroups(getTotalGroups(accountId, filterRequest.getSocialNetworkId()))
-            .totalsByRegion(getTotalGroupsByRegion(accountId, filterRequest.getSocialNetworkId()))
-            .groups(getGroupsOfResult(accountId, filterRequest.getSocialNetworkId()))
+            .totalGroups(getTotalGroups(accountId, filterRequest))
+            .totalsByRegion(getTotalGroupsByRegion(accountId, filterRequest))
+            .groups(getGroupsOfResult(accountId, filterRequest))
             .build();
     }
 
 
-    private Long getTotalGroups(UUID accountId, UUID socialNetworkId) {
+    private Long getTotalGroups(UUID accountId, ActivitySummaryByAccountRequest filterRequest) {
         CriteriaQuery<Long> queryOfTotalGroups = cb.createQuery(Long.class);
         Root<Account> accountRoot = queryOfTotalGroups.from(Account.class);
 
@@ -58,8 +58,7 @@ public class GroupSummaryService {
         queryOfTotalGroups.select(cb.countDistinct(accountGroupJoin.get("id")));
 
         queryOfTotalGroups.where(cb.and(
-            getPredicatesOfGroups(
-                accountRoot, accountId, socialNetworkId, accountGroupJoin).toArray(
+            getPredicatesOfGroups(accountRoot, accountId, filterRequest, accountGroupJoin).toArray(
                 Predicate[]::new)));
 
         return entityManager.createQuery(queryOfTotalGroups)
@@ -67,7 +66,7 @@ public class GroupSummaryService {
     }
 
     private List<AccountSummaryTableResponse> getGroupsOfResult(UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<AccountSummaryTableResponse> queryGroupsOfResult = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -89,17 +88,15 @@ public class GroupSummaryService {
         ));
 
         queryGroupsOfResult.where(cb.and(
-            getPredicatesOfGroups(
-                accountRoot, accountId, socialNetworkId,
-                accountGroupJoin
-            ).toArray(Predicate[]::new)));
+            getPredicatesOfGroups(accountRoot, accountId, filterRequest, accountGroupJoin).toArray(
+                Predicate[]::new)));
 
         return entityManager.createQuery(queryGroupsOfResult)
             .getResultList();
     }
 
     private List<GroupRegionSummaryResponse> getTotalGroupsByRegion(UUID accountId,
-        UUID socialNetworkId)
+        ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<GroupRegionSummaryResponse> queryGroupsByRegion = cb.createQuery(
             GroupRegionSummaryResponse.class);
@@ -122,8 +119,7 @@ public class GroupSummaryService {
         ));
 
         queryGroupsByRegion.where(cb.and(
-            getPredicatesOfGroups(
-                accountRoot, accountId, socialNetworkId, accountGroupJoin).toArray(
+            getPredicatesOfGroups(accountRoot, accountId, filterRequest, accountGroupJoin).toArray(
                 Predicate[]::new)));
 
         queryGroupsByRegion.groupBy(regionJoin.get("id"), regionJoin.get("name"));
@@ -133,13 +129,16 @@ public class GroupSummaryService {
     }
 
     private List<Predicate> getPredicatesOfGroups(Root<Account> accountRoot, UUID accountId,
-        UUID socialNetworkId, Join<Account, AccountGroup> accountGroupJoin)
+        ActivitySummaryByAccountRequest filterRequest, Join<Account, AccountGroup> accountGroupJoin)
     {
         Join<AccountGroup, GroupState> groupStateJoin = accountGroupJoin.join(
             "groupState", JoinType.INNER);
 
         List<Predicate> predicateList = commonPredicateToSummary.getCommonAccountPredicates(
-            accountRoot, accountId, socialNetworkId);
+            accountRoot, accountId, filterRequest.getSocialNetworkId());
+
+        commonPredicateToSummary.addTimeLapsePredicate(
+            filterRequest, predicateList, accountGroupJoin.get("joinedAt"));
 
         if (groupStateJoin != null) {
             predicateList.add(
