@@ -10,6 +10,7 @@ import com.kernotec.farm.inventory.rest.ApiSpec.DeviceSpec;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
 import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseFilterMapper;
 import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseMapper;
+import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseMinMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -34,6 +35,7 @@ public class DeviceController {
     private final DeviceService deviceService;
     private final DeviceResponseMapper deviceResponseMapper;
     private final DeviceResponseFilterMapper deviceResponseFilterMapper;
+    private final DeviceResponseMinMapper deviceResponseMinMapper;
 
     @Operation(summary = "Find all Devices")
     @GetMapping
@@ -71,6 +73,19 @@ public class DeviceController {
         return PageResponse.<DeviceResponse>builder()
             .code(HttpStatus.OK.value())
             .data(deviceResponseMapper.toResponse(deviceList))
+            .build();
+    }
+
+    @Operation(summary = "Find all devices with minimal data")
+    @GetMapping("minimal")
+    @ResponseStatus(HttpStatus.OK)
+    public PageResponse<DeviceResponse> findAllMinimal(@RequestParam(required = false) UUID farmId)
+    {
+        List<Device> deviceList = deviceService.findAllWithSpecification(farmId);
+
+        return PageResponse.<DeviceResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(deviceResponseMinMapper.toResponse(deviceList))
             .build();
     }
 
