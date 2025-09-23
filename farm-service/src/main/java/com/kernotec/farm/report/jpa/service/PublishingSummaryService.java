@@ -1,5 +1,6 @@
 package com.kernotec.farm.report.jpa.service;
 
+import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Publishing;
 import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
@@ -38,10 +39,12 @@ public class PublishingSummaryService {
     public PublishingSummaryResponse getPublishingSummary(UUID accountId,
         ActivitySummaryByAccountRequest filterRequest)
     {
+        Long totalPublications = getTotalPublications(accountId, filterRequest);
+
         return PublishingSummaryResponse.builder()
-            .totalPublications(getTotalPublications(accountId, filterRequest))
+            .totalPublications(totalPublications)
             .totalsByContext(getTotalPublicationsByContext(accountId, filterRequest))
-            .publications(getPublicationsOfResult(accountId, filterRequest))
+            .publications(getPublicationsOfResult(accountId, filterRequest, totalPublications))
             .build();
     }
 
@@ -66,8 +69,8 @@ public class PublishingSummaryService {
             .getSingleResult();
     }
 
-    private List<AccountSummaryTableResponse> getPublicationsOfResult(UUID accountId,
-        ActivitySummaryByAccountRequest filterRequest)
+    private PageResponse<AccountSummaryTableResponse> getPublicationsOfResult(UUID accountId,
+        ActivitySummaryByAccountRequest filterRequest, Long totalPublications)
     {
         CriteriaQuery<AccountSummaryTableResponse> queryPublicationsOfResult = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -97,8 +100,15 @@ public class PublishingSummaryService {
                 )
                 .toArray(Predicate[]::new)));
 
-        return entityManager.createQuery(queryPublicationsOfResult)
-            .getResultList();
+        if (filterRequest.getPageable() == null) {
+            return PageResponse.<AccountSummaryTableResponse>builder()
+                .data(entityManager.createQuery(queryPublicationsOfResult)
+                    .getResultList())
+                .build();
+        }
+
+        return commonPredicateToSummary.getResultTableWithPagination(
+            queryPublicationsOfResult, filterRequest.getPageable(), totalPublications);
     }
 
     private List<PublishingContextSummaryResponse> getTotalPublicationsByContext(UUID accountId,
