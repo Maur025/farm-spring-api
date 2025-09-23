@@ -1,5 +1,6 @@
 package com.kernotec.farm.report.jpa.service;
 
+import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.AccountFollowProfile;
 import com.kernotec.farm.account.jpa.enums.AccountFollowProfileStateEnum;
@@ -39,10 +40,12 @@ public class PageSummaryService {
     public PageSummaryResponse getPageSummary(UUID accountId,
         ActivitySummaryByAccountRequest filterRequest)
     {
+        Long totalPages = getTotalPages(accountId, filterRequest);
+
         return PageSummaryResponse.builder()
-            .totalPages(getTotalPages(accountId, filterRequest))
+            .totalPages(totalPages)
             .totalsByRegion(getTotalPagesByRegion(accountId, filterRequest))
-            .profiles(getProfilesOfResult(accountId, filterRequest))
+            .profiles(getProfilesOfResult(accountId, filterRequest, totalPages))
             .build();
     }
 
@@ -64,8 +67,8 @@ public class PageSummaryService {
             .getSingleResult();
     }
 
-    private List<AccountSummaryTableResponse> getProfilesOfResult(UUID accountId,
-        ActivitySummaryByAccountRequest filterRequest)
+    private PageResponse<AccountSummaryTableResponse> getProfilesOfResult(UUID accountId,
+        ActivitySummaryByAccountRequest filterRequest, Long totalPages)
     {
         CriteriaQuery<AccountSummaryTableResponse> getPagesQuery = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -92,8 +95,15 @@ public class PageSummaryService {
             accountFollowProfileJoin
         ).toArray(Predicate[]::new)));
 
-        return entityManager.createQuery(getPagesQuery)
-            .getResultList();
+        if (filterRequest.getPageable() == null) {
+            return PageResponse.<AccountSummaryTableResponse>builder()
+                .data(entityManager.createQuery(getPagesQuery)
+                    .getResultList())
+                .build();
+        }
+
+        return commonPredicateToSummary.getResultTableWithPagination(
+            getPagesQuery, filterRequest.getPageable(), totalPages);
     }
 
     private List<PageRegionSummaryResponse> getTotalPagesByRegion(UUID accountId,
