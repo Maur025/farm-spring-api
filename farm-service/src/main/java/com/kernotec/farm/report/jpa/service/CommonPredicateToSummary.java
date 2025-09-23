@@ -106,6 +106,9 @@ public class CommonPredicateToSummary {
     public <DTO> Page<DTO> applyPagination(TypedQuery<DTO> query, Pageable pageable,
         Long totalItems)
     {
+
+        log.info("Paginated size: {}", pageable.getPageSize());
+
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 
