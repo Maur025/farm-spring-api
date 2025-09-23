@@ -13,4 +13,14 @@ public class ApiSpec {
         private DeviceSpec() {
         }
     }
+
+    public static final class FarmSpec {
+
+        public static final String BASE_PATH = ApiSpecMain.ROOT_PATH + "/farms";
+        public static final String TAG_NAME = "FARM";
+        public static final String TAG_DESCRIPTION = "Farm management";
+
+        private FarmSpec() {
+        }
+    }
 }
