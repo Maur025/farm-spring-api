@@ -1,5 +1,6 @@
 package com.kernotec.farm.report.rest.dto.response.account;
 
+import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
 import java.util.List;
 import lombok.Builder;
@@ -11,5 +12,5 @@ public class GroupSummaryResponse extends EntityResponse {
 
     private Long totalGroups;
     private List<GroupRegionSummaryResponse> totalsByRegion;
-    private List<AccountSummaryTableResponse> groups;
+    private PageResponse<AccountSummaryTableResponse> groups;
 }

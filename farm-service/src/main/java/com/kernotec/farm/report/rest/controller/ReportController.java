@@ -1,5 +1,6 @@
 package com.kernotec.farm.report.rest.controller;
 
+import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.report.jpa.service.AccountSummaryReportService;
 import com.kernotec.farm.report.jpa.service.CommentSummaryService;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,13 +66,19 @@ public class ReportController {
         @PathVariable("accountId") UUID accountId,
         @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
+        @RequestParam(defaultValue = "5") Integer size,
         @RequestParam(defaultValue = "name") String sortBy,
-        @RequestParam(defaultValue = "true") String descending)
+        @RequestParam(defaultValue = "true") boolean descending)
     {
+        Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
+
         return SingleResponse.<FriendSummaryResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(friendSummaryService.getFriendSummary(accountId, request))
+            .data(friendSummaryService.getFriendSummary(
+                accountId, request.toBuilder()
+                    .pageable(pageable)
+                    .build()
+            ))
             .build();
     }
 
@@ -81,13 +89,19 @@ public class ReportController {
         @PathVariable("accountId") UUID accountId,
         @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
+        @RequestParam(defaultValue = "5") Integer size,
         @RequestParam(defaultValue = "name") String sortBy,
-        @RequestParam(defaultValue = "true") String descending)
+        @RequestParam(defaultValue = "true") boolean descending)
     {
+        Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
+
         return SingleResponse.<GroupSummaryResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(groupSummaryService.getGroupSummary(accountId, request))
+            .data(groupSummaryService.getGroupSummary(
+                accountId, request.toBuilder()
+                    .pageable(pageable)
+                    .build()
+            ))
             .build();
     }
 
@@ -98,13 +112,19 @@ public class ReportController {
         @PathVariable("accountId") UUID accountId,
         @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
+        @RequestParam(defaultValue = "5") Integer size,
         @RequestParam(defaultValue = "name") String sortBy,
-        @RequestParam(defaultValue = "true") String descending)
+        @RequestParam(defaultValue = "true") boolean descending)
     {
+        Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
+
         return SingleResponse.<PageSummaryResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(pageSummaryService.getPageSummary(accountId, request))
+            .data(pageSummaryService.getPageSummary(
+                accountId, request.toBuilder()
+                    .pageable(pageable)
+                    .build()
+            ))
             .build();
     }
 
@@ -115,13 +135,19 @@ public class ReportController {
         @PathVariable("accountId") UUID accountId,
         @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
+        @RequestParam(defaultValue = "5") Integer size,
         @RequestParam(defaultValue = "name") String sortBy,
-        @RequestParam(defaultValue = "true") String descending)
+        @RequestParam(defaultValue = "true") boolean descending)
     {
+        Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
+
         return SingleResponse.<PublishingSummaryResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(publishingSummaryService.getPublishingSummary(accountId, request))
+            .data(publishingSummaryService.getPublishingSummary(
+                accountId, request.toBuilder()
+                    .pageable(pageable)
+                    .build()
+            ))
             .build();
     }
 
@@ -145,13 +171,19 @@ public class ReportController {
         @PathVariable("accountId") UUID accountId,
         @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
+        @RequestParam(defaultValue = "5") Integer size,
         @RequestParam(defaultValue = "name") String sortBy,
-        @RequestParam(defaultValue = "true") String descending)
+        @RequestParam(defaultValue = "true") boolean descending)
     {
+        Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
+
         return SingleResponse.<CommentSummaryResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(commentSummaryService.getCommentSummary(accountId, request))
+            .data(commentSummaryService.getCommentSummary(
+                accountId, request.toBuilder()
+                    .pageable(pageable)
+                    .build()
+            ))
             .build();
     }
 }

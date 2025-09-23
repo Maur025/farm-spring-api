@@ -1,5 +1,6 @@
 package com.kernotec.farm.report.jpa.service;
 
+import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.Friend;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
@@ -41,7 +42,8 @@ public class FriendSummaryService {
         FriendSummaryResponse totalsOfFriendSummary = getTotalsOfFriendSummary(
             accountId, filterRequest);
 
-        return totalsOfFriendSummary.withFriends(getFriendsOfResult(accountId, filterRequest));
+        return totalsOfFriendSummary.withFriends(
+            getFriendsOfResult(accountId, filterRequest, totalsOfFriendSummary.getTotalFriends()));
     }
 
     private FriendSummaryResponse getTotalsOfFriendSummary(UUID accountId,
@@ -90,8 +92,8 @@ public class FriendSummaryService {
             .getSingleResult();
     }
 
-    private List<AccountSummaryTableResponse> getFriendsOfResult(UUID accountId,
-        ActivitySummaryByAccountRequest filterRequest)
+    private PageResponse<AccountSummaryTableResponse> getFriendsOfResult(UUID accountId,
+        ActivitySummaryByAccountRequest filterRequest, Long totalFriends)
     {
         CriteriaQuery<AccountSummaryTableResponse> queryFriendsOfResult = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -116,8 +118,15 @@ public class FriendSummaryService {
             getPredicatesOfFriends(accountRoot, accountId, filterRequest, friendJoin).toArray(
                 Predicate[]::new)));
 
-        return entityManager.createQuery(queryFriendsOfResult)
-            .getResultList();
+        if (filterRequest.getPageable() == null) {
+            return PageResponse.<AccountSummaryTableResponse>builder()
+                .data(entityManager.createQuery(queryFriendsOfResult)
+                    .getResultList())
+                .build();
+        }
+
+        return commonPredicateToSummary.getResultTableWithPagination(
+            queryFriendsOfResult, filterRequest.getPageable(), totalFriends);
     }
 
     private List<Predicate> getPredicatesOfFriends(Root<Account> accountRoot, UUID accountId,

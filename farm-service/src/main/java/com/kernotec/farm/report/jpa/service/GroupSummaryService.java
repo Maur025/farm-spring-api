@@ -1,5 +1,6 @@
 package com.kernotec.farm.report.jpa.service;
 
+import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.activity.jpa.entity.Group;
@@ -40,13 +41,14 @@ public class GroupSummaryService {
     public GroupSummaryResponse getGroupSummary(UUID accountId,
         ActivitySummaryByAccountRequest filterRequest)
     {
+        Long totalGroups = getTotalGroups(accountId, filterRequest);
+
         return GroupSummaryResponse.builder()
-            .totalGroups(getTotalGroups(accountId, filterRequest))
+            .totalGroups(totalGroups)
             .totalsByRegion(getTotalGroupsByRegion(accountId, filterRequest))
-            .groups(getGroupsOfResult(accountId, filterRequest))
+            .groups(getGroupsOfResult(accountId, filterRequest, totalGroups))
             .build();
     }
-
 
     private Long getTotalGroups(UUID accountId, ActivitySummaryByAccountRequest filterRequest) {
         CriteriaQuery<Long> queryOfTotalGroups = cb.createQuery(Long.class);
@@ -65,8 +67,8 @@ public class GroupSummaryService {
             .getSingleResult();
     }
 
-    private List<AccountSummaryTableResponse> getGroupsOfResult(UUID accountId,
-        ActivitySummaryByAccountRequest filterRequest)
+    private PageResponse<AccountSummaryTableResponse> getGroupsOfResult(UUID accountId,
+        ActivitySummaryByAccountRequest filterRequest, Long totalGroups)
     {
         CriteriaQuery<AccountSummaryTableResponse> queryGroupsOfResult = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -91,8 +93,15 @@ public class GroupSummaryService {
             getPredicatesOfGroups(accountRoot, accountId, filterRequest, accountGroupJoin).toArray(
                 Predicate[]::new)));
 
-        return entityManager.createQuery(queryGroupsOfResult)
-            .getResultList();
+        if (filterRequest.getPageable() == null) {
+            return PageResponse.<AccountSummaryTableResponse>builder()
+                .data(entityManager.createQuery(queryGroupsOfResult)
+                    .getResultList())
+                .build();
+        }
+
+        return commonPredicateToSummary.getResultTableWithPagination(
+            queryGroupsOfResult, filterRequest.getPageable(), totalGroups);
     }
 
     private List<GroupRegionSummaryResponse> getTotalGroupsByRegion(UUID accountId,
