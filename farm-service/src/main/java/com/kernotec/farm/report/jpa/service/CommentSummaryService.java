@@ -1,5 +1,6 @@
 package com.kernotec.farm.report.jpa.service;
 
+import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Comment;
 import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
@@ -14,7 +15,6 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,10 @@ public class CommentSummaryService {
         CommentSummaryResponse commentSummaryResponse = getTotalsOfCommentSummary(
             accountId, filterRequest);
 
-        return commentSummaryResponse.withComments(getCommentsOfResult(accountId, filterRequest));
+        return commentSummaryResponse.withComments(getCommentsOfResult(
+            accountId, filterRequest,
+            commentSummaryResponse.getTotalComments()
+        ));
     }
 
     private CommentSummaryResponse getTotalsOfCommentSummary(UUID accountId,
@@ -80,8 +83,8 @@ public class CommentSummaryService {
             .getSingleResult();
     }
 
-    private List<AccountSummaryTableResponse> getCommentsOfResult(UUID accountId,
-        ActivitySummaryByAccountRequest filterRequest)
+    private PageResponse<AccountSummaryTableResponse> getCommentsOfResult(UUID accountId,
+        ActivitySummaryByAccountRequest filterRequest, Long totalComments)
     {
         CriteriaQuery<AccountSummaryTableResponse> queryCommentsOfResult = cb.createQuery(
             AccountSummaryTableResponse.class);
@@ -110,7 +113,14 @@ public class CommentSummaryService {
                 )
                 .toArray(Predicate[]::new)));
 
-        return entityManager.createQuery(queryCommentsOfResult)
-            .getResultList();
+        if (filterRequest.getPageable() == null) {
+            return PageResponse.<AccountSummaryTableResponse>builder()
+                .data(entityManager.createQuery(queryCommentsOfResult)
+                    .getResultList())
+                .build();
+        }
+
+        return commonPredicateToSummary.getResultTableWithPagination(
+            queryCommentsOfResult, filterRequest.getPageable(), totalComments);
     }
 }
