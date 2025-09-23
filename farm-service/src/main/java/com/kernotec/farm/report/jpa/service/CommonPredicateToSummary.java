@@ -1,11 +1,16 @@
 package com.kernotec.farm.report.jpa.service;
 
+import com.kernotec.core.rest.dto.response.PageResponse;
+import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
+import com.kernotec.farm.report.rest.dto.response.account.AccountSummaryTableResponse;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -17,6 +22,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -93,5 +101,31 @@ public class CommonPredicateToSummary {
         log.info("Applying time lapse filter to {}", zonedDateTimeToCompare);
 
         predicateList.add(cb.between(zonedDateTimeToCompare, fromStartOfDay, toEndOfDay));
+    }
+
+    public <DTO> Page<DTO> applyPagination(TypedQuery<DTO> query, Pageable pageable,
+        Long totalItems)
+    {
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        List<DTO> resultPaginateList = query.getResultList();
+
+        return new PageImpl<>(resultPaginateList, pageable, totalItems);
+    }
+
+    public PageResponse<AccountSummaryTableResponse> getResultTableWithPagination(
+        CriteriaQuery<AccountSummaryTableResponse> query, Pageable pageable, Long totalItems)
+    {
+        Page<AccountSummaryTableResponse> resultPage = applyPagination(
+            entityManager.createQuery(query), pageable, totalItems);
+
+        return PageResponse.<AccountSummaryTableResponse>builder()
+            .data(resultPage.getContent())
+            .pagination(PaginationResponse.builder()
+                .pages(resultPage.getTotalPages())
+                .count(resultPage.getTotalElements())
+                .build())
+            .build();
     }
 }

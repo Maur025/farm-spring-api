@@ -1,27 +1,20 @@
 package com.kernotec.farm.report.rest.dto.response.account;
 
+import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
-import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
+@AllArgsConstructor
 public class FriendSummaryResponse extends EntityResponse {
 
     private Long totalFriends;
     private Long totalInternalFriends;
     private Long totalExternalFriends;
-    private List<AccountSummaryTableResponse> friends;
-
-    public FriendSummaryResponse(Long totalFriends, Long totalInternalFriends,
-        Long totalExternalFriends, List<AccountSummaryTableResponse> friends)
-    {
-        this.totalFriends = totalFriends;
-        this.totalInternalFriends = totalInternalFriends;
-        this.totalExternalFriends = totalExternalFriends;
-        this.friends = friends;
-    }
+    private PageResponse<AccountSummaryTableResponse> friends;
 
     public FriendSummaryResponse(Long totalFriends, Long totalInternalFriends,
         Long totalExternalFriends)
@@ -38,7 +31,7 @@ public class FriendSummaryResponse extends EntityResponse {
         );
     }
 
-    public FriendSummaryResponse withFriends(List<AccountSummaryTableResponse> friends) {
+    public FriendSummaryResponse withFriends(PageResponse<AccountSummaryTableResponse> friends) {
         return new FriendSummaryResponse(
             this.totalFriends, this.totalInternalFriends,
             this.totalExternalFriends, friends
