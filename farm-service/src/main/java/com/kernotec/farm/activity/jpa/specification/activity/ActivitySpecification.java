@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -37,6 +38,19 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         return joinMap.get(ActivitySpecificationJoinEnum.ACCOUNT_JOIN);
     }
 
+    private Join<?, ?> getOrCreateDeviceJoin(Map<ActivitySpecificationJoinEnum, Join<?, ?>> joinMap,
+        Root<?> root)
+    {
+        if (!joinMap.containsKey(ActivitySpecificationJoinEnum.DEVICE_JOIN)) {
+            joinMap.put(
+                ActivitySpecificationJoinEnum.DEVICE_JOIN,
+                getOrCreateAccountJoin(joinMap, root).join("devices", JoinType.INNER)
+            );
+        }
+
+        return joinMap.get(ActivitySpecificationJoinEnum.DEVICE_JOIN);
+    }
+
     @Override
     public Predicate toPredicate(Root<Activity> root, CriteriaQuery<?> query, CriteriaBuilder cb)
     {
@@ -46,6 +60,11 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         includeOnlyUserActivitiesFilter(root, cb).ifPresent(predicateList::add);
         addUserAuthIdFilter(root, cb).ifPresent(predicateList::add);
         addSocialNetworkIdFilter(root, cb, joinMap).ifPresent(predicateList::add);
+        addDeviceIdFilter(root, cb, joinMap).ifPresent(predicateList::add);
+        addFarmIdFilter(root, cb, joinMap).ifPresent(predicateList::add);
+        addActivityTypeIdFilter(root, cb).ifPresent(predicateList::add);
+        addAccountIdFilter(root, cb).ifPresent(predicateList::add);
+        addAccountIdListFilter(root).ifPresent(predicateList::add);
 
         query.distinct(true);
         return cb.and(predicateList.toArray(Predicate[]::new));
@@ -91,5 +110,62 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         return Optional.ofNullable(criteria.getSocialNetworkId())
             .map(socialNetworkId -> cb.equal(
                 getOrCreateAccountJoin(joinMap, root).get("socialNetworkId"), socialNetworkId));
+    }
+
+    public ActivitySpecification withDeviceId(UUID deviceId) {
+        this.criteria.setDeviceId(deviceId);
+        return this;
+    }
+
+    private Optional<Predicate> addDeviceIdFilter(Root<Activity> root, CriteriaBuilder cb,
+        Map<ActivitySpecificationJoinEnum, Join<?, ?>> joinMap)
+    {
+        return Optional.ofNullable(criteria.getDeviceId())
+            .map(deviceId -> cb.equal(getOrCreateDeviceJoin(joinMap, root).get("id"), deviceId));
+    }
+
+    public ActivitySpecification withFarmId(UUID farmId) {
+        this.criteria.setFarmId(farmId);
+        return this;
+    }
+
+    private Optional<Predicate> addFarmIdFilter(Root<Activity> root, CriteriaBuilder cb,
+        Map<ActivitySpecificationJoinEnum, Join<?, ?>> joinMap)
+    {
+        return Optional.ofNullable(criteria.getFarmId())
+            .map(farmId -> cb.equal(getOrCreateDeviceJoin(joinMap, root).get("farmId"), farmId));
+    }
+
+    public ActivitySpecification withActivityTypeId(UUID activityTypeId) {
+        this.criteria.setActivityTypeId(activityTypeId);
+        return this;
+    }
+
+    private Optional<Predicate> addActivityTypeIdFilter(Root<Activity> root, CriteriaBuilder cb) {
+        return Optional.ofNullable(criteria.getActivityTypeId())
+            .map(activityTypeId -> cb.equal(root.get("activityTypeId"), activityTypeId));
+    }
+
+    public ActivitySpecification withAccountId(UUID accountId) {
+        this.criteria.setAccountId(accountId);
+        return this;
+    }
+
+    private Optional<Predicate> addAccountIdFilter(Root<Activity> root, CriteriaBuilder cb) {
+        return Optional.ofNullable(criteria.getAccountId())
+            .map(accountId -> cb.equal(root.get("accountId"), accountId));
+    }
+
+    public ActivitySpecification withAccountIdList(Set<UUID> accountIdList) {
+        this.criteria.setAccountIdList(
+            accountIdList != null && !accountIdList.isEmpty() ? accountIdList : null);
+
+        return this;
+    }
+
+    private Optional<Predicate> addAccountIdListFilter(Root<Activity> root) {
+        return Optional.ofNullable(criteria.getAccountIdList())
+            .map(accountIdList -> root.get("accountId")
+                .in(accountIdList));
     }
 }

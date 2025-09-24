@@ -6,8 +6,8 @@ import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.Person;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.repository.ActivityRepository;
+import com.kernotec.farm.activity.jpa.specification.activity.ActivitySpecification;
 import com.kernotec.farm.activity.rest.dto.request.activity.ActivityFindAllFilterRequest;
-import com.kernotec.farm.inventory.jpa.entity.Device;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -40,36 +40,11 @@ public class ActivityService extends BaseServiceImpl<Activity, UUID> {
         Pageable pageable)
     {
         return repository.findAll(
-            (Specification<Activity>) (root, query, cb) -> {
-                List<Predicate> predicateList = new ArrayList<>();
-
-                Join<Activity, Account> accountJoin = root.join("account", JoinType.INNER);
-                Join<Account, Device> accountDeviceJoin = accountJoin.join(
-                    "devices", JoinType.INNER);
-
-                predicateList.add(cb.isFalse(root.get("isSystemActivity")));
-
-                if (filterRequest.getSocialNetworkId() != null) {
-                    predicateList.add(cb.equal(
-                        accountJoin.get("socialNetworkId"),
-                        filterRequest.getSocialNetworkId()
-                    ));
-                }
-
-                if (filterRequest.getDeviceId() != null) {
-                    predicateList.add(
-                        cb.equal(accountDeviceJoin.get("id"), filterRequest.getDeviceId()));
-                }
-
-                if (filterRequest.getAccountIds() != null && !filterRequest.getAccountIds()
-                    .isEmpty())
-                {
-                    predicateList.add(root.get("accountId")
-                        .in(filterRequest.getAccountIds()));
-                }
-
-                return cb.and(predicateList.toArray(Predicate[]::new));
-            }, pageable
+            ActivitySpecification.builder()
+                .includeOnlyUserActivities(Boolean.TRUE)
+                .withSocialNetworkId(filterRequest.getSocialNetworkId())
+                .withDeviceId(filterRequest.getDeviceId())
+                .withAccountIdList(filterRequest.getAccountIds()), pageable
         );
     }
 
