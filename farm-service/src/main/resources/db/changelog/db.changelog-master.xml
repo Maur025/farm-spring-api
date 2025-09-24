@@ -156,4 +156,9 @@
   <include file="db/changelog/2025/09/22-01-changelog-127.xml"/>
   <include file="db/changelog/2025/09/22-01-changelog-128.xml"/>
   <include file="db/changelog/2025/09/22-01-changelog-129.xml"/>
+
+  <!-- region update3 - add Bolivia value -->
+  <changeSet id="1758745141816-1" author="Maur025">
+    <sqlFile path="data/region/region_seeder_update3.sql" relativeToChangelogFile="true"/>
+  </changeSet>
 </databaseChangeLog>

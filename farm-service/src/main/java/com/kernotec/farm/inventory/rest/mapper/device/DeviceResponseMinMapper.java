@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 public interface DeviceResponseMinMapper {
 
     @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "deviceNumber", ignore = true)
+    @Mapping(target = "name", ignore = true)
     @Mapping(target = "model", ignore = true)
     @Mapping(target = "brand", ignore = true)
     @Mapping(target = "serialNumber", ignore = true)

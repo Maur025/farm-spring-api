@@ -38,10 +38,11 @@ public class DeviceService extends BaseServiceImpl<Device, UUID> {
         );
     }
 
-    public List<Device> findAllWithSpecification(UUID farmId) {
+    public List<Device> findAllWithMinData(UUID farmId) {
 
         return repository.findAll(DeviceSpecification.builder()
-            .withFarmId(farmId));
+            .withFarmId(farmId)
+            .withOrderBy("deviceNumber", false));
     }
 
     public Optional<Device> findByDeviceNumber(String deviceNumber) {
