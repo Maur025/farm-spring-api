@@ -3,6 +3,7 @@ package com.kernotec.farm.account.jpa.service;
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.repository.AccountRepository;
 import com.kernotec.farm.account.jpa.specification.account.AccountSpecification;
 import java.util.UUID;
@@ -51,7 +52,8 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
     public Page<Account> findAllWithMinData(UUID socialNetworkId, Pageable pageable) {
         return repository.findAll(
             AccountSpecification.builder()
-                .withSocialNetworkId(socialNetworkId), pageable
+                .withSocialNetworkId(socialNetworkId)
+                .withAccountType(AccountTypeEnum.INTERNAL), pageable
         );
     }
 }

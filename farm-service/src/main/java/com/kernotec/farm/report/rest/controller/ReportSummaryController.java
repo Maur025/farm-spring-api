@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = ReportSpec.BASE_PATH)
 @AllArgsConstructor
 @RestController
-public class ReportController {
+public class ReportSummaryController {
 
     private final AccountSummaryReportService accountSummaryReportService;
     private final FriendSummaryService friendSummaryService;

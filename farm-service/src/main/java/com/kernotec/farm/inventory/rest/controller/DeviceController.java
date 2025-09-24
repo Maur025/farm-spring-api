@@ -81,7 +81,7 @@ public class DeviceController {
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<DeviceResponse> findAllMinimal(@RequestParam(required = false) UUID farmId)
     {
-        List<Device> deviceList = deviceService.findAllWithSpecification(farmId);
+        List<Device> deviceList = deviceService.findAllWithMinData(farmId);
 
         return PageResponse.<DeviceResponse>builder()
             .code(HttpStatus.OK.value())

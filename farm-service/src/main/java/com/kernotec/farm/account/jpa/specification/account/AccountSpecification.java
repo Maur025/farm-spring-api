@@ -2,6 +2,7 @@ package com.kernotec.farm.account.jpa.specification.account;
 
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.Person;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.specification.criteria.AccountSpecificationCriteria;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -58,6 +59,7 @@ public class AccountSpecification implements Specification<Account> {
         addIgnoreAccountIdFilter().ifPresent(predicateList::add);
         addUsernameSearchFilter().ifPresent(predicateList::add);
         addKeywordFilter().ifPresent(predicateList::add);
+        addAccountTypeFilter().ifPresent(predicateList::add);
 
         query.distinct(true);
         return cb.and(predicateList.toArray(Predicate[]::new));
@@ -113,5 +115,15 @@ public class AccountSpecification implements Specification<Account> {
                     cb.equal(cb.lower(getDeviceJoin().get("deviceNumber")), keyword)
                 );
             });
+    }
+
+    public AccountSpecification withAccountType(AccountTypeEnum accountType) {
+        this.criteria.setAccountType(accountType);
+        return this;
+    }
+
+    private Optional<Predicate> addAccountTypeFilter() {
+        return Optional.ofNullable(criteria.getAccountType())
+            .map(accountType -> cb.equal(root.get("type"), accountType));
     }
 }
