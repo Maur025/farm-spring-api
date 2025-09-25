@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +16,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
+@Slf4j
 public record ActivitySpecification(ActivitySpecificationCriteria criteria) implements
     Specification<Activity>
 {
@@ -65,6 +68,10 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         addActivityTypeIdFilter(root, cb).ifPresent(predicateList::add);
         addAccountIdFilter(root, cb).ifPresent(predicateList::add);
         addAccountIdListFilter(root).ifPresent(predicateList::add);
+        addSimpleDateFilter(root, cb).ifPresent(predicateList::add);
+        addDateRangeFilter(root, cb).ifPresent(predicateList::add);
+        addMonthDateFilter(root, cb).ifPresent(predicateList::add);
+        addYearDateFilter(root, cb).ifPresent(predicateList::add);
 
         query.distinct(true);
         return cb.and(predicateList.toArray(Predicate[]::new));
@@ -167,5 +174,89 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         return Optional.ofNullable(criteria.getAccountIdList())
             .map(accountIdList -> root.get("accountId")
                 .in(accountIdList));
+    }
+
+    public ActivitySpecification withSimpleDate(ZonedDateTime simpleDate) {
+        this.criteria.setSimpleDate(simpleDate);
+        return this;
+    }
+
+    private Optional<Predicate> addSimpleDateFilter(Root<Activity> root, CriteriaBuilder cb) {
+        return Optional.ofNullable(criteria.getSimpleDate())
+            .map(simpleDate -> {
+                ZonedDateTime startOfDay = simpleDate.toLocalDate()
+                    .atStartOfDay(simpleDate.getZone());
+
+                ZonedDateTime endOfDay = startOfDay.plusDays(1)
+                    .minusNanos(1);
+
+                return cb.between(root.get("activityDate"), startOfDay, endOfDay);
+            });
+    }
+
+    public ActivitySpecification withDateRange(ZonedDateTime fromDate, ZonedDateTime toDate) {
+        this.criteria.setFromDate(fromDate);
+        this.criteria.setToDate(toDate);
+        return this;
+    }
+
+    private Optional<Predicate> addDateRangeFilter(Root<Activity> root, CriteriaBuilder cb) {
+        ZonedDateTime from = criteria.getFromDate();
+        ZonedDateTime to = criteria.getToDate();
+
+        if (from != null && to != null) {
+            ZonedDateTime startOfFromDate = from.toLocalDate()
+                .atStartOfDay(from.getZone());
+
+            ZonedDateTime startOfToDate = to.toLocalDate()
+                .atStartOfDay(to.getZone());
+            ZonedDateTime endOfToDate = startOfToDate.plusDays(1)
+                .minusNanos(1);
+
+            log.info("from Date: {}", startOfFromDate);
+            log.info("to Date: {}", endOfToDate);
+
+            return Optional.of(cb.between(root.get("activityDate"), startOfFromDate, endOfToDate));
+        }
+
+        return Optional.empty();
+    }
+
+    public ActivitySpecification withMonthDate(ZonedDateTime monthDate) {
+        this.criteria.setMonthDate(monthDate);
+        return this;
+    }
+
+    private Optional<Predicate> addMonthDateFilter(Root<Activity> root, CriteriaBuilder cb) {
+        return Optional.ofNullable(criteria.getMonthDate())
+            .map(monthDate -> {
+                ZonedDateTime startOfMonth = monthDate.withDayOfMonth(1)
+                    .toLocalDate()
+                    .atStartOfDay(monthDate.getZone());
+
+                ZonedDateTime endOfMonth = startOfMonth.plusMonths(1)
+                    .minusNanos(1);
+
+                return cb.between(root.get("activityDate"), startOfMonth, endOfMonth);
+            });
+    }
+
+    public ActivitySpecification withYearDate(ZonedDateTime yearDate) {
+        this.criteria.setYearDate(yearDate);
+        return this;
+    }
+
+    private Optional<Predicate> addYearDateFilter(Root<Activity> root, CriteriaBuilder cb) {
+        return Optional.ofNullable(criteria.getYearDate())
+            .map(yearDate -> {
+                ZonedDateTime startOfYear = yearDate.withDayOfYear(1)
+                    .toLocalDate()
+                    .atStartOfDay(yearDate.getZone());
+
+                ZonedDateTime endOfYear = startOfYear.plusYears(1)
+                    .minusNanos(1);
+
+                return cb.between(root.get("activityDate"), startOfYear, endOfYear);
+            });
     }
 }
