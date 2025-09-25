@@ -1,5 +1,5 @@
 package com.kernotec.farm.activity.jpa.specification.activity;
 
 public enum ActivitySpecificationJoinEnum {
-    ACCOUNT_JOIN, DEVICE_JOIN
+    ACCOUNT_JOIN, DEVICE_JOIN, FARM_JOIN
 }

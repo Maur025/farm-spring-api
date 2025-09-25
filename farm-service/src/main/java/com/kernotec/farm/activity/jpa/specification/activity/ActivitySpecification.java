@@ -54,6 +54,19 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         return joinMap.get(ActivitySpecificationJoinEnum.DEVICE_JOIN);
     }
 
+    private Join<?, ?> getOrCreateFarmJoin(Map<ActivitySpecificationJoinEnum, Join<?, ?>> joinMap,
+        Root<?> root)
+    {
+        if (!joinMap.containsKey(ActivitySpecificationJoinEnum.FARM_JOIN)) {
+            joinMap.put(
+                ActivitySpecificationJoinEnum.FARM_JOIN,
+                getOrCreateDeviceJoin(joinMap, root).join("farm", JoinType.LEFT)
+            );
+        }
+
+        return joinMap.get(ActivitySpecificationJoinEnum.FARM_JOIN);
+    }
+
     @Override
     public Predicate toPredicate(Root<Activity> root, CriteriaQuery<?> query, CriteriaBuilder cb)
     {
@@ -72,6 +85,7 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         addDateRangeFilter(root, cb).ifPresent(predicateList::add);
         addMonthDateFilter(root, cb).ifPresent(predicateList::add);
         addYearDateFilter(root, cb).ifPresent(predicateList::add);
+        addKeywordFilter(root, cb, joinMap).ifPresent(predicateList::add);
 
         query.distinct(true);
         return cb.and(predicateList.toArray(Predicate[]::new));
@@ -257,6 +271,30 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
                     .minusNanos(1);
 
                 return cb.between(root.get("activityDate"), startOfYear, endOfYear);
+            });
+    }
+
+    public ActivitySpecification withKeyword(String keyword) {
+        this.criteria.setKeyword(keyword != null && !keyword.isBlank() ? keyword : null);
+        return this;
+    }
+
+    private Optional<Predicate> addKeywordFilter(Root<Activity> root, CriteriaBuilder cb,
+        Map<ActivitySpecificationJoinEnum, Join<?, ?>> joinMap)
+    {
+        return Optional.ofNullable(criteria.getKeyword())
+            .map(keyword -> {
+                String pattern = "%" + criteria.getKeyword()
+                    .toLowerCase() + "%";
+
+                return cb.or(
+                    cb.like(
+                        cb.lower(getOrCreateAccountJoin(joinMap, root).get("username")), pattern),
+                    cb.like(
+                        cb.lower(getOrCreateDeviceJoin(joinMap, root).get("deviceNumber")),
+                        pattern
+                    ), cb.like(cb.lower(getOrCreateFarmJoin(joinMap, root).get("name")), pattern)
+                );
             });
     }
 }
