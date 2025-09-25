@@ -198,7 +198,8 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
     private Optional<Predicate> addSimpleDateFilter(Root<Activity> root, CriteriaBuilder cb) {
         return Optional.ofNullable(criteria.getSimpleDate())
             .map(simpleDate -> {
-                ZonedDateTime startOfDay = simpleDate.toLocalDate()
+                ZonedDateTime startOfDay = simpleDate.withZoneSameInstant(simpleDate.getZone())
+                    .toLocalDate()
                     .atStartOfDay(simpleDate.getZone());
 
                 ZonedDateTime endOfDay = startOfDay.plusDays(1)

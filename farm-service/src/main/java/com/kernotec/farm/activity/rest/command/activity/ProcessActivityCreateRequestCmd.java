@@ -10,6 +10,8 @@ import com.kernotec.farm.activity.rest.command.publishing.PublishingCreateActivi
 import com.kernotec.farm.activity.rest.command.reaction.ReactionCreateActivityRelationCmd;
 import com.kernotec.farm.activity.rest.dto.request.activity.ActivityCreateRequest;
 import jakarta.validation.constraints.NotNull;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +47,8 @@ public class ProcessActivityCreateRequestCmd extends
     @Override
     protected UUID run(Request request) {
         ActivityCreateRequest activityRequest = request.getActivityRequest();
+
+        activityRequest.setActivityDate(ZonedDateTime.now(ZoneOffset.UTC));
 
         UUID activityId = activityCreateCmd.withRequest(ActivityCreateCmd.Request.builder()
                 .link(activityRequest.getLink())
