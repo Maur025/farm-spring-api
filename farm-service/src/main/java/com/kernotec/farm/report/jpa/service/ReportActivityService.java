@@ -25,7 +25,11 @@ public class ReportActivityService {
                 .withDeviceId(filterRequest.getDeviceId())
                 .withFarmId(filterRequest.getFarmId())
                 .withActivityTypeId(filterRequest.getActivityTypeId())
-                .withAccountId(filterRequest.getAccountId()), pageable
+                .withAccountId(filterRequest.getAccountId())
+                .withSimpleDate(filterRequest.getSimpleDate())
+                .withDateRange(filterRequest.getFromDate(), filterRequest.getToDate())
+                .withMonthDate(filterRequest.getMonthDate())
+                .withYearDate(filterRequest.getYearDate()), pageable
         );
     }
 }

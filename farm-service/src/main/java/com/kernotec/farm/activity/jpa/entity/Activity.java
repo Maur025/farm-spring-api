@@ -3,7 +3,9 @@ package com.kernotec.farm.activity.jpa.entity;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.audit.user.DataBaseAuditEntity;
 import com.kernotec.farm.parametric.jpa.entity.ActivityType;
+import com.kernotec.farm.util.SafeZonedDateTimeConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -28,6 +30,7 @@ public class Activity extends DataBaseAuditEntity {
     private String link;
 
     @Column(name = "activity_date", nullable = false)
+    @Convert(converter = SafeZonedDateTimeConverter.class)
     private ZonedDateTime activityDate;
 
     @Column(name = "is_system_activity", columnDefinition = "boolean default false")

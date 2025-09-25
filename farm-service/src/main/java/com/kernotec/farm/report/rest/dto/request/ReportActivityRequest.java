@@ -25,5 +25,5 @@ public class ReportActivityRequest extends BaseRequest {
     private ZonedDateTime fromDate;
     private ZonedDateTime toDate;
     private ZonedDateTime monthDate;
-    private Integer year;
+    private ZonedDateTime yearDate;
 }
