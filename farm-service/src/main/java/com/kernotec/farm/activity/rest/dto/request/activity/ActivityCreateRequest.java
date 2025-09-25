@@ -1,5 +1,6 @@
 package com.kernotec.farm.activity.rest.dto.request.activity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.farm.activity.rest.dto.request.comment.CommentCreateRequest;
@@ -8,6 +9,7 @@ import com.kernotec.farm.activity.rest.dto.request.follow.FollowCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.group.membership.GroupMembershipCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.publishing.PublishingCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.reaction.ReactionCreateRequest;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Getter;
@@ -21,7 +23,11 @@ import lombok.Setter;
 public class ActivityCreateRequest {
 
     private String link;
+
+    @JsonIgnore
+    @Schema(hidden = true)
     private ZonedDateTime activityDate;
+
     private UUID accountId;
     private UUID activityTypeId;
 
