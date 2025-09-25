@@ -21,7 +21,15 @@ public class ReportActivityService {
             ActivitySpecification.builder()
                 .includeOnlyUserActivities(Boolean.TRUE)
                 .withUserAuthId(filterRequest.getUserAuthId())
-                .withSocialNetworkId(filterRequest.getSocialNetworkId()), pageable
+                .withSocialNetworkId(filterRequest.getSocialNetworkId())
+                .withDeviceId(filterRequest.getDeviceId())
+                .withFarmId(filterRequest.getFarmId())
+                .withActivityTypeId(filterRequest.getActivityTypeId())
+                .withAccountId(filterRequest.getAccountId())
+                .withSimpleDate(filterRequest.getSimpleDate())
+                .withDateRange(filterRequest.getFromDate(), filterRequest.getToDate())
+                .withMonthDate(filterRequest.getMonthDate())
+                .withYearDate(filterRequest.getYearDate()), pageable
         );
     }
 }
