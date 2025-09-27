@@ -58,6 +58,9 @@ public class Account extends BaseAuditEntity {
                 updatable = false)
     private SocialNetwork socialNetwork;
 
+    @Column(name = "is_enabled", columnDefinition = "boolean default true")
+    private Boolean isEnabled = true;
+
     @ManyToMany(mappedBy = "accounts", fetch = FetchType.LAZY)
     private Set<Device> devices;
 

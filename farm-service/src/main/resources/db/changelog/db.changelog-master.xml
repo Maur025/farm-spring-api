@@ -161,4 +161,6 @@
   <changeSet id="1758745141816-1" author="Maur025">
     <sqlFile path="data/region/region_seeder_update3.sql" relativeToChangelogFile="true"/>
   </changeSet>
+
+  <include file="db/changelog/2025/09/26-01-changelog-130.xml"/>
 </databaseChangeLog>
