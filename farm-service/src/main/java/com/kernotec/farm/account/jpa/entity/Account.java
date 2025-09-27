@@ -61,6 +61,12 @@ public class Account extends BaseAuditEntity {
     @Column(name = "is_enabled", columnDefinition = "boolean default true")
     private Boolean isEnabled = true;
 
+    @Column(name = "account_link", length = 500, unique = true)
+    private String accountLink;
+
+    @Column(name = "identity_username", unique = true)
+    private String identityUsername;
+
     @ManyToMany(mappedBy = "accounts", fetch = FetchType.LAZY)
     private Set<Device> devices;
 
