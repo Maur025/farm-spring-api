@@ -7,7 +7,7 @@ import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.service.AccountService;
 import com.kernotec.farm.account.rest.ApiSpec.AccountSpec;
-import com.kernotec.farm.account.rest.command.AccountReplaceRequestCmd;
+import com.kernotec.farm.account.rest.command.account.AccountReplaceRequestCmd;
 import com.kernotec.farm.account.rest.dto.request.account.AccountReplaceRequest;
 import com.kernotec.farm.account.rest.dto.response.account.AccountResponse;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseFlatMapper;
