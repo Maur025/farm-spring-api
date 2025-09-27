@@ -1,4 +1,4 @@
-package com.kernotec.farm.account.rest.command;
+package com.kernotec.farm.account.rest.command.account;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.account.command.account.AccountCreateCmd;
@@ -68,6 +68,16 @@ public class AccountReplaceRequestCmd extends
 
         UUID personId;
         if (replaceRequest.getReplacePerson()) {
+            if (replaceRequest.getFakeName() == null || replaceRequest.getFakeLastName() == null
+                || replaceRequest.getFakeName()
+                .isBlank() || replaceRequest.getFakeLastName()
+                .isBlank())
+            {
+
+                throw new IllegalArgumentException(
+                    "Fake name and last name must be provided when replacing person");
+            }
+
             PersonDto personDto = personFindOrCreateCmd.withRequest(
                     PersonFindOrCreateCmd.Request.builder()
                         .name(replaceRequest.getFakeName())
