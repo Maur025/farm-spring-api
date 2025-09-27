@@ -17,6 +17,7 @@ public class AccountDto extends AuditEntityDto {
     private String username;
     private String password;
     private AccountTypeEnum type;
+    private Boolean isEnabled;
 
     private UUID personId;
     private PersonDto person;

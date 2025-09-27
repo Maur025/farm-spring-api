@@ -15,6 +15,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
@@ -54,5 +55,6 @@ public class Chip extends BaseAuditEntity {
     private Device device;
 
     @ManyToMany(mappedBy = "chips", fetch = FetchType.LAZY)
+    @Where(clause = "deleted is false AND is_enabled is true")
     private Set<Account> accounts;
 }
