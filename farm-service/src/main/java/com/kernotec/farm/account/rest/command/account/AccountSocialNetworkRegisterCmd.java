@@ -11,14 +11,17 @@ import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.parametric.jpa.enums.SocialNetworkEnum;
 import com.kernotec.farm.parametric.jpa.service.SocialNetworkService;
+import com.kernotec.farm.util.LinkUtil;
 import jakarta.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AccountSocialNetworkRegisterCmd extends
@@ -33,6 +36,7 @@ public class AccountSocialNetworkRegisterCmd extends
     private final ObservationCreateCmd observationCreateCmd;
     private final AccountObservationCreateCmd accountObservationCreateCmd;
     private final AccountExtensionCreateCmd accountExtensionCreateCmd;
+    private final LinkUtil linkUtil;
 
     @Override
     protected Void run(Request request) {
@@ -40,12 +44,23 @@ public class AccountSocialNetworkRegisterCmd extends
             request.getSocialNetworkCode()
                 .toString());
 
+        String identityUsername = switch (SocialNetworkEnum.fromValue(socialNetwork.getCode())) {
+            case FACEBOOK -> linkUtil.getIdentityFacebookOfLink(request.getAccountLink());
+            case TIKTOK -> {
+                log.info("TikTok Account Link: {}", request.getAccountLink());
+                yield null;
+            }
+            default -> null;
+        };
+
         UUID accountId = accountCreateCmd.withRequest(AccountCreateCmd.Request.builder()
                 .username(request.getUsername())
                 .password(request.getPassword() == null ? "N/A" : request.getPassword())
                 .personId(request.getPersonId())
                 .socialNetworkId(socialNetwork.getId())
                 .type(request.getAccountType())
+                .accountLink(request.getAccountLink())
+                .identityUsername(identityUsername)
                 .build())
             .execute();
 
@@ -111,5 +126,6 @@ public class AccountSocialNetworkRegisterCmd extends
         private final AccountTypeEnum accountType;
         private final String observation;
         private final String referenceEmail;
+        private final String accountLink;
     }
 }

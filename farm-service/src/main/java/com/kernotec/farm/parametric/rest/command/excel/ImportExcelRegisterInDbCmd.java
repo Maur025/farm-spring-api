@@ -94,6 +94,7 @@ public class ImportExcelRegisterInDbCmd extends
                         .accountType(AccountTypeEnum.INTERNAL)
                         .observation(excelDataDto.getFacebookObservation())
                         .referenceEmail(excelDataDto.getEmailUsername())
+                        .accountLink(excelDataDto.getFacebookAccountLink())
                         .build())
                 .execute();
         }

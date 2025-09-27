@@ -54,7 +54,9 @@ public class ExcelImportCmd extends
             throw new RuntimeException(e);
         }
 
-        return null;
+        throw new IllegalArgumentException("Error Processing Excel File simulated, test purpose");
+
+        // return null;
     }
 
     @Builder
