@@ -4,6 +4,7 @@ import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.activity.exception.ActivityException;
 import com.kernotec.farm.activity.rest.dto.request.activity.ActivityCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.comment.CommentCreateRequest;
+import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.follow.FollowCreateRequest;
 import com.kernotec.farm.activity.rest.dto.request.publishing.PublishingCreateRequest;
 import com.kernotec.farm.parametric.command.activity.type.ActivityTypeGetDtoCmd;
@@ -44,8 +45,15 @@ public class ActivityCreateRequestValidateCmd extends
                 }
             }
             case AMISTAD -> {
-                if (activityRequest.getConnection() == null || activityRequest.getConnection()
-                    .getAction() == null)
+                if (activityRequest.getConnection() == null) {
+                    launchExceptionDataMissing("connection");
+                }
+
+                ConnectionCreateRequest connection = activityRequest.getConnection();
+
+                if (connection.getAction() == null || activityRequest.getLink() == null
+                    || activityRequest.getLink()
+                    .isBlank())
                 {
                     launchExceptionDataMissing("connection");
                 }

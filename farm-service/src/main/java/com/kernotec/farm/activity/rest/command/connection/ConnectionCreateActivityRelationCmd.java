@@ -4,9 +4,13 @@ import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.account.command.account.AccountCreateCmd;
 import com.kernotec.farm.account.command.account.AccountGetDtoCmd;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
+import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.account.jpa.service.AccountService;
 import com.kernotec.farm.activity.rest.dto.request.connection.ConnectionCreateRequest;
+import com.kernotec.farm.util.LinkUtil;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +31,8 @@ public class ConnectionCreateActivityRelationCmd extends
     private final ConnectionCreateDirectConnectionCmd connectionCreateDirectConnectionCmd;
     private final ConnectionHandleExternalCmd connectionHandleExternalCmd;
     private final ConnectionHandleInternalCmd connectionHandleInternalCmd;
+    private final AccountService accountService;
+    private final LinkUtil linkUtil;
 
     @Override
     protected Void run(Request request) {
@@ -43,17 +49,26 @@ public class ConnectionCreateActivityRelationCmd extends
                     .build())
             .execute();
 
-        UUID targetAccountId = connectionRequest.getPotentialFriendAccountId();
+        Optional<Account> accountOptionalByLink = accountService.findByAccountLinkAndSocialNetworkId(
+            request.getAccountLink(), sourceAccountDto.getSocialNetworkId());
 
-        if (connectionRequest.getIsNewAccount() && targetAccountId == null) {
-            targetAccountId = accountCreateCmd.withRequest(AccountCreateCmd.Request.builder()
-                    .username(connectionRequest.getFriendUsername())
-                    .password("N/A")
-                    .socialNetworkId(sourceAccountDto.getSocialNetworkId())
-                    .type(AccountTypeEnum.EXTERNAL)
-                    .build())
-                .execute();
-        }
+        UUID targetAccountId = accountOptionalByLink.map(Account::getId)
+            .orElseGet(() -> {
+                if (connectionRequest.getPotentialFriendAccountId() != null) {
+                    throw new IllegalArgumentException(
+                        "The provided potentialFriendAccountId does not exist in the system.");
+                }
+
+                return accountCreateCmd.withRequest(AccountCreateCmd.Request.builder()
+                        .username(connectionRequest.getFriendUsername())
+                        .password("N/A")
+                        .socialNetworkId(sourceAccountDto.getSocialNetworkId())
+                        .type(AccountTypeEnum.EXTERNAL)
+                        .accountLink(request.getAccountLink())
+                        .identityUsername(linkUtil.getIdentityFacebookOfLink(request.getAccountLink()))
+                        .build())
+                    .execute();
+            });
 
         AccountDto targetAccountDto = accountGetDtoCmd.withRequest(
                 AccountGetDtoCmd.Request.builder()
@@ -114,5 +129,6 @@ public class ConnectionCreateActivityRelationCmd extends
         private final UUID activityTypeId;
         private final UUID accountId;
         private final ZonedDateTime activityDate;
+        private final String accountLink;
     }
 }
