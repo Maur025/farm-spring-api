@@ -155,7 +155,7 @@ public class AccountController {
             .build();
     }
 
-    @Operation(summary = "Add aditional data to account")
+    @Operation(summary = "Add additional data to account")
     @PostMapping("{accountId}/extension")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<AccountResponse> addExtensionData(
