@@ -22,6 +22,9 @@ public class AccountResponse extends EntityResponse {
 
     private String username;
     private String password;
+    private Boolean isEnabled;
+    private String accountLink;
+    private String identityUsername;
 
     private AccountTypeEnum type;
 
