@@ -99,6 +99,7 @@ public class ProcessActivityCreateRequestCmd extends
                     .activityTypeId(activityRequest.getActivityTypeId())
                     .accountId(activityRequest.getAccountId())
                     .activityDate(activityRequest.getActivityDate())
+                    .accountLink(activityRequest.getLink())
                     .build())
             .execute();
 

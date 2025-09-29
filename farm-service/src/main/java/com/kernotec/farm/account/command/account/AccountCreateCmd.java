@@ -29,7 +29,9 @@ public class AccountCreateCmd extends
         account.setPersonId(request.getPersonId());
         account.setSocialNetworkId(request.getSocialNetworkId());
         account.setType(request.getType());
-        account.setIsEnabled(request.getIsEnabled());
+
+        account.setIsEnabled(request.getIsEnabled() == null || request.getIsEnabled());
+
         account.setAccountLink(request.getAccountLink());
         account.setIdentityUsername(request.getIdentityUsername());
 
