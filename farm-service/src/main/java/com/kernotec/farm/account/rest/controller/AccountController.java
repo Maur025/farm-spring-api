@@ -4,10 +4,12 @@ import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
+import com.kernotec.farm.account.command.account.extension.AccountExtensionCreateCmd;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.service.AccountService;
 import com.kernotec.farm.account.rest.ApiSpec.AccountSpec;
 import com.kernotec.farm.account.rest.command.account.AccountReplaceRequestCmd;
+import com.kernotec.farm.account.rest.dto.request.account.AccountExtensionRequest;
 import com.kernotec.farm.account.rest.dto.request.account.AccountReplaceRequest;
 import com.kernotec.farm.account.rest.dto.response.account.AccountResponse;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseFlatMapper;
@@ -41,6 +43,7 @@ public class AccountController {
     private final AccountResponseFlatMapper accountResponseFlatMapper;
     private final AccountResponseMinMapper accountResponseMinMapper;
     private final AccountReplaceRequestCmd accountReplaceRequestCmd;
+    private final AccountExtensionCreateCmd accountExtensionCreateCmd;
 
     @Operation(summary = "Find all accounts")
     @GetMapping
@@ -147,6 +150,25 @@ public class AccountController {
         return SingleResponse.<AccountResponse>builder()
             .code(HttpStatus.OK.value())
             .data(accountResponseMapper.toResponse(newAccountId))
+            .build();
+    }
+
+    @Operation(summary = "Add aditional data to account")
+    @PostMapping("{accountId}/extension")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<AccountResponse> addExtensionData(
+        @PathVariable("accountId") UUID accountId, @RequestBody AccountExtensionRequest request)
+    {
+        UUID accountExtensionId = accountExtensionCreateCmd.withRequest(
+                AccountExtensionCreateCmd.Request.builder()
+                    .accountId(accountId)
+                    .referenceEmail(request.getReferenceEmail())
+                    .build())
+            .execute();
+
+        return SingleResponse.<AccountResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(accountResponseMapper.toResponse(accountExtensionId))
             .build();
     }
 }

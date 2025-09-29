@@ -38,4 +38,5 @@ public class ImportExcelDataDto {
     private String farmType;
     private String birthDateRegister;
     private String birthDateFake;
+    private String facebookAccountLink;
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+  objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+  <changeSet id="1758983332438-1" author="mmoya@PragmaInvest.com">
+    <addColumn tableName="accounts">
+      <column name="account_link" type="VARCHAR(500)"/>
+      <column name="identity_username" type="VARCHAR(255)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet id="1758983332438-3" author="mmoya@PragmaInvest.com">
+    <addUniqueConstraint columnNames="account_link" constraintName="uc_accounts_account_link"
+      tableName="accounts"/>
+  </changeSet>
+  <changeSet id="1758983332438-4" author="mmoya@PragmaInvest.com">
+    <addUniqueConstraint columnNames="identity_username"
+      constraintName="uc_accounts_identity_username" tableName="accounts"/>
+  </changeSet>
+
+</databaseChangeLog>
