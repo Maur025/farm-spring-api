@@ -14,6 +14,8 @@ import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
 import com.kernotec.farm.parametric.jpa.service.GroupStateService;
 import com.kernotec.farm.parametric.jpa.service.RequestStateService;
 import jakarta.validation.constraints.NotNull;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +37,7 @@ public class ProcessGroupMembershipUpdateRequestCmd extends
     @Override
     protected Void run(Request request) {
         GroupMembershipUpdateRequest groupMembershipRequest = request.getGroupMembershipRequest();
+        groupMembershipRequest.setResponseDate(ZonedDateTime.now(ZoneOffset.UTC));
 
         RequestState requestState = requestStateService.findByCodeThrow(
             RequestStateCodeEnum.fromValue(groupMembershipRequest.getResponseRequestState()));
