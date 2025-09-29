@@ -69,16 +69,18 @@ public class AccountController {
             .build();
     }
 
-    @Operation(summary = "Search accounts by username")
+    @Operation(summary = "Search accounts by username or link")
     @GetMapping("search")
     @ResponseStatus(HttpStatus.OK)
-    public PageResponse<AccountResponse> searchByUsername(@RequestParam String username,
+    public PageResponse<AccountResponse> searchByUsernameOrLink(
+        @RequestParam(required = false) String username,
         @RequestParam(required = false) UUID socialNetworkId,
-        @RequestParam(required = false) UUID ignoreAccountId)
+        @RequestParam(required = false) UUID ignoreAccountId,
+        @RequestParam(required = false) String link)
     {
-        Pageable pageable = PageableUtil.of(0, 20, "createdAt", true);
-        Page<Account> accountPage = accountService.searchByUsername(
-            username, socialNetworkId, ignoreAccountId, pageable);
+        Pageable pageable = PageableUtil.of(0, 30, "createdAt", true);
+        Page<Account> accountPage = accountService.searchByUsernameOrLink(
+            username, socialNetworkId, ignoreAccountId, link, pageable);
 
         return PageResponse.<AccountResponse>builder()
             .code(HttpStatus.OK.value())
