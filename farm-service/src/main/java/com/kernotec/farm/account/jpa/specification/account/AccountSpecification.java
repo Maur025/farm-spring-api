@@ -60,6 +60,7 @@ public class AccountSpecification implements Specification<Account> {
         addUsernameSearchFilter().ifPresent(predicateList::add);
         addKeywordFilter().ifPresent(predicateList::add);
         addAccountTypeFilter().ifPresent(predicateList::add);
+        addLinkSearchFilter().ifPresent(predicateList::add);
 
         query.distinct(true);
         return cb.and(predicateList.toArray(Predicate[]::new));
@@ -125,5 +126,15 @@ public class AccountSpecification implements Specification<Account> {
     private Optional<Predicate> addAccountTypeFilter() {
         return Optional.ofNullable(criteria.getAccountType())
             .map(accountType -> cb.equal(root.get("type"), accountType));
+    }
+
+    public AccountSpecification withLinkSearch(String link) {
+        this.criteria.setLinkSearch(link != null && !link.isBlank() ? link : null);
+        return this;
+    }
+
+    private Optional<Predicate> addLinkSearchFilter() {
+        return Optional.ofNullable(criteria.getLinkSearch())
+            .map(link -> cb.equal(root.get("accountLink"), link));
     }
 }

@@ -37,15 +37,16 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
         );
     }
 
-    public Page<Account> searchByUsername(String username, UUID socialNetworkId,
-        UUID ignoreAccountId, Pageable pageable)
+    public Page<Account> searchByUsernameOrLink(String username, UUID socialNetworkId,
+        UUID ignoreAccountId, String link, Pageable pageable)
     {
 
         return repository.findAll(
             AccountSpecification.builder()
                 .withUsernameSearch(username)
                 .withSocialNetworkId(socialNetworkId)
-                .ignoreAccountId(ignoreAccountId), pageable
+                .ignoreAccountId(ignoreAccountId)
+                .withLinkSearch(link), pageable
         );
     }
 

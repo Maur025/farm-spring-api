@@ -14,4 +14,5 @@ public class AccountSpecificationCriteria {
     private String usernameSearch;
     private String keyword;
     private AccountTypeEnum accountType;
+    private String linkSearch;
 }
