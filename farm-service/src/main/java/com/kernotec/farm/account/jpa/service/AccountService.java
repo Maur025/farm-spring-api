@@ -6,6 +6,7 @@ import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.repository.AccountRepository;
 import com.kernotec.farm.account.jpa.specification.account.AccountSpecification;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -56,5 +57,11 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
                 .withSocialNetworkId(socialNetworkId)
                 .withAccountType(AccountTypeEnum.INTERNAL), pageable
         );
+    }
+
+    public Optional<Account> findByAccountLinkAndSocialNetworkId(String accountLink,
+        UUID socialNetworkId)
+    {
+        return repository.findByAccountLinkAndSocialNetworkId(accountLink, socialNetworkId);
     }
 }
