@@ -21,6 +21,8 @@ import com.kernotec.farm.parametric.command.request.state.RequestStateGetIdByCod
 import com.kernotec.farm.parametric.jpa.enums.FriendStateCodeEnum;
 import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
 import jakarta.validation.constraints.NotNull;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +48,7 @@ public class ProcessConnectionUpdateRequestCmd extends
     @Override
     protected Void run(Request request) {
         ConnectionUpdateRequest connectionRequest = request.getConnectionRequest();
+        connectionRequest.setResponseDate(ZonedDateTime.now(ZoneOffset.UTC));
 
         UUID approveOrRejectRequestStateId = requestStateGetIdByCodeCmd.withRequest(
                 RequestStateGetIdByCodeCmd.Request.builder()
