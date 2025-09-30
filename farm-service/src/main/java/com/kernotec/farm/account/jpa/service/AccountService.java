@@ -29,12 +29,14 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
         return repository;
     }
 
-    public Page<Account> findAllWithFilters(UUID socialNetworkId, String keyword, Pageable pageable)
+    public Page<Account> findAllInternalWithFilters(UUID socialNetworkId, String keyword,
+        Pageable pageable)
     {
         return repository.findAll(
             AccountSpecification.builder()
                 .withSocialNetworkId(socialNetworkId)
-                .withKeyword(keyword), pageable
+                .withKeyword(keyword)
+                .withAccountType(AccountTypeEnum.INTERNAL), pageable
         );
     }
 

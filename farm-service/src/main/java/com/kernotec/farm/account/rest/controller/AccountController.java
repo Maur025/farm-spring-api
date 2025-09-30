@@ -9,8 +9,10 @@ import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.service.AccountService;
 import com.kernotec.farm.account.rest.ApiSpec.AccountSpec;
 import com.kernotec.farm.account.rest.command.account.AccountReplaceRequestCmd;
+import com.kernotec.farm.account.rest.command.account.ProcessAccountUpdateRequestCmd;
 import com.kernotec.farm.account.rest.dto.request.account.AccountExtensionRequest;
 import com.kernotec.farm.account.rest.dto.request.account.AccountReplaceRequest;
+import com.kernotec.farm.account.rest.dto.request.account.AccountUpdateRequest;
 import com.kernotec.farm.account.rest.dto.response.account.AccountResponse;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseFlatMapper;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseMapper;
@@ -26,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,6 +47,7 @@ public class AccountController {
     private final AccountResponseMinMapper accountResponseMinMapper;
     private final AccountReplaceRequestCmd accountReplaceRequestCmd;
     private final AccountExtensionCreateCmd accountExtensionCreateCmd;
+    private final ProcessAccountUpdateRequestCmd processAccountUpdateRequestCmd;
 
     @Operation(summary = "Find all accounts")
     @GetMapping
@@ -56,7 +60,7 @@ public class AccountController {
         @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
-        Page<Account> accountPage = accountService.findAllWithFilters(
+        Page<Account> accountPage = accountService.findAllInternalWithFilters(
             socialNetworkId, keyword, pageable);
 
         return PageResponse.<AccountResponse>builder()
@@ -171,6 +175,24 @@ public class AccountController {
         return SingleResponse.<AccountResponse>builder()
             .code(HttpStatus.OK.value())
             .data(accountResponseMapper.toResponse(accountExtensionId))
+            .build();
+    }
+
+    @Operation(summary = "Update account data")
+    @PutMapping("{accountId}")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<AccountResponse> updateAccount(@PathVariable("accountId") UUID accountId,
+        @RequestBody AccountUpdateRequest request)
+    {
+        processAccountUpdateRequestCmd.withRequest(ProcessAccountUpdateRequestCmd.Request.builder()
+                .accountId(accountId)
+                .updateRequest(request)
+                .build())
+            .execute();
+
+        return SingleResponse.<AccountResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message("Account updated successfully")
             .build();
     }
 }

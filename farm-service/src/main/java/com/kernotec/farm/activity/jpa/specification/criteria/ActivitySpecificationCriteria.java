@@ -23,5 +23,6 @@ public class ActivitySpecificationCriteria {
     private ZonedDateTime toDate;
     private ZonedDateTime monthDate;
     private ZonedDateTime yearDate;
+    private String zoneId;
     private String keyword;
 }
