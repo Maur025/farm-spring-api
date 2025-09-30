@@ -6,7 +6,6 @@ import com.kernotec.farm.account.jpa.service.AccountService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,16 +19,25 @@ public class AccountUpdateCmd extends
 
     @Override
     protected Void run(Request request) {
-        Account account = accountService.findByIdThrow(request.getAccountId());
+        Account account = accountService.findByIdThrow(request.accountId());
 
-        if (request.getUsername() != null) {
-            account.setUsername(request.getUsername());
+        if (request.username() != null) {
+            account.setUsername(request.username());
         }
-        if (request.getPassword() != null) {
-            account.setPassword(request.getPassword());
+        if (request.password() != null) {
+            account.setPassword(request.password());
         }
-        if (request.getIsEnabled() != null) {
-            account.setIsEnabled(request.getIsEnabled());
+        if (request.personId() != null) {
+            account.setPersonId(request.personId());
+        }
+        if (request.isEnabled() != null) {
+            account.setIsEnabled(request.isEnabled());
+        }
+        if (request.accountLink() != null) {
+            account.setAccountLink(request.accountLink());
+        }
+        if (request.identityUsername() != null) {
+            account.setIdentityUsername(request.identityUsername());
         }
 
         accountService.save(account);
@@ -37,16 +45,9 @@ public class AccountUpdateCmd extends
     }
 
     @Builder
-    @Getter
-    public static class Request {
+    public record Request(@NotNull UUID accountId, String username, String password, UUID personId,
+                          Boolean isEnabled, String accountLink, String identityUsername)
+    {
 
-        @NotNull
-        private final UUID accountId;
-
-        private final String username;
-        private final String password;
-        /*private final*/
-
-        private final Boolean isEnabled;
     }
 }

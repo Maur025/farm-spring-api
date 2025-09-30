@@ -8,6 +8,9 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -198,12 +201,21 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
     private Optional<Predicate> addSimpleDateFilter(Root<Activity> root, CriteriaBuilder cb) {
         return Optional.ofNullable(criteria.getSimpleDate())
             .map(simpleDate -> {
-                ZonedDateTime startOfDay = simpleDate.withZoneSameInstant(simpleDate.getZone())
-                    .toLocalDate()
-                    .atStartOfDay(simpleDate.getZone());
+                log.info("zoneId: {}", criteria.getZoneId());
+                log.info("simpleDate: {}", simpleDate);
 
-                ZonedDateTime endOfDay = startOfDay.plusDays(1)
-                    .minusNanos(1);
+                ZoneId userZoneId = getZoneId();
+
+                LocalDate simpleLocalDate = simpleDate.toLocalDate();
+                log.info("simpleLocalDate: {}", simpleLocalDate);
+
+                ZonedDateTime startOfDay = simpleLocalDate.atStartOfDay(userZoneId);
+
+                ZonedDateTime endOfDay = simpleLocalDate.atTime(LocalTime.MAX)
+                    .atZone(userZoneId);
+
+                log.info("startOfDay: {}", startOfDay);
+                log.info("endOfDay: {}", endOfDay);
 
                 return cb.between(root.get("activityDate"), startOfDay, endOfDay);
             });
@@ -220,13 +232,14 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         ZonedDateTime to = criteria.getToDate();
 
         if (from != null && to != null) {
-            ZonedDateTime startOfFromDate = from.toLocalDate()
-                .atStartOfDay(from.getZone());
+            ZoneId userZoneId = getZoneId();
+            LocalDate fromLocalDate = from.toLocalDate();
+            ZonedDateTime startOfFromDate = fromLocalDate.atStartOfDay(userZoneId);
 
-            ZonedDateTime startOfToDate = to.toLocalDate()
-                .atStartOfDay(to.getZone());
-            ZonedDateTime endOfToDate = startOfToDate.plusDays(1)
-                .minusNanos(1);
+            LocalDate toLocalDate = to.toLocalDate();
+
+            ZonedDateTime endOfToDate = toLocalDate.atTime(LocalTime.MAX)
+                .atZone(userZoneId);
 
             log.info("from Date: {}", startOfFromDate);
             log.info("to Date: {}", endOfToDate);
@@ -245,12 +258,18 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
     private Optional<Predicate> addMonthDateFilter(Root<Activity> root, CriteriaBuilder cb) {
         return Optional.ofNullable(criteria.getMonthDate())
             .map(monthDate -> {
-                ZonedDateTime startOfMonth = monthDate.withDayOfMonth(1)
-                    .toLocalDate()
-                    .atStartOfDay(monthDate.getZone());
+                ZoneId userZoneId = getZoneId();
+
+                LocalDate monthLocalDate = monthDate.withDayOfMonth(1)
+                    .toLocalDate();
+
+                ZonedDateTime startOfMonth = monthLocalDate.atStartOfDay(userZoneId);
 
                 ZonedDateTime endOfMonth = startOfMonth.plusMonths(1)
                     .minusNanos(1);
+
+                log.info("startOfMonth: {}", startOfMonth);
+                log.info("endOfMonth: {}", endOfMonth);
 
                 return cb.between(root.get("activityDate"), startOfMonth, endOfMonth);
             });
@@ -264,12 +283,17 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
     private Optional<Predicate> addYearDateFilter(Root<Activity> root, CriteriaBuilder cb) {
         return Optional.ofNullable(criteria.getYearDate())
             .map(yearDate -> {
-                ZonedDateTime startOfYear = yearDate.withDayOfYear(1)
-                    .toLocalDate()
-                    .atStartOfDay(yearDate.getZone());
+                ZoneId userZoneId = getZoneId();
+                LocalDate yearLocalDate = yearDate.withDayOfYear(1)
+                    .toLocalDate();
+
+                ZonedDateTime startOfYear = yearLocalDate.atStartOfDay(userZoneId);
 
                 ZonedDateTime endOfYear = startOfYear.plusYears(1)
                     .minusNanos(1);
+
+                log.info("startOfYear: {}", startOfYear);
+                log.info("endOfYear: {}", endOfYear);
 
                 return cb.between(root.get("activityDate"), startOfYear, endOfYear);
             });
@@ -297,5 +321,16 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
                     ), cb.like(cb.lower(getOrCreateFarmJoin(joinMap, root).get("name")), pattern)
                 );
             });
+    }
+
+    public ActivitySpecification withZoneId(String zoneId) {
+        this.criteria.setZoneId(zoneId);
+        return this;
+    }
+
+    private ZoneId getZoneId() {
+        return ZoneId.of(this.criteria.getZoneId() != null ? this.criteria.getZoneId()
+            : ZoneId.systemDefault()
+                .toString());
     }
 }

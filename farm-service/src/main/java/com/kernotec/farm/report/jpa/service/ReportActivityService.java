@@ -37,6 +37,7 @@ public class ReportActivityService {
         return repository.findAll(
             ActivitySpecification.builder()
                 .includeOnlyUserActivities(Boolean.TRUE)
+                .withZoneId(filterRequest.getZoneId())
                 .withUserAuthId(filterRequest.getUserAuthId())
                 .withSocialNetworkId(filterRequest.getSocialNetworkId())
                 .withDeviceId(filterRequest.getDeviceId())
