@@ -45,6 +45,7 @@ public class AccountUpdateCmd extends
 
         private final String username;
         private final String password;
+        /*private final*/
 
         private final Boolean isEnabled;
     }
