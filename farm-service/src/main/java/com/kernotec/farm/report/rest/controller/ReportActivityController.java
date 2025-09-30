@@ -9,10 +9,12 @@ import com.kernotec.farm.activity.rest.dto.response.activity.ActivityResponse;
 import com.kernotec.farm.activity.rest.mapper.activity.ActivityResponseMapper;
 import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
+import com.kernotec.farm.report.rest.command.activity.ReportActivityExcelExportCmd;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,7 @@ public class ReportActivityController {
 
     private final ReportActivityService reportActivityService;
     private final ActivityResponseMapper activityResponseMapper;
+    private final ReportActivityExcelExportCmd reportActivityExcelExportCmd;
 
     @Operation(summary = "Activity report with filters")
     @PostMapping("activities/report")
@@ -66,5 +69,20 @@ public class ReportActivityController {
             .code(HttpStatus.OK.value())
             .data(reportActivityService.getTotalActivitiesByType(request))
             .build();
+    }
+
+    @Operation(summary = "Export activities report to excel with filters")
+    @PostMapping("activities/report/excel")
+    @ResponseStatus(HttpStatus.OK)
+    public void exportActivitiesReportAsExcel(HttpServletResponse response)
+    {
+        response.setContentType(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=report-activities.xlsx");
+
+        reportActivityExcelExportCmd.withRequest(ReportActivityExcelExportCmd.Request.builder()
+                .response(response)
+                .build())
+            .execute();
     }
 }

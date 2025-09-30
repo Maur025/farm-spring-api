@@ -1,13 +1,14 @@
 package com.kernotec.farm.report.rest.command.activity;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +21,7 @@ public class ReportActivityExcelExportCmd extends
 
     @Override
     protected Void run(Request request) {
-        var workbook = new SXSSFWorkbook(100);
-
-        try (var out = new FileOutputStream("report-activity.xlsx")) {
+      /*  try (var workbook = new SXSSFWorkbook(100)) {
             SXSSFSheet sheet = workbook.createSheet("Report-Activity");
 
             for (int i = 0; i < 10; i++) {
@@ -33,8 +32,31 @@ public class ReportActivityExcelExportCmd extends
                     .setCellValue(i * 10);
             }
 
-            workbook.write(out);
+            workbook.write(request.response()
+                .getOutputStream());
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+*/
+        var workbook = new SXSSFWorkbook(100);
+        Sheet sheet = workbook.createSheet("Report-Activity");
+
+        for (int i = 0; i < 10000; i++) {
+            Row row = sheet.createRow(i);
+            Cell cell = row.createCell(0);
+            cell.setCellValue("Data " + (i + 1));
+        }
+
+        try {
+            OutputStream out = request.response()
+                .getOutputStream();
+
+            workbook.write(out);
+            out.flush();
+            out.close();
+
+            workbook.close();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -42,7 +64,7 @@ public class ReportActivityExcelExportCmd extends
     }
 
     @Builder
-    public record Request() {
+    public record Request(HttpServletResponse response) {
 
     }
 }
