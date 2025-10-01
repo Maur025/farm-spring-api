@@ -1,6 +1,7 @@
 package com.kernotec.farm.activity.jpa.dto.entity;
 
 import com.kernotec.core.jpa.dto.AuditEntityDto;
+import com.kernotec.farm.parametric.jpa.dto.entity.PublishingContextDto;
 import com.kernotec.farm.parametric.jpa.dto.entity.RegionDto;
 import java.util.Set;
 import java.util.UUID;
@@ -16,6 +17,9 @@ public class GroupDto extends AuditEntityDto {
 
     private UUID regionId;
     private RegionDto region;
+
+    private UUID publishingContextId;
+    private PublishingContextDto publishingContext;
 
     private Set<GroupMembershipDto> groupMemberships;
 }

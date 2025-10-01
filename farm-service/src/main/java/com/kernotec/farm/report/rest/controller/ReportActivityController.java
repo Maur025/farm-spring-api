@@ -74,7 +74,8 @@ public class ReportActivityController {
     @Operation(summary = "Export activities report to excel with filters")
     @PostMapping("activities/report/excel")
     @ResponseStatus(HttpStatus.OK)
-    public void exportActivitiesReportAsExcel(HttpServletResponse response)
+    public void exportActivitiesReportAsExcel(HttpServletResponse response,
+        @RequestBody ReportActivityRequest filterRequest)
     {
         response.setContentType(
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -82,6 +83,7 @@ public class ReportActivityController {
 
         reportActivityExcelExportCmd.withRequest(ReportActivityExcelExportCmd.Request.builder()
                 .response(response)
+                .filterRequest(filterRequest)
                 .build())
             .execute();
     }

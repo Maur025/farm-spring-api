@@ -7,11 +7,9 @@ import java.util.Set;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
-public interface GroupMembershipDtoFlatMapper {
+@Mapper(uses = {GroupDtoAccountMapper.class})
+public interface GroupMemberDtoActivityMapper {
 
-    @Mapping(target = "group", ignore = true)
-    @Mapping(target = "requestState", ignore = true)
     @Mapping(target = "activity", ignore = true)
     @Mapping(target = "activityType", ignore = true)
     GroupMembershipDto toDto(GroupMembership groupMembership);

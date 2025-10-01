@@ -8,9 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface DeviceDtoFlatMapper {
+public interface DeviceDtoActivityMapper {
 
-    @Mapping(target = "farm", ignore = true)
     @Mapping(target = "chips", ignore = true)
     @Mapping(target = "accounts", ignore = true)
     @Mapping(target = "deviceImeis", ignore = true)
