@@ -35,7 +35,6 @@ import java.util.List;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -62,45 +61,7 @@ public class ReportActivityExcelExportCmd extends
             Sheet sheet = workbook.createSheet("Report-Activity");
             excelUtil.setColumnsSize(sheet, List.of(5, 10, 14, 25, 14, 14, 36, 25, 20));
 
-            int headerRowNum = setHeader(sheet, request.titleReport(), request.filterRequest());
-
-            int page = 0;
-            int size = 100;
-
-            int rowCount = 0;
-            Page<Activity> activityPage;
-
-            do {
-                Pageable pageable = PageableUtil.of(
-                    page, size, request.sortBy(), request.descending());
-
-                activityPage = reportActivityService.findAllWithFilters(
-                    request.filterRequest(), pageable);
-
-                List<ActivityDto> activityDtoList = activityDtoMapper.toDto(
-                    activityPage.getContent());
-
-                for (ActivityDto activityDto : activityDtoList) {
-                    Row row = sheet.createRow(rowCount + headerRowNum);
-                    rowCount++;
-
-                    String[] detailAndComplement = getDetailAndComplementFromActivity(activityDto);
-
-                    excelUtil.fillExcelRow(
-                        row, false, List.of(
-                            String.valueOf(rowCount), getFarmName(activityDto),
-                            getDeviceNumber(activityDto), getAccountUsername(activityDto),
-                            getActivityTypeName(activityDto), getSocialNetworkName(activityDto),
-                            detailAndComplement[0], detailAndComplement[1], excelUtil.getDateFormat(
-                                activityDto.getActivityDate(), request.filterRequest()
-                                    .getZoneId()
-                            )
-                        ), false
-                    );
-                }
-
-                page++;
-            } while (page < activityPage.getTotalPages());
+            reportActivityBuild(sheet, request);
 
             workbook.write(out);
             out.flush();
@@ -111,27 +72,70 @@ public class ReportActivityExcelExportCmd extends
         return null;
     }
 
-    private int setHeader(Sheet sheet, String title, ReportActivityRequest filterRequest) {
-        Row titleRow = sheet.createRow(0);
-        Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue(title == null ? "Activity Report" : title);
-        titleCell.setCellStyle(excelUtil.getCellStyle(
-            titleRow.getSheet()
-                .getWorkbook(), true, false
-        ));
+    private void reportActivityBuild(Sheet sheet, Request request) {
+        int headerRowNum = setHeader(
+            sheet, request.titleReport(), request.filterRequest(), request.authUsername());
 
-        Row reportDateRow = sheet.createRow(1);
-        Cell reportDateCell = reportDateRow.createCell(0);
-        reportDateCell.setCellValue(
-            "Fecha: " + excelUtil.getDateFormat(
-                ZonedDateTime.now(ZoneOffset.UTC), filterRequest.getZoneId()));
+        int page = 0;
+        int size = 100;
 
-        String reportTypeDescription = generateReportType(filterRequest);
-        Row reportTypeRow = sheet.createRow(2);
-        Cell reportTypeCell = reportTypeRow.createCell(0);
-        reportTypeCell.setCellValue(reportTypeDescription);
+        int rowCount = 0;
+        Page<Activity> activityPage;
 
-        Row headerRow = sheet.createRow(4);
+        do {
+            Pageable pageable = PageableUtil.of(page, size, request.sortBy(), request.descending());
+
+            activityPage = reportActivityService.findAllWithFilters(
+                request.filterRequest(), pageable);
+
+            List<ActivityDto> activityDtoList = activityDtoMapper.toDto(activityPage.getContent());
+
+            for (ActivityDto activityDto : activityDtoList) {
+                Row row = sheet.createRow(rowCount + headerRowNum);
+                rowCount++;
+
+                String[] detailAndComplement = getDetailAndComplementFromActivity(activityDto);
+
+                String activityDateStr = excelUtil.getDateFormat(
+                    activityDto.getActivityDate(), request.filterRequest()
+                        .getZoneId(), "dd-MM-yyyy HH:mm"
+                );
+
+                List<String> rowValues = List.of(
+                    String.valueOf(rowCount), getFarmName(activityDto),
+                    getDeviceNumber(activityDto), getAccountUsername(activityDto),
+                    getActivityTypeName(activityDto), getSocialNetworkName(activityDto),
+                    detailAndComplement[0], detailAndComplement[1], activityDateStr
+                );
+
+                excelUtil.fillExcelRow(row, false, rowValues, false);
+            }
+
+            page++;
+        } while (page < activityPage.getTotalPages());
+    }
+
+    private int setHeader(Sheet sheet, String title, ReportActivityRequest filterRequest,
+        String authUsername)
+    {
+        fillRowSingleColumn(sheet, title == null ? "Activity Report" : title, true, 0);
+        fillRowSingleColumn(sheet, "Generado por: " + authUsername, true, 1);
+
+        String reportDate = excelUtil.getDateFormat(
+            ZonedDateTime.now(ZoneOffset.UTC),
+            filterRequest.getZoneId(), "dd-MM-yyyy HH:mm"
+        );
+        fillRowSingleColumn(sheet, "Fecha: " + reportDate, false, 2);
+
+        String searchCriteria =
+            filterRequest.getSearchCriteria() == null || filterRequest.getSearchCriteria()
+                .isEmpty() ? "Sin criterios de busqueda" : filterRequest.getSearchCriteria();
+        fillRowSingleColumn(sheet, "Criterios de busqueda: " + searchCriteria, false, 3);
+
+        String reportDateDetail = getReportDateDetail(filterRequest);
+        fillRowSingleColumn(sheet, reportDateDetail, false, 4);
+
+        Row headerRow = sheet.createRow(6);
         excelUtil.fillExcelRow(
             headerRow, true, List.of(
                 "#", "Granja", "Dispositivo", "Cuenta", "Actividad", "Red Social", "Detalle",
@@ -139,12 +143,19 @@ public class ReportActivityExcelExportCmd extends
             ), true
         );
 
-        return 5;
+        return 7;
     }
 
-    private String generateReportType(ReportActivityRequest filterRequest) {
+    private void fillRowSingleColumn(Sheet sheet, String value, boolean isBold, int indexRow) {
+        Row row = sheet.createRow(indexRow);
+        excelUtil.fillExcelRow(row, isBold, List.of(value), false);
+    }
+
+    private String getReportDateDetail(ReportActivityRequest filterRequest) {
         var reportTypeStr = new StringBuilder();
-        reportTypeStr.append("Report by: ");
+        reportTypeStr.append("Por fechas: ");
+
+        var dateDetailStr = new StringBuilder();
 
         try {
             for (PropertyDescriptor propertyDescriptor : Introspector.getBeanInfo(
@@ -154,39 +165,30 @@ public class ReportActivityExcelExportCmd extends
                 Object value = propertyDescriptor.getReadMethod()
                     .invoke(filterRequest);
 
-                if (value != null) {
-                    String valueStr = switch (propertyDescriptor.getName()) {
-                        case "userAuthId" -> "usuario: " + value;
-                        case "socialNetworkId" -> "red social: " + value;
-                        case "activityTypeId" -> "actividad: " + value;
-                        case "farmId" -> "granja: " + value;
-                        case "deviceId" -> "dispositivo: " + value;
-                        case "accountId" -> "cuenta: " + value;
-                        case "simpleDate" -> "fecha simple: " + excelUtil.getDateFormat(
-                            (ZonedDateTime) value, filterRequest.getZoneId());
-                        case "fromDate" -> "desde: " + excelUtil.getDateFormat(
-                            (ZonedDateTime) value, filterRequest.getZoneId());
-                        case "toDate" -> "hasta: " + excelUtil.getDateFormat(
-                            (ZonedDateTime) value, filterRequest.getZoneId());
-                        case "monthDate" -> "mes: " + excelUtil.getDateFormat(
-                            (ZonedDateTime) value, filterRequest.getZoneId());
-                        case "yearDate" -> "año: " + excelUtil.getDateFormat(
-                            (ZonedDateTime) value, filterRequest.getZoneId());
-                        default -> "";
-                    };
+                if (value == null) {
+                    continue;
+                }
 
-                    if (!valueStr.isEmpty()) {
-                        reportTypeStr.append(valueStr)
-                            .append(", ");
-                    }
+                switch (propertyDescriptor.getName()) {
+                    case "simpleDate" -> dateDetailStr.append(
+                        excelUtil.getDateFormat((ZonedDateTime) value, "dd-MM-yyyy"));
+                    case "fromDate" -> dateDetailStr.append("Desde ")
+                        .append(excelUtil.getDateFormat((ZonedDateTime) value, "dd-MM-yyyy"));
+                    case "toDate" -> dateDetailStr.append(" hasta ")
+                        .append(excelUtil.getDateFormat((ZonedDateTime) value, "dd-MM-yyyy"));
+                    case "monthDate" -> dateDetailStr.append(
+                        excelUtil.getDateFormat((ZonedDateTime) value, "MM-yyyy"));
+                    case "yearDate" -> dateDetailStr.append(
+                        excelUtil.getDateFormat((ZonedDateTime) value, "yyyy"));
                 }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        log.info("filterRequestMap: {}", reportTypeStr);
-        return reportTypeStr.toString();
+        return dateDetailStr.isEmpty() ? reportTypeStr.append("Sin filtro de fechas")
+            .toString() : reportTypeStr.append(dateDetailStr)
+            .toString();
     }
 
     private String getFarmName(ActivityDto activityDto) {
@@ -285,13 +287,12 @@ public class ReportActivityExcelExportCmd extends
 
     private String getConnectionAction(ConnectionActionEnum action) {
         return switch (action) {
-            case OUTGOING_FRIEND_REQUEST -> "Se envió una solicitud de amistad";
-            case BREAK_CONNECTION -> "Se eliminó una amistad";
-            case REJECT_CONNECTION -> "Se rechazó una solicitud de amistad";
-            case APPROVE_CONNECTION -> "Se aceptó una solicitud de amistad";
-            case INCOMING_FRIEND_REQUEST_AND_CONFIRMED ->
-                "Se recibió y aceptó una solicitud de amistad";
-            case INCOMING_FRIEND_REQUEST -> "Se recibió una solicitud de amistad";
+            case OUTGOING_FRIEND_REQUEST -> "Enviado";
+            case BREAK_CONNECTION -> "Eliminado";
+            case REJECT_CONNECTION -> "Rechazado";
+            case APPROVE_CONNECTION -> "Confirmado";
+            case INCOMING_FRIEND_REQUEST_AND_CONFIRMED -> "Recibido y confirmado";
+            case INCOMING_FRIEND_REQUEST -> "Recibido";
         };
     }
 
@@ -366,7 +367,8 @@ public class ReportActivityExcelExportCmd extends
 
     @Builder
     public record Request(HttpServletResponse response, ReportActivityRequest filterRequest,
-                          String sortBy, boolean descending, String titleReport)
+                          String sortBy, boolean descending, String titleReport,
+                          String authUsername)
     {
 
     }

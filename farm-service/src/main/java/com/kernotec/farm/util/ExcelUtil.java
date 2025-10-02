@@ -66,14 +66,23 @@ public class ExcelUtil {
         }
     }
 
-    public String getDateFormat(ZonedDateTime zonedDateTime, String zoneId)
+    public String getDateFormat(ZonedDateTime zonedDateTime, String zoneId, String pattern)
     {
-        ZoneId userZone = zoneId != null ? ZoneId.of(zoneId) : ZoneId.systemDefault();
+        ZoneId userZone = getZoneId(zoneId);
 
         ZonedDateTime activityDateInUserZone = zonedDateTime.withZoneSameInstant(userZone);
 
-        var formater = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        var formater = DateTimeFormatter.ofPattern(pattern);
 
         return activityDateInUserZone.format(formater);
+    }
+
+    public String getDateFormat(ZonedDateTime zonedDateTime, String pattern) {
+        var formater = DateTimeFormatter.ofPattern(pattern);
+        return zonedDateTime.format(formater);
+    }
+
+    private ZoneId getZoneId(String zoneId) {
+        return zoneId != null ? ZoneId.of(zoneId) : ZoneId.systemDefault();
     }
 }

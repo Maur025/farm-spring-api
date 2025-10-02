@@ -27,4 +27,5 @@ public class ReportActivityRequest extends BaseRequest {
     private ZonedDateTime monthDate;
     private ZonedDateTime yearDate;
     private String zoneId;
+    private String searchCriteria;
 }

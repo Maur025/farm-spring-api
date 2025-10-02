@@ -2,6 +2,7 @@ package com.kernotec.farm.inventory.jpa.specification.device;
 
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.specification.criteria.DeviceSpecificationCriteria;
+import com.kernotec.farm.util.CommonSpecification;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -61,10 +62,10 @@ public record DeviceSpecification(DeviceSpecificationCriteria criteria) implemen
         getBySocialNetworkId(root, cb, joinMap).ifPresent(predicateList::add);
         getByKeyword(root, cb, joinMap).ifPresent(predicateList::add);
 
-        if (criteria.getOrderBy() != null) {
-            query.orderBy(criteria.isDescending() ? cb.desc(root.get(criteria.getOrderBy()))
-                : cb.asc(root.get(criteria.getOrderBy())));
-        }
+        CommonSpecification.queryOrderBy(
+            root, query, cb, criteria.getOrderBy(),
+            criteria.isDescending()
+        );
 
         query.distinct(true);
         return cb.and(predicateList.toArray(Predicate[]::new));
@@ -113,9 +114,8 @@ public record DeviceSpecification(DeviceSpecificationCriteria criteria) implemen
                 return cb.or(
                     cb.equal(root.get("deviceNumber"), keyword),
                     cb.like(
-                        cb.lower(getOrCreateAccountJoin(joinMap, root).get("username")),
-                        pattern
-                    ), cb.like(cb.lower(getOrCreatePersonJoin(joinMap, root).get("name")), pattern),
+                        cb.lower(getOrCreateAccountJoin(joinMap, root).get("username")), pattern),
+                    cb.like(cb.lower(getOrCreatePersonJoin(joinMap, root).get("name")), pattern),
                     cb.like(cb.lower(getOrCreatePersonJoin(joinMap, root).get("lastName")), pattern)
                 );
             });

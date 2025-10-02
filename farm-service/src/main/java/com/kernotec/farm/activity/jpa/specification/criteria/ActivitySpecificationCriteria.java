@@ -10,6 +10,9 @@ import lombok.Setter;
 @Setter
 public class ActivitySpecificationCriteria {
 
+    private String orderBy;
+    private boolean isDescending;
+
     private Boolean includeOnlyUserActivities;
     private UUID userAuthId;
     private UUID socialNetworkId;
