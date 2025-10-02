@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ActivityReport" pageWidth="612" pageHeight="792" columnWidth="471" leftMargin="85" rightMargin="56" topMargin="85" bottomMargin="56" uuid="c1e20dca-4f88-424c-9891-ab8c2c45572e">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="farm"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="416"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="584"/>
+	<parameter name="AUTH_USERNAME" class="java.lang.String"/>
+	<parameter name="TITLE" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ACTIVITY REPORT"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SEARCH CRITERIA" class="java.lang.String">
+		<defaultValueExpression><![CDATA["red social: Facebook"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_DETAIL" class="java.lang.String">
+		<defaultValueExpression><![CDATA["Sin filtro de fechas"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[data]]>
+	</queryString>
+	<field name="id" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="id"/>
+		<fieldDescription><![CDATA[id]]></fieldDescription>
+	</field>
+	<field name="deleted" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="deleted"/>
+		<fieldDescription><![CDATA[deleted]]></fieldDescription>
+	</field>
+	<field name="name" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="name"/>
+		<fieldDescription><![CDATA[name]]></fieldDescription>
+	</field>
+	<field name="code" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="code"/>
+		<fieldDescription><![CDATA[code]]></fieldDescription>
+	</field>
+	<field name="icon" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="icon"/>
+		<fieldDescription><![CDATA[icon]]></fieldDescription>
+	</field>
+	<field name="color" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="color"/>
+		<fieldDescription><![CDATA[color]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="56" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="79" y="0" width="230" height="16" uuid="9f19f6bd-ebd6-45ce-8c46-14e9bc7086f2"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Left">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE DE DISTANCIA - TIEMPO]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="79" y="16" width="230" height="10" uuid="38b0bc8f-ff22-43b8-ac55-4023b44a6598"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Generado por: "+ $P{AUTH_USERNAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="26" width="351" height="10" uuid="d8c84266-ad43-4527-8662-801d6593c376"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Left">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fecha emisión: " + (new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="36" width="230" height="10" uuid="093db509-840c-4a19-9b38-5449f74b1693">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Left">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Criterios de Busqueda: "+ $P{SEARCH CRITERIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="46" width="230" height="10" uuid="bf9f3c23-b041-4496-ac52-24a9039929a9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Left">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Por fechas: " + $P{DATE_DETAIL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
