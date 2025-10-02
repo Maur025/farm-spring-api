@@ -12,13 +12,17 @@ import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.command.activity.ReportActivityExcelExportCmd;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
+import com.kernotec.farm.util.AuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @Tag(name = ReportSpec.TAG_NAME, description = ReportSpec.TAG_DESCRIPTION)
 @RequestMapping(path = ReportSpec.BASE_PATH)
 @AllArgsConstructor
@@ -35,13 +40,14 @@ public class ReportActivityController {
     private final ReportActivityService reportActivityService;
     private final ActivityResponseMapper activityResponseMapper;
     private final ReportActivityExcelExportCmd reportActivityExcelExportCmd;
+    private final AuthUtil authUtil;
 
     @Operation(summary = "Activity report with filters")
     @PostMapping("activities/report")
     public PageResponse<ActivityResponse> getActivitiesReport(
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "10") Integer size,
-        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "activityDate") String sortBy,
         @RequestParam(defaultValue = "true") boolean descending,
         @RequestBody ReportActivityRequest filterRequest)
     {
@@ -56,6 +62,22 @@ public class ReportActivityController {
                 .pages(activityPage.getTotalPages())
                 .count(activityPage.getTotalElements())
                 .build())
+            .build();
+    }
+
+    @Operation(summary = "Activity report with filters (no pagination)")
+    @PostMapping("activities/report/unpaginated")
+    public PageResponse<ActivityResponse> getActivitiesReportUnpaginated(
+        @RequestParam(defaultValue = "activityDate") String sortBy,
+        @RequestParam(defaultValue = "true") boolean descending,
+        @RequestBody ReportActivityRequest filterRequest)
+    {
+        List<Activity> activityList = reportActivityService.findAllWithFiltersNoPaginated(
+            filterRequest, sortBy, descending);
+
+        return PageResponse.<ActivityResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(activityResponseMapper.toResponse(activityList))
             .build();
     }
 
@@ -78,7 +100,7 @@ public class ReportActivityController {
         @RequestBody ReportActivityRequest filterRequest,
         @RequestParam(required = false) String titleReport,
         @RequestParam(defaultValue = "activityDate") String sortBy,
-        @RequestParam(defaultValue = "true") boolean descending)
+        @RequestParam(defaultValue = "true") boolean descending, Authentication authentication)
     {
         response.setContentType(
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -90,6 +112,7 @@ public class ReportActivityController {
                 .sortBy(sortBy)
                 .descending(descending)
                 .titleReport(titleReport)
+                .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
                 .build())
             .execute();
     }

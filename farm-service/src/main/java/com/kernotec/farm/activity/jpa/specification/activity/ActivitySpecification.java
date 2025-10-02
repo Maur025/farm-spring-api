@@ -2,6 +2,7 @@ package com.kernotec.farm.activity.jpa.specification.activity;
 
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.specification.criteria.ActivitySpecificationCriteria;
+import com.kernotec.farm.util.CommonSpecification;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -89,6 +90,11 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         addMonthDateFilter(root, cb).ifPresent(predicateList::add);
         addYearDateFilter(root, cb).ifPresent(predicateList::add);
         addKeywordFilter(root, cb, joinMap).ifPresent(predicateList::add);
+
+        CommonSpecification.queryOrderBy(
+            root, query, cb, criteria.getOrderBy(),
+            criteria.isDescending()
+        );
 
         query.distinct(true);
         return cb.and(predicateList.toArray(Predicate[]::new));
@@ -327,5 +333,15 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         return ZoneId.of(this.criteria.getZoneId() != null ? this.criteria.getZoneId()
             : ZoneId.systemDefault()
                 .toString());
+    }
+
+    public ActivitySpecification withOrderBy(String orderBy, boolean isDescending) {
+        if (orderBy == null || orderBy.isBlank()) {
+            return this;
+        }
+
+        this.criteria.setOrderBy(orderBy);
+        this.criteria.setDescending(isDescending);
+        return this;
     }
 }

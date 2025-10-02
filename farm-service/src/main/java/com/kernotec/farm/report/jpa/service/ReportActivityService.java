@@ -52,7 +52,9 @@ public class ReportActivityService {
         );
     }
 
-    public List<Activity> findAllWithFiltersNoPaginated(ReportActivityRequest filterRequest) {
+    public List<Activity> findAllWithFiltersNoPaginated(ReportActivityRequest filterRequest,
+        String sortBy, boolean isDescending)
+    {
         return repository.findAll(ActivitySpecification.builder()
             .includeOnlyUserActivities(Boolean.TRUE)
             .withZoneId(filterRequest.getZoneId())
@@ -65,7 +67,8 @@ public class ReportActivityService {
             .withSimpleDate(filterRequest.getSimpleDate())
             .withDateRange(filterRequest.getFromDate(), filterRequest.getToDate())
             .withMonthDate(filterRequest.getMonthDate())
-            .withYearDate(filterRequest.getYearDate()));
+            .withYearDate(filterRequest.getYearDate())
+            .withOrderBy(sortBy, isDescending));
     }
 
     public ActivityTypeTotalResponse getTotalActivitiesByType(ReportActivityRequest filterRequest) {
