@@ -1,6 +1,7 @@
 package com.kernotec.farm.report.rest.command.activity;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
+import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.activity.jpa.dto.entity.ActivityDto;
 import com.kernotec.farm.activity.jpa.dto.entity.CommentDto;
@@ -12,6 +13,7 @@ import com.kernotec.farm.activity.jpa.dto.entity.PublishingDto;
 import com.kernotec.farm.activity.jpa.dto.entity.ReactionDto;
 import com.kernotec.farm.activity.jpa.dto.mapper.ActivityDtoMapper;
 import com.kernotec.farm.activity.jpa.entity.Activity;
+import com.kernotec.farm.activity.jpa.enums.ConnectionActionEnum;
 import com.kernotec.farm.inventory.jpa.dto.entity.DeviceDto;
 import com.kernotec.farm.inventory.jpa.dto.entity.FarmDto;
 import com.kernotec.farm.parametric.jpa.dto.entity.ActivityTypeDto;
@@ -25,7 +27,8 @@ import com.kernotec.farm.util.ExcelUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -53,51 +58,50 @@ public class ReportActivityExcelExportCmd extends
             .getOutputStream())
         {
             Sheet sheet = workbook.createSheet("Report-Activity");
+            excelUtil.setColumnsSize(sheet, List.of(5, 10, 14, 25, 14, 14, 36, 25, 20));
 
-            sheet.setColumnWidth(0, 5 * 256);
-            sheet.setColumnWidth(1, 10 * 256);
-            sheet.setColumnWidth(2, 20 * 256);
-            sheet.setColumnWidth(3, 35 * 256);
-            sheet.setColumnWidth(4, 15 * 256);
-            sheet.setColumnWidth(5, 20 * 256);
-            sheet.setColumnWidth(6, 20 * 256);
-            sheet.setColumnWidth(7, 15 * 256);
-
-            Row titleRow = sheet.createRow(0);
-            Cell titleCell = titleRow.createCell(0);
-            titleCell.setCellValue("Activity Report");
-
-            List<Activity> activityList = reportActivityService.findAllWithFiltersNoPaginated(
-                request.filterRequest());
-
-            List<ActivityDto> activityDtoList = activityDtoMapper.toDto(activityList);
-
-            Row headerRow = sheet.createRow(1);
-            excelUtil.fillExcelRow(
-                headerRow, true, List.of(
-                    "#", "Granja", "Dispositivo", "Cuenta", "Actividad", "Red Social", "Detalle",
-                    "Complemento", "Fecha"
-                )
+            int headerRowNum = setHeader(
+                sheet, request.titleReport(), request.filterRequest()
+                    .getZoneId()
             );
 
-            int headerRowNum = 2;
-            int rowCount = 0;
+            int page = 0;
+            int size = 100;
+            int totalPages = 999999;
 
-            for (ActivityDto activityDto : activityDtoList) {
-                Row row = sheet.createRow(rowCount + headerRowNum);
-                rowCount++;
+            while (page <= totalPages) {
+                Pageable pageable = PageableUtil.of(
+                    page, size, request.sortBy(), request.descending());
 
-                String[] detailAndComplement = getDetailAndComplementFromActivity(activityDto);
+                Page<Activity> activityPage = reportActivityService.findAllWithFilters(
+                    request.filterRequest(), pageable);
 
-                excelUtil.fillExcelRow(
-                    row, false, List.of(
-                        String.valueOf(rowCount), getFarmName(activityDto),
-                        getDeviceNumber(activityDto), getAccountUsername(activityDto),
-                        getActivityTypeName(activityDto), getSocialNetworkName(activityDto),
-                        detailAndComplement[0], detailAndComplement[1],
-                        getActivityDateFormat(activityDto)
-                    )
-                );
+                int rowCount = page * size;
+
+                totalPages = activityPage.getTotalPages();
+                page++;
+
+                List<ActivityDto> activityDtoList = activityDtoMapper.toDto(
+                    activityPage.getContent());
+
+                for (ActivityDto activityDto : activityDtoList) {
+                    Row row = sheet.createRow(rowCount + headerRowNum);
+                    rowCount++;
+
+                    String[] detailAndComplement = getDetailAndComplementFromActivity(activityDto);
+
+                    excelUtil.fillExcelRow(
+                        row, false, List.of(
+                            String.valueOf(rowCount), getFarmName(activityDto),
+                            getDeviceNumber(activityDto), getAccountUsername(activityDto),
+                            getActivityTypeName(activityDto), getSocialNetworkName(activityDto),
+                            detailAndComplement[0], detailAndComplement[1], excelUtil.getDateFormat(
+                                activityDto.getActivityDate(), request.filterRequest()
+                                    .getZoneId()
+                            )
+                        ), false
+                    );
+                }
             }
 
             workbook.write(out);
@@ -107,6 +111,31 @@ public class ReportActivityExcelExportCmd extends
         }
 
         return null;
+    }
+
+    private int setHeader(Sheet sheet, String title, String zoneId) {
+        Row titleRow = sheet.createRow(0);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue(title == null ? "Activity Report" : title);
+        titleCell.setCellStyle(excelUtil.getCellStyle(
+            titleRow.getSheet()
+                .getWorkbook(), true, false
+        ));
+
+        Row reportDateRow = sheet.createRow(1);
+        Cell reportDateCell = reportDateRow.createCell(0);
+        reportDateCell.setCellValue(
+            "Fecha: " + excelUtil.getDateFormat(ZonedDateTime.now(ZoneOffset.UTC), zoneId));
+
+        Row headerRow = sheet.createRow(3);
+        excelUtil.fillExcelRow(
+            headerRow, true, List.of(
+                "#", "Granja", "Dispositivo", "Cuenta", "Actividad", "Red Social", "Detalle",
+                "Complemento", "Fecha"
+            ), true
+        );
+
+        return 4;
     }
 
     private String getFarmName(ActivityDto activityDto) {
@@ -155,13 +184,6 @@ public class ReportActivityExcelExportCmd extends
         return socialNetworkDto.getName() != null ? socialNetworkDto.getName() : "N/A";
     }
 
-    private String getActivityDateFormat(ActivityDto activityDto) {
-        var formater = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-
-        return activityDto.getActivityDate()
-            .format(formater);
-    }
-
     private String[] getDetailAndComplementFromActivity(ActivityDto activityDto) {
         ActivityTypeDto activityType = activityDto.getActivityType();
         String link = activityDto.getLink() == null ? "N/A" : activityDto.getLink();
@@ -206,7 +228,20 @@ public class ReportActivityExcelExportCmd extends
         AccountDto accountDto = connectionDto.getPotentialFriendAccount() == null ? new AccountDto()
             : connectionDto.getPotentialFriendAccount();
 
-        return new String[]{connectionDto.getAction().toString(), accountDto.getUsername()};
+        return new String[]{getConnectionAction(connectionDto.getAction()),
+            accountDto.getUsername()};
+    }
+
+    private String getConnectionAction(ConnectionActionEnum action) {
+        return switch (action) {
+            case OUTGOING_FRIEND_REQUEST -> "Se envió una solicitud de amistad";
+            case BREAK_CONNECTION -> "Se eliminó una amistad";
+            case REJECT_CONNECTION -> "Se rechazó una solicitud de amistad";
+            case APPROVE_CONNECTION -> "Se aceptó una solicitud de amistad";
+            case INCOMING_FRIEND_REQUEST_AND_CONFIRMED ->
+                "Se recibió y aceptó una solicitud de amistad";
+            case INCOMING_FRIEND_REQUEST -> "Se recibió una solicitud de amistad";
+        };
     }
 
     private String[] getDetailAndComplementOfFollow(ActivityDto activityDto, String link) {
@@ -279,7 +314,9 @@ public class ReportActivityExcelExportCmd extends
     }
 
     @Builder
-    public record Request(HttpServletResponse response, ReportActivityRequest filterRequest) {
+    public record Request(HttpServletResponse response, ReportActivityRequest filterRequest,
+                          String sortBy, boolean descending, String titleReport)
+    {
 
     }
 }
