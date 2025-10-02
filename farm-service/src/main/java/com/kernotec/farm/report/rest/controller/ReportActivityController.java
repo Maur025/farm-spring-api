@@ -75,7 +75,10 @@ public class ReportActivityController {
     @PostMapping("activities/report/excel")
     @ResponseStatus(HttpStatus.OK)
     public void exportActivitiesReportAsExcel(HttpServletResponse response,
-        @RequestBody ReportActivityRequest filterRequest)
+        @RequestBody ReportActivityRequest filterRequest,
+        @RequestParam(required = false) String titleReport,
+        @RequestParam(defaultValue = "activityDate") String sortBy,
+        @RequestParam(defaultValue = "true") boolean descending)
     {
         response.setContentType(
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -84,6 +87,9 @@ public class ReportActivityController {
         reportActivityExcelExportCmd.withRequest(ReportActivityExcelExportCmd.Request.builder()
                 .response(response)
                 .filterRequest(filterRequest)
+                .sortBy(sortBy)
+                .descending(descending)
+                .titleReport(titleReport)
                 .build())
             .execute();
     }
