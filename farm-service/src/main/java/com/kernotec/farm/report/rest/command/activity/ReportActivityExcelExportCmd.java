@@ -25,6 +25,8 @@ import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.util.ExcelUtil;
 import jakarta.servlet.http.HttpServletResponse;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.ZoneOffset;
@@ -54,32 +56,26 @@ public class ReportActivityExcelExportCmd extends
 
     @Override
     protected Void run(Request request) {
-        try (var workbook = new SXSSFWorkbook(100); OutputStream out = request.response()
+        try (var workbook = new SXSSFWorkbook(500); OutputStream out = request.response()
             .getOutputStream())
         {
             Sheet sheet = workbook.createSheet("Report-Activity");
             excelUtil.setColumnsSize(sheet, List.of(5, 10, 14, 25, 14, 14, 36, 25, 20));
 
-            int headerRowNum = setHeader(
-                sheet, request.titleReport(), request.filterRequest()
-                    .getZoneId()
-            );
+            int headerRowNum = setHeader(sheet, request.titleReport(), request.filterRequest());
 
             int page = 0;
             int size = 100;
-            int totalPages = 999999;
 
-            while (page <= totalPages) {
+            int rowCount = 0;
+            Page<Activity> activityPage;
+
+            do {
                 Pageable pageable = PageableUtil.of(
                     page, size, request.sortBy(), request.descending());
 
-                Page<Activity> activityPage = reportActivityService.findAllWithFilters(
+                activityPage = reportActivityService.findAllWithFilters(
                     request.filterRequest(), pageable);
-
-                int rowCount = page * size;
-
-                totalPages = activityPage.getTotalPages();
-                page++;
 
                 List<ActivityDto> activityDtoList = activityDtoMapper.toDto(
                     activityPage.getContent());
@@ -102,7 +98,9 @@ public class ReportActivityExcelExportCmd extends
                         ), false
                     );
                 }
-            }
+
+                page++;
+            } while (page < activityPage.getTotalPages());
 
             workbook.write(out);
             out.flush();
@@ -113,7 +111,7 @@ public class ReportActivityExcelExportCmd extends
         return null;
     }
 
-    private int setHeader(Sheet sheet, String title, String zoneId) {
+    private int setHeader(Sheet sheet, String title, ReportActivityRequest filterRequest) {
         Row titleRow = sheet.createRow(0);
         Cell titleCell = titleRow.createCell(0);
         titleCell.setCellValue(title == null ? "Activity Report" : title);
@@ -125,9 +123,15 @@ public class ReportActivityExcelExportCmd extends
         Row reportDateRow = sheet.createRow(1);
         Cell reportDateCell = reportDateRow.createCell(0);
         reportDateCell.setCellValue(
-            "Fecha: " + excelUtil.getDateFormat(ZonedDateTime.now(ZoneOffset.UTC), zoneId));
+            "Fecha: " + excelUtil.getDateFormat(
+                ZonedDateTime.now(ZoneOffset.UTC), filterRequest.getZoneId()));
 
-        Row headerRow = sheet.createRow(3);
+        String reportTypeDescription = generateReportType(filterRequest);
+        Row reportTypeRow = sheet.createRow(2);
+        Cell reportTypeCell = reportTypeRow.createCell(0);
+        reportTypeCell.setCellValue(reportTypeDescription);
+
+        Row headerRow = sheet.createRow(4);
         excelUtil.fillExcelRow(
             headerRow, true, List.of(
                 "#", "Granja", "Dispositivo", "Cuenta", "Actividad", "Red Social", "Detalle",
@@ -135,7 +139,54 @@ public class ReportActivityExcelExportCmd extends
             ), true
         );
 
-        return 4;
+        return 5;
+    }
+
+    private String generateReportType(ReportActivityRequest filterRequest) {
+        var reportTypeStr = new StringBuilder();
+        reportTypeStr.append("Report by: ");
+
+        try {
+            for (PropertyDescriptor propertyDescriptor : Introspector.getBeanInfo(
+                    filterRequest.getClass(), Object.class)
+                .getPropertyDescriptors()) {
+
+                Object value = propertyDescriptor.getReadMethod()
+                    .invoke(filterRequest);
+
+                if (value != null) {
+                    String valueStr = switch (propertyDescriptor.getName()) {
+                        case "userAuthId" -> "usuario: " + value;
+                        case "socialNetworkId" -> "red social: " + value;
+                        case "activityTypeId" -> "actividad: " + value;
+                        case "farmId" -> "granja: " + value;
+                        case "deviceId" -> "dispositivo: " + value;
+                        case "accountId" -> "cuenta: " + value;
+                        case "simpleDate" -> "fecha simple: " + excelUtil.getDateFormat(
+                            (ZonedDateTime) value, filterRequest.getZoneId());
+                        case "fromDate" -> "desde: " + excelUtil.getDateFormat(
+                            (ZonedDateTime) value, filterRequest.getZoneId());
+                        case "toDate" -> "hasta: " + excelUtil.getDateFormat(
+                            (ZonedDateTime) value, filterRequest.getZoneId());
+                        case "monthDate" -> "mes: " + excelUtil.getDateFormat(
+                            (ZonedDateTime) value, filterRequest.getZoneId());
+                        case "yearDate" -> "año: " + excelUtil.getDateFormat(
+                            (ZonedDateTime) value, filterRequest.getZoneId());
+                        default -> "";
+                    };
+
+                    if (!valueStr.isEmpty()) {
+                        reportTypeStr.append(valueStr)
+                            .append(", ");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        log.info("filterRequestMap: {}", reportTypeStr);
+        return reportTypeStr.toString();
     }
 
     private String getFarmName(ActivityDto activityDto) {
