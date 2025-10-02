@@ -22,4 +22,6 @@ public class DeviceDto extends AuditEntityDto {
 
     private Set<ChipDto> chips;
     private Set<AccountDto> accounts;
+    private Set<DeviceImeiDto> deviceImeis;
+    private Set<DeviceConnectionDto> deviceConnections;
 }

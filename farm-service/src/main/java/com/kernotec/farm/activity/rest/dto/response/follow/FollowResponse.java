@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.response.data.EntityResponse;
 import com.kernotec.farm.activity.rest.dto.response.activity.ActivityResponse;
+import com.kernotec.farm.activity.rest.dto.response.profile.ProfileResponse;
 import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeResponse;
 import com.kernotec.farm.parametric.rest.dto.response.publishing.context.PublishingContextResponse;
 import com.kernotec.farm.parametric.rest.dto.response.region.RegionResponse;
@@ -30,4 +31,7 @@ public class FollowResponse extends EntityResponse {
 
     private UUID activityTypeId;
     private ActivityTypeResponse activityType;
+
+    private UUID profileId;
+    private ProfileResponse profile;
 }

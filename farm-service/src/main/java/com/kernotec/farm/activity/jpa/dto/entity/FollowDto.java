@@ -26,4 +26,7 @@ public class FollowDto extends AuditEntityDto {
 
     private UUID activityTypeId;
     private ActivityTypeDto activityType;
+
+    private UUID profileId;
+    private ProfileDto profile;
 }

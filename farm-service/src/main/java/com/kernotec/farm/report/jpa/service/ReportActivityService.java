@@ -14,6 +14,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +50,22 @@ public class ReportActivityService {
                 .withMonthDate(filterRequest.getMonthDate())
                 .withYearDate(filterRequest.getYearDate()), pageable
         );
+    }
+
+    public List<Activity> findAllWithFiltersNoPaginated(ReportActivityRequest filterRequest) {
+        return repository.findAll(ActivitySpecification.builder()
+            .includeOnlyUserActivities(Boolean.TRUE)
+            .withZoneId(filterRequest.getZoneId())
+            .withUserAuthId(filterRequest.getUserAuthId())
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withDeviceId(filterRequest.getDeviceId())
+            .withFarmId(filterRequest.getFarmId())
+            .withActivityTypeId(filterRequest.getActivityTypeId())
+            .withAccountId(filterRequest.getAccountId())
+            .withSimpleDate(filterRequest.getSimpleDate())
+            .withDateRange(filterRequest.getFromDate(), filterRequest.getToDate())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withYearDate(filterRequest.getYearDate()));
     }
 
     public ActivityTypeTotalResponse getTotalActivitiesByType(ReportActivityRequest filterRequest) {

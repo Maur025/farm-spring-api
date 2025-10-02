@@ -12,7 +12,6 @@ import org.mapstruct.Mapping;
 public interface GroupMembershipResponseFlatMapper {
 
     @Mapping(target = "group", ignore = true)
-    @Mapping(target = "region", ignore = true)
     @Mapping(target = "requestState", ignore = true)
     @Mapping(target = "activity", ignore = true)
     @Mapping(target = "activityType", ignore = true)
