@@ -14,11 +14,14 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springdoc.webmvc.ui.SwaggerConfigResource;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class ExcelUtil {
+
+    private final SwaggerConfigResource swaggerConfigResource;
 
     public void fillExcelRow(Row row, boolean isBold, List<String> values, boolean withBackground) {
         int columnCount = 0;
@@ -50,7 +53,7 @@ public class ExcelUtil {
         cellStyle.setBorderRight(BorderStyle.THIN);
 
         if (withBackground) {
-            cellStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+            cellStyle.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
 
