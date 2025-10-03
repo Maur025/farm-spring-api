@@ -17,4 +17,13 @@ public class AuthUtil {
 
         return "Unknown";
     }
+
+    public String getAuthTokenFromAuthentication(Authentication authentication) {
+        if (authentication instanceof JwtAuthenticationToken authenticationJwt) {
+            return authenticationJwt.getToken()
+                .getTokenValue();
+        }
+
+        return null;
+    }
 }
