@@ -7,22 +7,27 @@ import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.rest.dto.response.activity.ActivityResponse;
 import com.kernotec.farm.activity.rest.mapper.activity.ActivityResponseMapper;
+import com.kernotec.farm.report.jpa.enums.ReportDispositionEnum;
 import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.command.activity.ReportActivityExcelExportCmd;
+import com.kernotec.farm.report.rest.command.activity.ReportActivityPdfExportCmd;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
 import com.kernotec.farm.util.AuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +46,7 @@ public class ReportActivityController {
     private final ActivityResponseMapper activityResponseMapper;
     private final ReportActivityExcelExportCmd reportActivityExcelExportCmd;
     private final AuthUtil authUtil;
+    private final ReportActivityPdfExportCmd reportActivityPdfExportCmd;
 
     @Operation(summary = "Activity report with filters")
     @PostMapping("activities/report")
@@ -66,12 +72,36 @@ public class ReportActivityController {
     }
 
     @Operation(summary = "Activity report with filters (no pagination)")
-    @PostMapping("activities/report/unpaginated")
+    @GetMapping("activities/report/unpaginated")
     public PageResponse<ActivityResponse> getActivitiesReportUnpaginated(
         @RequestParam(defaultValue = "activityDate") String sortBy,
         @RequestParam(defaultValue = "true") boolean descending,
-        @RequestBody ReportActivityRequest filterRequest)
+        @RequestParam(required = false) UUID userAuthId,
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) UUID activityTypeId,
+        @RequestParam(required = false) UUID farmId, @RequestParam(required = false) UUID deviceId,
+        @RequestParam(required = false) UUID accountId,
+        @RequestParam(required = false) ZonedDateTime simpleDate,
+        @RequestParam(required = false) ZonedDateTime fromDate,
+        @RequestParam(required = false) ZonedDateTime toDate,
+        @RequestParam(required = false) ZonedDateTime monthDate,
+        @RequestParam(required = false) ZonedDateTime yearDate,
+        @RequestParam(required = false) String zoneId)
     {
+        var filterRequest = new ReportActivityRequest();
+        filterRequest.setUserAuthId(userAuthId);
+        filterRequest.setSocialNetworkId(socialNetworkId);
+        filterRequest.setActivityTypeId(activityTypeId);
+        filterRequest.setFarmId(farmId);
+        filterRequest.setDeviceId(deviceId);
+        filterRequest.setAccountId(accountId);
+        filterRequest.setSimpleDate(simpleDate);
+        filterRequest.setFromDate(fromDate);
+        filterRequest.setToDate(toDate);
+        filterRequest.setMonthDate(monthDate);
+        filterRequest.setYearDate(yearDate);
+        filterRequest.setZoneId(zoneId);
+
         List<Activity> activityList = reportActivityService.findAllWithFiltersNoPaginated(
             filterRequest, sortBy, descending);
 
@@ -113,6 +143,32 @@ public class ReportActivityController {
                 .descending(descending)
                 .titleReport(titleReport)
                 .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
+                .build())
+            .execute();
+    }
+
+    @Operation(summary = "Export activities report to pdf with filters")
+    @PostMapping("activities/report/pdf")
+    @ResponseStatus(HttpStatus.OK)
+    public void exportActivitiesReportAsPdf(HttpServletResponse response,
+        @RequestBody ReportActivityRequest filterRequest,
+        @RequestParam(required = false) String titleReport,
+        @RequestParam(defaultValue = "activityDate") String sortBy,
+        @RequestParam(defaultValue = "true") boolean descending, Authentication authentication,
+        @RequestParam(defaultValue = "inline") ReportDispositionEnum disposition)
+    {
+        response.setContentType("application/pdf");
+        response.setHeader(
+            "Content-Disposition", disposition.toString() + "; filename=report-activities.pdf");
+
+        reportActivityPdfExportCmd.withRequest(ReportActivityPdfExportCmd.Request.builder()
+                .response(response)
+                .titleReport(titleReport)
+                .token(authUtil.getAuthTokenFromAuthentication(authentication))
+                .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
+                .filterRequest(filterRequest)
+                .sortBy(sortBy)
+                .isDescending(descending)
                 .build())
             .execute();
     }

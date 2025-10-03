@@ -149,7 +149,7 @@
   <properties>
     <barcode4j.version>2.1</barcode4j.version>
     <commons-csv.version>1.8</commons-csv.version>
-    <jasperreports.version>6.20.5</jasperreports.version>
+    <jasperreports.version>6.21.5</jasperreports.version>
     <open-csv.version>5.3</open-csv.version>
     <poi.version>5.4.1</poi.version>
     <spring-webflux.version>5.3.10</spring-webflux.version>

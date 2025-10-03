@@ -1,4 +1,4 @@
-package com.kernotec.farm.swagger;
+package com.kernotec.farm.config;
 
 import java.util.List;
 import lombok.Getter;
