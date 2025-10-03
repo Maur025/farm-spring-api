@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.config.KernotecApiDefinition;
+import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.util.ResourceUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,6 +35,7 @@ public class ReportActivityPdfExportCmd extends
 {
 
     private final KernotecApiDefinition kernotecApiDefinition;
+    private final ReportActivityService reportActivityService;
 
     @Override
     protected Void run(Request request) {
@@ -85,18 +87,9 @@ public class ReportActivityPdfExportCmd extends
             throw new RuntimeException(e);
         }
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("AUTH_USERNAME", request.authUsername());
-        params.put("TITLE", request.titleReport());
-        params.put(
-            "SEARCH_CRITERIA", request.filterRequest()
-                .getSearchCriteria()
-        );
-        params.put("DATE_DETAIL", "");
-        params.put(
-            "REPORT_ZONE_ID", request.filterRequest()
-                .getZoneId()
-        );
+        ReportActivityRequest filterRequest = request.filterRequest();
+
+        Map<String, Object> params = getParams(request, filterRequest);
 
         try (OutputStream out = request.response()
             .getOutputStream())
@@ -114,6 +107,27 @@ public class ReportActivityPdfExportCmd extends
         }
 
         return null;
+    }
+
+    private Map<String, Object> getParams(Request request, ReportActivityRequest filterRequest)
+    {
+        String reportDateDetail = reportActivityService.getReportDateDetail(filterRequest);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("AUTH_USERNAME", request.authUsername());
+        params.put("TITLE", request.titleReport());
+        params.put(
+            "SEARCH_CRITERIA",
+            filterRequest.getSearchCriteria() == null || filterRequest.getSearchCriteria()
+                .isEmpty() ? "Sin criterios de busqueda" : filterRequest.getSearchCriteria()
+        );
+        params.put("DATE_DETAIL", reportDateDetail);
+        params.put("REPORT_ZONE_ID", filterRequest.getZoneId());
+        params.put(
+            "REPORT_LOGO", this.getClass()
+                .getResourceAsStream("/images/logotipoKD.png")
+        );
+        return params;
     }
 
     private void buildParamsToUrl(StringBuilder urlBuilder, ReportActivityRequest filterRequest,
