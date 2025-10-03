@@ -7,6 +7,7 @@ import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.parametric.jpa.enums.ActivityTypeCodeEnum;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
+import com.kernotec.farm.util.ExcelUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -14,6 +15,9 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +30,7 @@ public class ReportActivityService {
 
     private final ActivityRepository repository;
     private final EntityManager entityManager;
+    private final ExcelUtil excelUtil;
     private CriteriaBuilder cb;
 
     @PostConstruct
@@ -175,5 +180,45 @@ public class ReportActivityService {
 
         return entityManager.createQuery(totalActivitiesQuery)
             .getSingleResult();
+    }
+
+    public String getReportDateDetail(ReportActivityRequest filterRequest) {
+        var reportTypeStr = new StringBuilder();
+        reportTypeStr.append("Por fechas: ");
+
+        var dateDetailStr = new StringBuilder();
+
+        try {
+            for (PropertyDescriptor propertyDescriptor : Introspector.getBeanInfo(
+                    filterRequest.getClass(), Object.class)
+                .getPropertyDescriptors()) {
+
+                Object value = propertyDescriptor.getReadMethod()
+                    .invoke(filterRequest);
+
+                if (value == null) {
+                    continue;
+                }
+
+                switch (propertyDescriptor.getName()) {
+                    case "simpleDate" -> dateDetailStr.append(
+                        excelUtil.getDateFormat((ZonedDateTime) value, "dd-MM-yyyy"));
+                    case "fromDate" -> dateDetailStr.append("Desde ")
+                        .append(excelUtil.getDateFormat((ZonedDateTime) value, "dd-MM-yyyy"));
+                    case "toDate" -> dateDetailStr.append(" hasta ")
+                        .append(excelUtil.getDateFormat((ZonedDateTime) value, "dd-MM-yyyy"));
+                    case "monthDate" -> dateDetailStr.append(
+                        excelUtil.getDateFormat((ZonedDateTime) value, "MM-yyyy"));
+                    case "yearDate" -> dateDetailStr.append(
+                        excelUtil.getDateFormat((ZonedDateTime) value, "yyyy"));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return dateDetailStr.isEmpty() ? reportTypeStr.append("Sin filtro de fechas")
+            .toString() : reportTypeStr.append(dateDetailStr)
+            .toString();
     }
 }

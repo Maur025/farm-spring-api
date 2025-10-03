@@ -25,8 +25,6 @@ import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.util.ExcelUtil;
 import jakarta.servlet.http.HttpServletResponse;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.ZoneOffset;
@@ -125,14 +123,14 @@ public class ReportActivityExcelExportCmd extends
             ZonedDateTime.now(ZoneOffset.UTC),
             filterRequest.getZoneId(), "dd-MM-yyyy HH:mm"
         );
-        fillRowSingleColumn(sheet, "Fecha: " + reportDate, false, 2);
+        fillRowSingleColumn(sheet, "Fecha emisión: " + reportDate, false, 2);
 
         String searchCriteria =
             filterRequest.getSearchCriteria() == null || filterRequest.getSearchCriteria()
                 .isEmpty() ? "Sin criterios de busqueda" : filterRequest.getSearchCriteria();
         fillRowSingleColumn(sheet, "Criterios de busqueda: " + searchCriteria, false, 3);
 
-        String reportDateDetail = getReportDateDetail(filterRequest);
+        String reportDateDetail = reportActivityService.getReportDateDetail(filterRequest);
         fillRowSingleColumn(sheet, reportDateDetail, false, 4);
 
         Row headerRow = sheet.createRow(6);
@@ -149,46 +147,6 @@ public class ReportActivityExcelExportCmd extends
     private void fillRowSingleColumn(Sheet sheet, String value, boolean isBold, int indexRow) {
         Row row = sheet.createRow(indexRow);
         excelUtil.fillExcelRow(row, isBold, List.of(value), false);
-    }
-
-    private String getReportDateDetail(ReportActivityRequest filterRequest) {
-        var reportTypeStr = new StringBuilder();
-        reportTypeStr.append("Por fechas: ");
-
-        var dateDetailStr = new StringBuilder();
-
-        try {
-            for (PropertyDescriptor propertyDescriptor : Introspector.getBeanInfo(
-                    filterRequest.getClass(), Object.class)
-                .getPropertyDescriptors()) {
-
-                Object value = propertyDescriptor.getReadMethod()
-                    .invoke(filterRequest);
-
-                if (value == null) {
-                    continue;
-                }
-
-                switch (propertyDescriptor.getName()) {
-                    case "simpleDate" -> dateDetailStr.append(
-                        excelUtil.getDateFormat((ZonedDateTime) value, "dd-MM-yyyy"));
-                    case "fromDate" -> dateDetailStr.append("Desde ")
-                        .append(excelUtil.getDateFormat((ZonedDateTime) value, "dd-MM-yyyy"));
-                    case "toDate" -> dateDetailStr.append(" hasta ")
-                        .append(excelUtil.getDateFormat((ZonedDateTime) value, "dd-MM-yyyy"));
-                    case "monthDate" -> dateDetailStr.append(
-                        excelUtil.getDateFormat((ZonedDateTime) value, "MM-yyyy"));
-                    case "yearDate" -> dateDetailStr.append(
-                        excelUtil.getDateFormat((ZonedDateTime) value, "yyyy"));
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return dateDetailStr.isEmpty() ? reportTypeStr.append("Sin filtro de fechas")
-            .toString() : reportTypeStr.append(dateDetailStr)
-            .toString();
     }
 
     private String getFarmName(ActivityDto activityDto) {
