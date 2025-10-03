@@ -17,7 +17,7 @@
 	<parameter name="TITLE" class="java.lang.String">
 		<defaultValueExpression><![CDATA["ACTIVITY REPORT"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="SEARCH CRITERIA" class="java.lang.String">
+	<parameter name="SEARCH_CRITERIA" class="java.lang.String">
 		<defaultValueExpression><![CDATA["red social: Facebook"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="DATE_DETAIL" class="java.lang.String">
@@ -208,7 +208,7 @@
 				<textElement textAlignment="Left">
 					<font size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Criterios de Busqueda: "+ $P{SEARCH CRITERIA}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Criterios de Busqueda: "+ $P{SEARCH_CRITERIA}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
 				<reportElement x="133" y="46" width="367" height="10" uuid="bf9f3c23-b041-4496-ac52-24a9039929a9">
