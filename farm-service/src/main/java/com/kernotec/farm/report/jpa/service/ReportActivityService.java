@@ -7,6 +7,7 @@ import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.parametric.jpa.enums.ActivityTypeCodeEnum;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
+import com.kernotec.farm.util.CommonSpecification;
 import com.kernotec.farm.util.ExcelUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -83,86 +84,7 @@ public class ReportActivityService {
         Join<Activity, ActivityType> activityTypeJoin = activityRoot.join(
             "activityType", JoinType.INNER);
 
-        totalActivitiesQuery.select(cb.construct(
-            ActivityTypeTotalResponse.class,
-            // totalActivities;
-            cb.countDistinct(activityRoot.get("id")),
-            // totalComments;
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.equal(
-                            activityTypeJoin.get("code"),
-                            ActivityTypeCodeEnum.COMENTARIO.toString()
-                        ), 1L
-                    )
-                    .otherwise(0L)), 0L
-            ),
-            // totalGroups;
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.equal(
-                            activityTypeJoin.get("code"), ActivityTypeCodeEnum.GRUPO.toString()), 1L
-                    )
-                    .otherwise(0L)), 0L
-            ),
-            // totalFriends;
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.equal(
-                            activityTypeJoin.get("code"), ActivityTypeCodeEnum.AMISTAD.toString()),
-                        1L
-                    )
-                    .otherwise(0L)), 0L
-            ),
-            // totalPageFollows;
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.equal(
-                            activityTypeJoin.get("code"),
-                            ActivityTypeCodeEnum.FOLLOW.toString()
-                        ), 1L
-                    )
-                    .otherwise(0L)), 0L
-            ),
-            // totalReactions;
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.equal(
-                            activityTypeJoin.get("code"),
-                            ActivityTypeCodeEnum.REACCION.toString()
-                        ), 1L
-                    )
-                    .otherwise(0L)), 0L
-            ),
-            // totalPublications;
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.equal(
-                            activityTypeJoin.get("code"),
-                            ActivityTypeCodeEnum.PUBLICACION.toString()
-                        ), 1L
-                    )
-                    .otherwise(0L)), 0L
-            ),
-            // totalTiktokProfileFollows;
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.equal(
-                            activityTypeJoin.get("code"),
-                            ActivityTypeCodeEnum.FOLLOW_TIKTOK.toString()
-                        ), 1L
-                    )
-                    .otherwise(0L)), 0L
-            )
-
-        ));
+        setTotalActivitiesByTypeSelectClause(totalActivitiesQuery, activityRoot, activityTypeJoin);
 
         totalActivitiesQuery.where(ActivitySpecification.builder()
             .includeOnlyUserActivities(Boolean.TRUE)
@@ -180,6 +102,44 @@ public class ReportActivityService {
 
         return entityManager.createQuery(totalActivitiesQuery)
             .getSingleResult();
+    }
+
+    public void setTotalActivitiesByTypeSelectClause(
+        CriteriaQuery<ActivityTypeTotalResponse> totalActivitiesQuery, Root<?> activityRoot,
+        Join<?, ?> activityTypeJoin)
+    {
+        totalActivitiesQuery.select(cb.construct(
+            ActivityTypeTotalResponse.class,
+            // totalActivities;
+            cb.countDistinct(activityRoot.get("id")),
+            // totalComments;
+            CommonSpecification.getTotalBySumCase(
+                cb, activityTypeJoin.get("code"),
+                ActivityTypeCodeEnum.COMENTARIO.toString()
+            ),
+            // totalGroups;
+            CommonSpecification.getTotalBySumCase(
+                cb, activityTypeJoin.get("code"), ActivityTypeCodeEnum.GRUPO.toString()),
+            // totalFriends;
+            CommonSpecification.getTotalBySumCase(
+                cb, activityTypeJoin.get("code"), ActivityTypeCodeEnum.AMISTAD.toString()),
+            // totalPageFollows;
+            CommonSpecification.getTotalBySumCase(
+                cb, activityTypeJoin.get("code"), ActivityTypeCodeEnum.FOLLOW.toString()),
+            // totalReactions;
+            CommonSpecification.getTotalBySumCase(
+                cb, activityTypeJoin.get("code"), ActivityTypeCodeEnum.REACCION.toString()),
+            // totalPublications;
+            CommonSpecification.getTotalBySumCase(
+                cb, activityTypeJoin.get("code"),
+                ActivityTypeCodeEnum.PUBLICACION.toString()
+            ),
+            // totalTiktokProfileFollows;
+            CommonSpecification.getTotalBySumCase(
+                cb, activityTypeJoin.get("code"),
+                ActivityTypeCodeEnum.FOLLOW_TIKTOK.toString()
+            )
+        ));
     }
 
     public String getReportDateDetail(ReportActivityRequest filterRequest) {
