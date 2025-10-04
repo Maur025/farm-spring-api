@@ -1,5 +1,6 @@
 package com.kernotec.farm.activity.jpa.specification.criteria;
 
+import com.kernotec.farm.report.jpa.enums.TemporyDateForRequestEnum;
 import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -28,4 +29,5 @@ public class ActivitySpecificationCriteria {
     private ZonedDateTime yearDate;
     private String zoneId;
     private String keyword;
+    private TemporyDateForRequestEnum temporaryDateEnum;
 }
