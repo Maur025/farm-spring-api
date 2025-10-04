@@ -2,6 +2,7 @@ package com.kernotec.farm.activity.jpa.specification.activity;
 
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.specification.criteria.ActivitySpecificationCriteria;
+import com.kernotec.farm.report.jpa.enums.TemporyDateForRequestEnum;
 import com.kernotec.farm.util.CommonSpecification;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -90,6 +91,7 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         addMonthDateFilter(root, cb).ifPresent(predicateList::add);
         addYearDateFilter(root, cb).ifPresent(predicateList::add);
         addKeywordFilter(root, cb, joinMap).ifPresent(predicateList::add);
+        addTemporaryDateFilter(root, cb).ifPresent(predicateList::add);
 
         CommonSpecification.queryOrderBy(
             root, query, cb, criteria.getOrderBy(),
@@ -343,5 +345,18 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         this.criteria.setOrderBy(orderBy);
         this.criteria.setDescending(isDescending);
         return this;
+    }
+
+    public ActivitySpecification withTemporaryDate(TemporyDateForRequestEnum temporaryDate) {
+        this.criteria.setTemporaryDateEnum(temporaryDate);
+        return this;
+    }
+
+    private Optional<Predicate> addTemporaryDateFilter(Root<Activity> root, CriteriaBuilder cb) {
+        return Optional.ofNullable(criteria.getTemporaryDateEnum())
+            .map(temporaryDate -> CommonSpecification.addTimeLapsePredicateByEnum(
+                cb, getZoneId(),
+                temporaryDate, root.get("activityDate")
+            ));
     }
 }
