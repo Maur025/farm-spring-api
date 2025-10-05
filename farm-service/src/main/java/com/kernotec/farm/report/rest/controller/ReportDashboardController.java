@@ -8,6 +8,7 @@ import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
 import com.kernotec.farm.report.rest.dto.response.account.ReactionSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.dashboard.ReportDashboardTotalResponse;
 import com.kernotec.farm.report.rest.dto.response.farm.FarmReportTotalResponse;
 import com.kernotec.farm.report.rest.dto.response.social.network.ReportActivityGroupBySocialNetworkResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,6 +73,22 @@ public class ReportDashboardController {
             .data(ReportActivityGroupBySocialNetworkResponse.builder()
                 .totalActivities(reportDashboardService.countActivitiesWithFilters(request))
                 .socialNetworks(reportDashboardService.findActivitiesGroupBySocialNetwork(request))
+                .build())
+            .build();
+    }
+
+    @Operation(summary = "total dashboard summary")
+    @PostMapping("dashboard/summary/total")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<ReportDashboardTotalResponse> getDashboardTotalSummary(
+        @RequestBody ReportDashboardRequest request)
+    {
+        return SingleResponse.<ReportDashboardTotalResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(ReportDashboardTotalResponse.builder()
+                .totalDevices(reportDashboardService.countTotalDevices())
+                .totalFarms(reportDashboardService.countTotalFarms())
+                .totalAccounts(reportDashboardService.countTotalAccounts(request))
                 .build())
             .build();
     }
