@@ -6,7 +6,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,4 +33,7 @@ public class Farm extends BaseAuditEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "type", length = 100)
     private FarmTypeEnum type;
+
+    @OneToMany(mappedBy = "farm", fetch = FetchType.LAZY)
+    private Set<Device> devices;
 }

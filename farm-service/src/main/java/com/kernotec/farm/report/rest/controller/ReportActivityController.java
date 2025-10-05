@@ -13,7 +13,9 @@ import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.command.activity.ReportActivityExcelExportCmd;
 import com.kernotec.farm.report.rest.command.activity.ReportActivityPdfExportCmd;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
+import com.kernotec.farm.report.rest.dto.request.ReportRatingRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
+import com.kernotec.farm.report.rest.dto.response.rating.ReportRatingGroupListResponse;
 import com.kernotec.farm.util.AuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -171,5 +173,20 @@ public class ReportActivityController {
                 .isDescending(descending)
                 .build())
             .execute();
+    }
+
+    @Operation(summary = "get rating of activities with filters")
+    @PostMapping("activities/ratings/report")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<ReportRatingGroupListResponse> getActivitiesRatings(
+        @RequestBody ReportRatingRequest request)
+    {
+        return SingleResponse.<ReportRatingGroupListResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(ReportRatingGroupListResponse.builder()
+                .ratingMoreActivities(reportActivityService.getActivitiesRatings(request, true))
+                .ratingLessActivities(reportActivityService.getActivitiesRatings(request, false))
+                .build())
+            .build();
     }
 }
