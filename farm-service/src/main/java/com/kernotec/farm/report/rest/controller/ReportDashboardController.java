@@ -9,6 +9,7 @@ import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest
 import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
 import com.kernotec.farm.report.rest.dto.response.account.ReactionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.farm.FarmReportTotalResponse;
+import com.kernotec.farm.report.rest.dto.response.social.network.ReportActivityGroupBySocialNetworkResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -57,6 +58,21 @@ public class ReportDashboardController {
                     .zoneId(request.getZoneId())
                     .build()
             ))
+            .build();
+    }
+
+    @Operation(summary = "total Activities grouped by Social Networks")
+    @PostMapping("dashboard/activities/social-networks/total")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<ReportActivityGroupBySocialNetworkResponse> getTotalActivitiesBySocialNetworks(
+        @RequestBody ReportDashboardRequest request)
+    {
+        return SingleResponse.<ReportActivityGroupBySocialNetworkResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(ReportActivityGroupBySocialNetworkResponse.builder()
+                .totalActivities(reportDashboardService.countActivitiesWithFilters(request))
+                .socialNetworks(reportDashboardService.findActivitiesGroupBySocialNetwork(request))
+                .build())
             .build();
     }
 }

@@ -6,9 +6,11 @@ import com.kernotec.farm.activity.jpa.specification.activity.ActivitySpecificati
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.entity.Farm;
 import com.kernotec.farm.parametric.jpa.entity.ActivityType;
+import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.parametric.jpa.enums.ActivityTypeCodeEnum;
 import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
 import com.kernotec.farm.report.rest.dto.response.farm.FarmReportTotalResponse;
+import com.kernotec.farm.report.rest.dto.response.social.network.ReportActivitySocialNetworkResponse;
 import com.kernotec.farm.util.CommonSpecification;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -102,5 +104,67 @@ public class ReportDashboardService {
 
         return entityManager.createQuery(totalActivitiesByFarmQuery)
             .getResultList();
+    }
+
+    public List<ReportActivitySocialNetworkResponse> findActivitiesGroupBySocialNetwork(
+        ReportDashboardRequest filterRequest)
+    {
+        CriteriaQuery<ReportActivitySocialNetworkResponse> activitySocialNetworkQuery = cb.createQuery(
+            ReportActivitySocialNetworkResponse.class);
+        Root<Activity> activityRoot = activitySocialNetworkQuery.from(Activity.class);
+        Join<Activity, Account> accountJoin = activityRoot.join("account", JoinType.INNER);
+        Join<Account, SocialNetwork> socialNetworkJoin = accountJoin.join(
+            "socialNetwork", JoinType.INNER);
+
+        activitySocialNetworkQuery.select(cb.construct(
+            ReportActivitySocialNetworkResponse.class,
+            // socialNetworkId
+            socialNetworkJoin.get("id"),
+            // socialNetworkName
+            socialNetworkJoin.get("name"),
+            // socialNetworkCode
+            socialNetworkJoin.get("code"),
+            // socialNetworkIcon
+            socialNetworkJoin.get("icon"),
+            // socialNetworkColor
+            socialNetworkJoin.get("color"),
+            // totalActivities
+            cb.countDistinct(activityRoot.get("id"))
+        ));
+
+        activitySocialNetworkQuery.groupBy(
+            socialNetworkJoin.get("id"), socialNetworkJoin.get("name"),
+            socialNetworkJoin.get("code"), socialNetworkJoin.get("icon"),
+            socialNetworkJoin.get("color")
+        );
+
+        activitySocialNetworkQuery.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withUserAuthId(filterRequest.getAuthUserId())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withZoneId(filterRequest.getZoneId())
+            .toPredicate(activityRoot, activitySocialNetworkQuery, cb));
+
+        return entityManager.createQuery(activitySocialNetworkQuery)
+            .getResultList();
+    }
+
+    public Long countActivitiesWithFilters(ReportDashboardRequest filterRequest) {
+        CriteriaQuery<Long> countActivitiesQuery = cb.createQuery(Long.class);
+        Root<Activity> activityRoot = countActivitiesQuery.from(Activity.class);
+
+        countActivitiesQuery.select(cb.countDistinct(activityRoot.get("id")));
+
+        countActivitiesQuery.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withUserAuthId(filterRequest.getAuthUserId())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withZoneId(filterRequest.getZoneId())
+            .toPredicate(activityRoot, countActivitiesQuery, cb));
+
+        return entityManager.createQuery(countActivitiesQuery)
+            .getSingleResult();
     }
 }
