@@ -1,6 +1,8 @@
 package com.kernotec.farm.report.jpa.service;
 
 import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.account.jpa.specification.account.AccountSpecification;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.specification.activity.ActivitySpecification;
 import com.kernotec.farm.inventory.jpa.entity.Device;
@@ -165,6 +167,41 @@ public class ReportDashboardService {
             .toPredicate(activityRoot, countActivitiesQuery, cb));
 
         return entityManager.createQuery(countActivitiesQuery)
+            .getSingleResult();
+    }
+
+    public Long countTotalDevices() {
+        CriteriaQuery<Long> countDevicesQuery = cb.createQuery(Long.class);
+        Root<Device> deviceRoot = countDevicesQuery.from(Device.class);
+
+        countDevicesQuery.select(cb.countDistinct(deviceRoot.get("id")));
+
+        return entityManager.createQuery(countDevicesQuery)
+            .getSingleResult();
+    }
+
+    public Long countTotalFarms() {
+        CriteriaQuery<Long> countFarmsQuery = cb.createQuery(Long.class);
+        Root<Farm> farmRoot = countFarmsQuery.from(Farm.class);
+
+        countFarmsQuery.select(cb.countDistinct(farmRoot.get("id")));
+
+        return entityManager.createQuery(countFarmsQuery)
+            .getSingleResult();
+    }
+
+    public Long countTotalAccounts(ReportDashboardRequest filterRequest) {
+        CriteriaQuery<Long> countAccountsQuery = cb.createQuery(Long.class);
+        Root<Account> accountRoot = countAccountsQuery.from(Account.class);
+
+        countAccountsQuery.select(cb.countDistinct(accountRoot.get("id")));
+
+        countAccountsQuery.where(AccountSpecification.builder()
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withAccountType(AccountTypeEnum.INTERNAL)
+            .toPredicate(accountRoot, countAccountsQuery, cb));
+
+        return entityManager.createQuery(countAccountsQuery)
             .getSingleResult();
     }
 }
