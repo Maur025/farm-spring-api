@@ -9,6 +9,8 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -30,6 +32,14 @@ public class CommonSpecification {
         return cb.coalesce(
             cb.sum(cb.<Long>selectCase()
                 .when(cb.equal(pathToSum, valueToCompare), 1L)
+                .otherwise(0L)), 0L
+        );
+    }
+
+    public static Expression<?> getTotalBySumCase(CriteriaBuilder cb, Predicate predicate) {
+        return cb.coalesce(
+            cb.sum(cb.<Long>selectCase()
+                .when(predicate, 1L)
                 .otherwise(0L)), 0L
         );
     }
@@ -60,5 +70,27 @@ public class CommonSpecification {
         log.info("Applying time lapse filter from {} to {}", fromStartOfDay, toEndOfDay);
 
         return cb.between(zonedDateTimeToCompare, fromStartOfDay, toEndOfDay);
+    }
+
+    public static ZonedDateTime[][] getMonthsOfYear(ZonedDateTime baseDate, ZoneId userZone) {
+        List<ZonedDateTime> monthsOfYear = new ArrayList<>();
+
+        for (int index = 1; index <= 12; index++) {
+            monthsOfYear.add(baseDate.withMonth(index)
+                .withDayOfMonth(1)
+                .toLocalDate()
+                .atStartOfDay(userZone));
+        }
+
+        List<ZonedDateTime[]> monthsOfYearList = new ArrayList<>();
+
+        for (ZonedDateTime monthStart : monthsOfYear) {
+            ZonedDateTime monthEnd = monthStart.plusMonths(1)
+                .minusNanos(1);
+
+            monthsOfYearList.add(new ZonedDateTime[]{monthStart, monthEnd});
+        }
+
+        return monthsOfYearList.toArray(ZonedDateTime[][]::new);
     }
 }

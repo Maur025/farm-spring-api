@@ -8,6 +8,7 @@ import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
 import com.kernotec.farm.report.rest.dto.response.account.ReactionSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.dashboard.ReportActivityYearSummary;
 import com.kernotec.farm.report.rest.dto.response.dashboard.ReportDashboardTotalResponse;
 import com.kernotec.farm.report.rest.dto.response.farm.FarmReportTotalResponse;
 import com.kernotec.farm.report.rest.dto.response.social.network.ReportActivityGroupBySocialNetworkResponse;
@@ -90,6 +91,18 @@ public class ReportDashboardController {
                 .totalFarms(reportDashboardService.countTotalFarms())
                 .totalAccounts(reportDashboardService.countTotalAccounts(request))
                 .build())
+            .build();
+    }
+
+    @Operation(summary = "total yearly of activities")
+    @PostMapping("dashboard/activities/yearly/total")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<ReportActivityYearSummary> getTotalYearlyActivities(
+        @RequestBody ReportDashboardRequest request)
+    {
+        return SingleResponse.<ReportActivityYearSummary>builder()
+            .code(HttpStatus.OK.value())
+            .data(reportDashboardService.getTotalYearlyActivities(request))
             .build();
     }
 }
