@@ -4,6 +4,7 @@ import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.report.jpa.service.CommentSummaryService;
 import com.kernotec.farm.report.jpa.service.GroupSummaryService;
+import com.kernotec.farm.report.jpa.service.PageSummaryService;
 import com.kernotec.farm.report.jpa.service.PublishingSummaryService;
 import com.kernotec.farm.report.jpa.service.ReactionSummaryService;
 import com.kernotec.farm.report.jpa.service.ReportActivityService;
@@ -12,6 +13,7 @@ import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
 import com.kernotec.farm.report.rest.dto.response.account.GroupSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.account.PageSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.PublishingSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.ReactionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.comment.CommentGroupContextSummaryResponse;
@@ -41,6 +43,7 @@ public class ReportDashboardController {
     private final PublishingSummaryService publishingSummaryService;
     private final CommentSummaryService commentSummaryService;
     private final GroupSummaryService groupSummaryService;
+    private final PageSummaryService pageSummaryService;
 
     @Operation(summary = "Get activity total details grouped by farms")
     @PostMapping("dashboard/farms/activities/total")
@@ -135,7 +138,9 @@ public class ReportDashboardController {
             .data(PublishingSummaryResponse.builder()
                 .totalPublications(
                     reportActivityService.getTotalActivitiesByTypeToSummary(
-                        null, filterRequest, "publishings"))
+                        null, filterRequest,
+                        "publishings"
+                    ))
                 .totalsByContext(
                     publishingSummaryService.getTotalPublicationsByContext(null, filterRequest))
                 .build())
@@ -183,6 +188,28 @@ public class ReportDashboardController {
                         .build(), "groupMemberships"
                 ))
                 .totalsByRegion(groupSummaryService.getTotalActivitiesGroupByRegion(request))
+                .build())
+            .build();
+    }
+
+    @Operation(summary = "total activity follows group by region")
+    @PostMapping("dashboard/activities/follows/total")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<PageSummaryResponse> getTotalFollowsByRegion(
+        @RequestBody ReportDashboardRequest request)
+    {
+        return SingleResponse.<PageSummaryResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(PageSummaryResponse.builder()
+                .totalPages(reportActivityService.getTotalActivitiesByTypeToSummary(
+                    null, ActivitySummaryByAccountRequest.builder()
+                        .socialNetworkId(request.getSocialNetworkId())
+                        .authUserId(request.getAuthUserId())
+                        .monthDate(request.getMonthDate())
+                        .zoneId(request.getZoneId())
+                        .build(), "follows"
+                ))
+                .totalsByRegion(pageSummaryService.getTotalActivitiesPageGroupedByRegion(request))
                 .build())
             .build();
     }
