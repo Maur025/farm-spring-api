@@ -4,9 +4,13 @@ import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.AccountFollowProfile;
 import com.kernotec.farm.account.jpa.enums.AccountFollowProfileStateEnum;
+import com.kernotec.farm.activity.jpa.entity.Activity;
+import com.kernotec.farm.activity.jpa.entity.Follow;
 import com.kernotec.farm.activity.jpa.entity.Profile;
+import com.kernotec.farm.activity.jpa.specification.activity.ActivitySpecification;
 import com.kernotec.farm.parametric.jpa.entity.Region;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
+import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
 import com.kernotec.farm.report.rest.dto.response.account.AccountSummaryTableResponse;
 import com.kernotec.farm.report.rest.dto.response.account.PageRegionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.PageSummaryResponse;
@@ -153,5 +157,40 @@ public class PageSummaryService {
             accountFollowProfileJoin.get("followState"), AccountFollowProfileStateEnum.FOLLOWING);
 
         return predicateList;
+    }
+
+    public List<PageRegionSummaryResponse> getTotalActivitiesPageGroupedByRegion(
+        ReportDashboardRequest filterRequest)
+    {
+        CriteriaQuery<PageRegionSummaryResponse> pageRegionQuery = cb.createQuery(
+            PageRegionSummaryResponse.class);
+
+        Root<Activity> activityRoot = pageRegionQuery.from(Activity.class);
+        Join<Activity, Follow> followJoin = activityRoot.join("follows", JoinType.INNER);
+        Join<Follow, Profile> profileJoin = followJoin.join("profile", JoinType.LEFT);
+        Join<Profile, Region> regionJoin = profileJoin.join("region", JoinType.LEFT);
+
+        pageRegionQuery.select(cb.construct(
+            PageRegionSummaryResponse.class,
+            // regionName
+            regionJoin.get("name"),
+            // regionId
+            regionJoin.get("id"),
+            // totalPagesByRegion
+            cb.countDistinct(followJoin.get("id"))
+        ));
+
+        pageRegionQuery.groupBy(regionJoin.get("name"), regionJoin.get("id"));
+
+        pageRegionQuery.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withUserAuthId(filterRequest.getAuthUserId())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withZoneId(filterRequest.getZoneId())
+            .toPredicate(activityRoot, pageRegionQuery, cb));
+
+        return entityManager.createQuery(pageRegionQuery)
+            .getResultList();
     }
 }
