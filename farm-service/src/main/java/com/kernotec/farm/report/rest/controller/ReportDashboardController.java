@@ -3,6 +3,7 @@ package com.kernotec.farm.report.rest.controller;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.report.jpa.service.CommentSummaryService;
+import com.kernotec.farm.report.jpa.service.GroupSummaryService;
 import com.kernotec.farm.report.jpa.service.PublishingSummaryService;
 import com.kernotec.farm.report.jpa.service.ReactionSummaryService;
 import com.kernotec.farm.report.jpa.service.ReportActivityService;
@@ -10,6 +11,7 @@ import com.kernotec.farm.report.jpa.service.ReportDashboardService;
 import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
+import com.kernotec.farm.report.rest.dto.response.account.GroupSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.PublishingSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.ReactionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.comment.CommentGroupContextSummaryResponse;
@@ -38,6 +40,7 @@ public class ReportDashboardController {
     private final ReportActivityService reportActivityService;
     private final PublishingSummaryService publishingSummaryService;
     private final CommentSummaryService commentSummaryService;
+    private final GroupSummaryService groupSummaryService;
 
     @Operation(summary = "Get activity total details grouped by farms")
     @PostMapping("dashboard/farms/activities/total")
@@ -157,6 +160,29 @@ public class ReportDashboardController {
                         .build(), "comments"
                 ))
                 .totalsByContext(commentSummaryService.getTotalCommentsByContext(request))
+                .build())
+            .build();
+    }
+
+    @Operation(summary = "total activity groups group by region ")
+    @PostMapping("dashboard/activities/groups/total")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<GroupSummaryResponse> getTotalGroupsByRegion(
+        @RequestBody ReportDashboardRequest request)
+    {
+
+        return SingleResponse.<GroupSummaryResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(GroupSummaryResponse.builder()
+                .totalGroups(reportActivityService.getTotalActivitiesByTypeToSummary(
+                    null, ActivitySummaryByAccountRequest.builder()
+                        .socialNetworkId(request.getSocialNetworkId())
+                        .authUserId(request.getAuthUserId())
+                        .monthDate(request.getMonthDate())
+                        .zoneId(request.getZoneId())
+                        .build(), "groupMemberships"
+                ))
+                .totalsByRegion(groupSummaryService.getTotalActivitiesGroupByRegion(request))
                 .build())
             .build();
     }
