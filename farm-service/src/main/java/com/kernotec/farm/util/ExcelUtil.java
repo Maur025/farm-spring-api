@@ -85,4 +85,9 @@ public class ExcelUtil {
     private ZoneId getZoneId(String zoneId) {
         return zoneId != null ? ZoneId.of(zoneId) : ZoneId.systemDefault();
     }
+
+    public void fillRowSingleColumn(Sheet sheet, String value, boolean isBold, int indexRow) {
+        Row row = sheet.createRow(indexRow);
+        fillExcelRow(row, isBold, List.of(value), false);
+    }
 }

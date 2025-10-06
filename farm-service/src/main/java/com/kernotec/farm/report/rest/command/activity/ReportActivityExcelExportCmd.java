@@ -22,20 +22,15 @@ import com.kernotec.farm.parametric.jpa.dto.entity.RegionDto;
 import com.kernotec.farm.parametric.jpa.dto.entity.SocialNetworkDto;
 import com.kernotec.farm.parametric.jpa.enums.ActivityTypeCodeEnum;
 import com.kernotec.farm.report.jpa.service.ReportActivityService;
+import com.kernotec.farm.report.rest.command.excel.ReportHeadCreateCmd;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.util.ExcelUtil;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,29 +45,32 @@ public class ReportActivityExcelExportCmd extends
     private final ReportActivityService reportActivityService;
     private final ActivityDtoMapper activityDtoMapper;
     private final ExcelUtil excelUtil;
+    private final ReportHeadCreateCmd reportHeadCreateCmd;
 
     @Override
     protected Void run(Request request) {
-        try (var workbook = new SXSSFWorkbook(500); OutputStream out = request.response()
-            .getOutputStream())
-        {
-            Sheet sheet = workbook.createSheet("Report-Activity");
-            excelUtil.setColumnsSize(sheet, List.of(5, 10, 14, 25, 14, 14, 36, 25, 20));
+        Sheet sheet = request.sheet();
+        ReportActivityRequest filterRequest = request.filterRequest();
 
-            reportActivityBuild(sheet, request);
+        excelUtil.setColumnsSize(sheet, List.of(5, 10, 14, 25, 14, 14, 36, 25, 20));
 
-            workbook.write(out);
-            out.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        int headerRowNum = reportHeadCreateCmd.withRequest(ReportHeadCreateCmd.Request.builder()
+                .sheet(sheet)
+                .reportTitle(request.titleReport())
+                .authUsername(request.authUsername())
+                .zoneId(filterRequest.getZoneId())
+                .searchCriteria(filterRequest.getSearchCriteria())
+                .searchDateDetail(reportActivityService.getReportDateDetail(filterRequest))
+                .build())
+            .execute();
 
-        return null;
-    }
-
-    private void reportActivityBuild(Sheet sheet, Request request) {
-        int headerRowNum = setHeader(
-            sheet, request.titleReport(), request.filterRequest(), request.authUsername());
+        Row headerRow = sheet.createRow(headerRowNum++);
+        excelUtil.fillExcelRow(
+            headerRow, true, List.of(
+                "#", "Granja", "Dispositivo", "Cuenta", "Actividad", "Red Social", "Detalle",
+                "Complemento", "Fecha"
+            ), true
+        );
 
         int page = 0;
         int size = 100;
@@ -111,42 +109,8 @@ public class ReportActivityExcelExportCmd extends
 
             page++;
         } while (page < activityPage.getTotalPages());
-    }
 
-    private int setHeader(Sheet sheet, String title, ReportActivityRequest filterRequest,
-        String authUsername)
-    {
-        fillRowSingleColumn(sheet, title == null ? "Activity Report" : title, true, 0);
-        fillRowSingleColumn(sheet, "Generado por: " + authUsername, true, 1);
-
-        String reportDate = excelUtil.getDateFormat(
-            ZonedDateTime.now(ZoneOffset.UTC),
-            filterRequest.getZoneId(), "dd-MM-yyyy HH:mm"
-        );
-        fillRowSingleColumn(sheet, "Fecha emisión: " + reportDate, false, 2);
-
-        String searchCriteria =
-            filterRequest.getSearchCriteria() == null || filterRequest.getSearchCriteria()
-                .isEmpty() ? "Sin criterios de busqueda" : filterRequest.getSearchCriteria();
-        fillRowSingleColumn(sheet, "Criterios de busqueda: " + searchCriteria, false, 3);
-
-        String reportDateDetail = reportActivityService.getReportDateDetail(filterRequest);
-        fillRowSingleColumn(sheet, reportDateDetail, false, 4);
-
-        Row headerRow = sheet.createRow(6);
-        excelUtil.fillExcelRow(
-            headerRow, true, List.of(
-                "#", "Granja", "Dispositivo", "Cuenta", "Actividad", "Red Social", "Detalle",
-                "Complemento", "Fecha"
-            ), true
-        );
-
-        return 7;
-    }
-
-    private void fillRowSingleColumn(Sheet sheet, String value, boolean isBold, int indexRow) {
-        Row row = sheet.createRow(indexRow);
-        excelUtil.fillExcelRow(row, isBold, List.of(value), false);
+        return null;
     }
 
     private String getFarmName(ActivityDto activityDto) {
@@ -324,9 +288,8 @@ public class ReportActivityExcelExportCmd extends
     }
 
     @Builder
-    public record Request(HttpServletResponse response, ReportActivityRequest filterRequest,
-                          String sortBy, boolean descending, String titleReport,
-                          String authUsername)
+    public record Request(Sheet sheet, ReportActivityRequest filterRequest, String sortBy,
+                          boolean descending, String titleReport, String authUsername)
     {
 
     }
