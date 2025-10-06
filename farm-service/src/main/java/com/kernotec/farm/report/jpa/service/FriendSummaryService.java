@@ -9,6 +9,7 @@ import com.kernotec.farm.parametric.jpa.enums.FriendStateCodeEnum;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.response.account.AccountSummaryTableResponse;
 import com.kernotec.farm.report.rest.dto.response.account.FriendSummaryResponse;
+import com.kernotec.farm.util.CommonSpecification;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -61,26 +62,20 @@ public class FriendSummaryService {
             /* totalFriends */
             cb.countDistinct(friendJoin.get("id")),
             /* totalInternalFriends */
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.and(
-                            cb.equal(friendJoin.get("accountId"), accountId),
-                            cb.equal(targetAccountJoin.get("type"), AccountTypeEnum.INTERNAL)
-                        ), 1L
-                    )
-                    .otherwise(0L)), 0L
+            CommonSpecification.getTotalBySumCase(
+                cb,
+                cb.and(
+                    cb.equal(friendJoin.get("accountId"), accountId),
+                    cb.equal(targetAccountJoin.get("type"), AccountTypeEnum.INTERNAL)
+                )
             ),
             /* totalExternalFriends */
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(
-                        cb.and(
-                            cb.equal(friendJoin.get("accountId"), accountId),
-                            cb.equal(targetAccountJoin.get("type"), AccountTypeEnum.EXTERNAL)
-                        ), 1L
-                    )
-                    .otherwise(0L)), 0L
+            CommonSpecification.getTotalBySumCase(
+                cb,
+                cb.and(
+                    cb.equal(friendJoin.get("accountId"), accountId),
+                    cb.equal(targetAccountJoin.get("type"), AccountTypeEnum.EXTERNAL)
+                )
             )
         ));
 
