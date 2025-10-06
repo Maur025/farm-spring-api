@@ -3,6 +3,7 @@ package com.kernotec.farm.report.jpa.service;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Publishing;
+import com.kernotec.farm.activity.jpa.specification.activity.ActivitySpecification;
 import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
 import com.kernotec.farm.parametric.jpa.entity.PublishingType;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
@@ -15,7 +16,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +28,7 @@ public class PublishingSummaryService {
 
     private final EntityManager entityManager;
     private final CommonPredicateToSummary commonPredicateToSummary;
+    private final ReportActivityService reportActivityService;
 
     private CriteriaBuilder cb;
 
@@ -39,34 +40,14 @@ public class PublishingSummaryService {
     public PublishingSummaryResponse getPublishingSummary(UUID accountId,
         ActivitySummaryByAccountRequest filterRequest)
     {
-        Long totalPublications = getTotalPublications(accountId, filterRequest);
+        Long totalPublications = reportActivityService.getTotalActivitiesByTypeToSummary(
+            accountId, filterRequest, "publishings");
 
         return PublishingSummaryResponse.builder()
             .totalPublications(totalPublications)
             .totalsByContext(getTotalPublicationsByContext(accountId, filterRequest))
             .publications(getPublicationsOfResult(accountId, filterRequest, totalPublications))
             .build();
-    }
-
-    private Long getTotalPublications(UUID accountId, ActivitySummaryByAccountRequest filterRequest)
-    {
-        CriteriaQuery<Long> queryOfTotalPublications = cb.createQuery(Long.class);
-        Root<Activity> activityRoot = queryOfTotalPublications.from(Activity.class);
-
-        Join<Activity, Publishing> publishingJoin = activityRoot.join(
-            "publishings", JoinType.INNER);
-
-        queryOfTotalPublications.select(cb.countDistinct(publishingJoin.get("id")));
-
-        queryOfTotalPublications.where(
-            commonPredicateToSummary.getCommonActivityPredicates(
-                    activityRoot, accountId,
-                    filterRequest
-                )
-                .toArray(Predicate[]::new));
-
-        return entityManager.createQuery(queryOfTotalPublications)
-            .getSingleResult();
     }
 
     private PageResponse<AccountSummaryTableResponse> getPublicationsOfResult(UUID accountId,
@@ -93,12 +74,15 @@ public class PublishingSummaryService {
             publishingContextJoin.get("name")
         ));
 
-        queryPublicationsOfResult.where(cb.and(
-            commonPredicateToSummary.getCommonActivityPredicates(
-                    activityRoot, accountId,
-                    filterRequest
-                )
-                .toArray(Predicate[]::new)));
+        queryPublicationsOfResult.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withZoneId(filterRequest.getZoneId())
+            .withAccountId(accountId)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withTemporaryDate(filterRequest.getFilterDate())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withUserAuthId(filterRequest.getAuthUserId())
+            .toPredicate(activityRoot, queryPublicationsOfResult, cb));
 
         if (filterRequest.getPageable() == null) {
             return PageResponse.<AccountSummaryTableResponse>builder()
@@ -111,7 +95,7 @@ public class PublishingSummaryService {
             queryPublicationsOfResult, filterRequest.getPageable(), totalPublications);
     }
 
-    private List<PublishingContextSummaryResponse> getTotalPublicationsByContext(UUID accountId,
+    public List<PublishingContextSummaryResponse> getTotalPublicationsByContext(UUID accountId,
         ActivitySummaryByAccountRequest filterRequest)
     {
         CriteriaQuery<PublishingContextSummaryResponse> queryPublicationsByContext = cb.createQuery(
@@ -133,12 +117,15 @@ public class PublishingSummaryService {
             cb.countDistinct(publishingJoin.get("id"))
         ));
 
-        queryPublicationsByContext.where(cb.and(
-            commonPredicateToSummary.getCommonActivityPredicates(
-                    activityRoot, accountId,
-                    filterRequest
-                )
-                .toArray(Predicate[]::new)));
+        queryPublicationsByContext.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withZoneId(filterRequest.getZoneId())
+            .withAccountId(accountId)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withTemporaryDate(filterRequest.getFilterDate())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withUserAuthId(filterRequest.getAuthUserId())
+            .toPredicate(activityRoot, queryPublicationsByContext, cb));
 
         queryPublicationsByContext.groupBy(
             publishingContextJoin.get("id"), publishingContextJoin.get("name"));

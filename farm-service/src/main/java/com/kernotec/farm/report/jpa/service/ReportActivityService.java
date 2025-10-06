@@ -11,6 +11,7 @@ import com.kernotec.farm.inventory.jpa.entity.Farm;
 import com.kernotec.farm.inventory.jpa.specification.device.DeviceSpecification;
 import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.parametric.jpa.enums.ActivityTypeCodeEnum;
+import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportRatingRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
@@ -338,5 +339,29 @@ public class ReportActivityService {
         return entityManager.createQuery(ratingAuthUserQuery)
             .setMaxResults(filterRequest.getLimit())
             .getResultList();
+    }
+
+    public Long getTotalActivitiesByTypeToSummary(UUID accountId,
+        ActivitySummaryByAccountRequest filterRequest, String relationEntity)
+    {
+        CriteriaQuery<Long> queryOfTotalActivities = cb.createQuery(Long.class);
+        Root<Activity> activityRoot = queryOfTotalActivities.from(Activity.class);
+
+        Join<Activity, ?> relationJoin = activityRoot.join(relationEntity, JoinType.INNER);
+
+        queryOfTotalActivities.select(cb.countDistinct(relationJoin.get("id")));
+
+        queryOfTotalActivities.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withZoneId(filterRequest.getZoneId())
+            .withAccountId(accountId)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withTemporaryDate(filterRequest.getFilterDate())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withUserAuthId(filterRequest.getAuthUserId())
+            .toPredicate(activityRoot, queryOfTotalActivities, cb));
+
+        return entityManager.createQuery(queryOfTotalActivities)
+            .getSingleResult();
     }
 }

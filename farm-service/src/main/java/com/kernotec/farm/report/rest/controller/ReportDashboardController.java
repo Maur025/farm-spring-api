@@ -2,11 +2,14 @@ package com.kernotec.farm.report.rest.controller;
 
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
+import com.kernotec.farm.report.jpa.service.PublishingSummaryService;
 import com.kernotec.farm.report.jpa.service.ReactionSummaryService;
+import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.jpa.service.ReportDashboardService;
 import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
+import com.kernotec.farm.report.rest.dto.response.account.PublishingSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.ReactionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.dashboard.ReportActivityYearSummary;
 import com.kernotec.farm.report.rest.dto.response.dashboard.ReportDashboardTotalResponse;
@@ -30,6 +33,8 @@ public class ReportDashboardController {
 
     private final ReportDashboardService reportDashboardService;
     private final ReactionSummaryService reactionSummaryService;
+    private final ReportActivityService reportActivityService;
+    private final PublishingSummaryService publishingSummaryService;
 
     @Operation(summary = "Get activity total details grouped by farms")
     @PostMapping("dashboard/farms/activities/total")
@@ -103,6 +108,33 @@ public class ReportDashboardController {
         return SingleResponse.<ReportActivityYearSummary>builder()
             .code(HttpStatus.OK.value())
             .data(reportDashboardService.getTotalYearlyActivities(request))
+            .build();
+    }
+
+    @Operation(summary = "total publications grouped by publishing context")
+    @PostMapping("dashboard/activities/publications/total")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<PublishingSummaryResponse> getTotalPublicationsByContext(
+        @RequestBody ReportDashboardRequest request)
+    {
+        var filterRequest = ActivitySummaryByAccountRequest.builder()
+            .socialNetworkId(request.getSocialNetworkId())
+            .authUserId(request.getAuthUserId())
+            .monthDate(request.getMonthDate())
+            .zoneId(request.getZoneId())
+            .build();
+
+        return SingleResponse.<PublishingSummaryResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(PublishingSummaryResponse.builder()
+                .totalPublications(
+                    reportActivityService.getTotalActivitiesByTypeToSummary(
+                        null, filterRequest,
+                        "publishings"
+                    ))
+                .totalsByContext(
+                    publishingSummaryService.getTotalPublicationsByContext(null, filterRequest))
+                .build())
             .build();
     }
 }
