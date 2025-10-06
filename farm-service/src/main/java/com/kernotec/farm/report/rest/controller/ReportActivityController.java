@@ -12,6 +12,8 @@ import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.command.activity.ReportActivityExcelExportCmd;
 import com.kernotec.farm.report.rest.command.activity.ReportActivityPdfExportCmd;
+import com.kernotec.farm.report.rest.command.excel.ExcelExportCmd;
+import com.kernotec.farm.report.rest.command.rating.ActivityRatingExcelExportCmd;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportRatingRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
@@ -49,6 +51,8 @@ public class ReportActivityController {
     private final ReportActivityExcelExportCmd reportActivityExcelExportCmd;
     private final AuthUtil authUtil;
     private final ReportActivityPdfExportCmd reportActivityPdfExportCmd;
+    private final ActivityRatingExcelExportCmd activityRatingExcelExportCmd;
+    private final ExcelExportCmd excelExportCmd;
 
     @Operation(summary = "Activity report with filters")
     @PostMapping("activities/report")
@@ -138,13 +142,19 @@ public class ReportActivityController {
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=report-activities.xlsx");
 
-        reportActivityExcelExportCmd.withRequest(ReportActivityExcelExportCmd.Request.builder()
+        excelExportCmd.withRequest(ExcelExportCmd.Request.builder()
                 .response(response)
-                .filterRequest(filterRequest)
-                .sortBy(sortBy)
-                .descending(descending)
-                .titleReport(titleReport)
-                .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
+                .reportTitle(titleReport)
+                .callback(sheet -> reportActivityExcelExportCmd.withRequest(
+                        ReportActivityExcelExportCmd.Request.builder()
+                            .sheet(sheet)
+                            .filterRequest(filterRequest)
+                            .sortBy(sortBy)
+                            .descending(descending)
+                            .titleReport(titleReport)
+                            .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
+                            .build())
+                    .execute())
                 .build())
             .execute();
     }
@@ -188,5 +198,36 @@ public class ReportActivityController {
                 .ratingLessActivities(reportActivityService.getActivitiesRatings(request, false))
                 .build())
             .build();
+    }
+
+    @Operation(summary = "rating activities with filters export to excel")
+    @PostMapping("activities/ratings/excel")
+    @ResponseStatus(HttpStatus.OK)
+    public void exportActivitiesRatingsToExcel(HttpServletResponse response,
+        @RequestBody ReportRatingRequest request,
+        @RequestParam(defaultValue = "activityDate") String sortBy,
+        @RequestParam(defaultValue = "true") boolean descending, Authentication authentication)
+    {
+
+        response.setContentType(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader(
+            "Content-Disposition", "attachment; filename=report-activities-ratings.xlsx");
+
+        excelExportCmd.withRequest(ExcelExportCmd.Request.builder()
+                .response(response)
+                .reportTitle("test-activities-ratings")
+                .callback(sheet -> activityRatingExcelExportCmd.withRequest(
+                        ActivityRatingExcelExportCmd.Request.builder()
+                            .sheet(sheet)
+                            .reportTitle("test-activities-ratings")
+                            .filterRequest(request)
+                            .sortBy(sortBy)
+                            .descending(descending)
+                            .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
+                            .build())
+                    .execute())
+                .build())
+            .execute();
     }
 }

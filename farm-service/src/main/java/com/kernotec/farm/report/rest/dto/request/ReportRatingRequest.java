@@ -22,4 +22,5 @@ public class ReportRatingRequest extends BaseRequest {
     private RatingTypeEnum ratingType;
     private Integer limit;
     private String zoneId;
+    private String searchCriteria;
 }
