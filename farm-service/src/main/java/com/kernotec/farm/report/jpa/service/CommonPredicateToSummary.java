@@ -3,7 +3,6 @@ package com.kernotec.farm.report.jpa.service;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
-import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.response.account.AccountSummaryTableResponse;
 import com.kernotec.farm.util.CommonSpecification;
@@ -12,7 +11,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -60,30 +58,6 @@ public class CommonPredicateToSummary {
         List<Predicate> predicateList = new ArrayList<>();
         predicateList.add(cb.equal(root.get("id"), accountId));
         predicateList.add(cb.equal(root.get("socialNetworkId"), socialNetworkId));
-
-        return predicateList;
-    }
-
-    /**
-     * Generates common predicates to filter activities by account and social network, and applies a
-     * time-lapse filter if provided. Used for activity summary queries.
-     *
-     * @param activityRoot  Root entity for Activity in the query.
-     * @param accountId     Unique identifier of the account.
-     * @param filterRequest Request object containing filter parameters.
-     * @return List of predicates for activity filtering.
-     */
-    public List<Predicate> getCommonActivityPredicates(Root<Activity> activityRoot, UUID accountId,
-        ActivitySummaryByAccountRequest filterRequest)
-    {
-        Join<Activity, Account> accountJoin = activityRoot.join("account");
-
-        List<Predicate> predicateList = new ArrayList<>();
-        predicateList.add(cb.equal(activityRoot.get("accountId"), accountId));
-        predicateList.add(
-            cb.equal(accountJoin.get("socialNetworkId"), filterRequest.getSocialNetworkId()));
-
-        addTimeLapsePredicate(filterRequest, predicateList, activityRoot.get("activityDate"));
 
         return predicateList;
     }

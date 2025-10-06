@@ -3,18 +3,22 @@ package com.kernotec.farm.report.jpa.service;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Comment;
+import com.kernotec.farm.activity.jpa.specification.activity.ActivitySpecification;
 import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
+import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
 import com.kernotec.farm.report.rest.dto.response.account.AccountSummaryTableResponse;
 import com.kernotec.farm.report.rest.dto.response.account.CommentSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.comment.CommentByContextResponse;
+import com.kernotec.farm.util.CommonSpecification;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -59,25 +63,18 @@ public class CommentSummaryService {
             /* totalComments */
             cb.countDistinct(commentJoin.get("id")),
             /* totalPositiveComments */
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(cb.isTrue(commentJoin.get("isAgreeComment")), 1L)
-                    .otherwise(0L)), 0L
-            ),
+            CommonSpecification.getTotalBySumCase(cb, cb.isTrue(commentJoin.get("isAgreeComment"))),
             /* totalNegativeComments */
-            cb.coalesce(
-                cb.sum(cb.<Long>selectCase()
-                    .when(cb.isFalse(commentJoin.get("isAgreeComment")), 1L)
-                    .otherwise(0L)), 0L
-            )
+            CommonSpecification.getTotalBySumCase(cb, cb.isFalse(commentJoin.get("isAgreeComment")))
         ));
 
-        queryCommentSummary.where(cb.and(
-            commonPredicateToSummary.getCommonActivityPredicates(
-                    activityRoot, accountId,
-                    filterRequest
-                )
-                .toArray(Predicate[]::new)));
+        queryCommentSummary.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withZoneId(filterRequest.getZoneId())
+            .withAccountId(accountId)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withTemporaryDate(filterRequest.getFilterDate())
+            .toPredicate(activityRoot, queryCommentSummary, cb));
 
         return entityManager.createQuery(queryCommentSummary)
             .getSingleResult();
@@ -106,12 +103,13 @@ public class CommentSummaryService {
                 .otherwise("Negativo")
         ));
 
-        queryCommentsOfResult.where(cb.and(
-            commonPredicateToSummary.getCommonActivityPredicates(
-                    activityRoot, accountId,
-                    filterRequest
-                )
-                .toArray(Predicate[]::new)));
+        queryCommentsOfResult.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withZoneId(filterRequest.getZoneId())
+            .withAccountId(accountId)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withTemporaryDate(filterRequest.getFilterDate())
+            .toPredicate(activityRoot, queryCommentsOfResult, cb));
 
         if (filterRequest.getPageable() == null) {
             return PageResponse.<AccountSummaryTableResponse>builder()
@@ -122,5 +120,41 @@ public class CommentSummaryService {
 
         return commonPredicateToSummary.getResultTableWithPagination(
             queryCommentsOfResult, filterRequest.getPageable(), totalComments);
+    }
+
+    public List<CommentByContextResponse> getTotalCommentsByContext(
+        ReportDashboardRequest filterRequest)
+    {
+        CriteriaQuery<CommentByContextResponse> commentByContextQuery = cb.createQuery(
+            CommentByContextResponse.class);
+
+        Root<Activity> activityRoot = commentByContextQuery.from(Activity.class);
+        Join<Activity, Comment> commentJoin = activityRoot.join("comments", JoinType.INNER);
+        Join<Comment, PublishingContext> publishingContextJoin = commentJoin.join(
+            "publishingContext", JoinType.LEFT);
+
+        commentByContextQuery.select(cb.construct(
+            CommentByContextResponse.class,
+            // publishingContextId
+            publishingContextJoin.get("id"),
+            // publishingContextName
+            publishingContextJoin.get("name"),
+            // totalCommentsByContext
+            cb.countDistinct(commentJoin.get("id"))
+        ));
+
+        commentByContextQuery.groupBy(
+            publishingContextJoin.get("id"), publishingContextJoin.get("name"));
+
+        commentByContextQuery.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withUserAuthId(filterRequest.getAuthUserId())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withZoneId(filterRequest.getZoneId())
+            .toPredicate(activityRoot, commentByContextQuery, cb));
+
+        return entityManager.createQuery(commentByContextQuery)
+            .getResultList();
     }
 }
