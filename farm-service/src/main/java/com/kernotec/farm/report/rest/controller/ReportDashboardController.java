@@ -2,6 +2,7 @@ package com.kernotec.farm.report.rest.controller;
 
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
+import com.kernotec.farm.report.jpa.service.CommentSummaryService;
 import com.kernotec.farm.report.jpa.service.PublishingSummaryService;
 import com.kernotec.farm.report.jpa.service.ReactionSummaryService;
 import com.kernotec.farm.report.jpa.service.ReportActivityService;
@@ -11,6 +12,7 @@ import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest
 import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
 import com.kernotec.farm.report.rest.dto.response.account.PublishingSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.ReactionSummaryResponse;
+import com.kernotec.farm.report.rest.dto.response.comment.CommentGroupContextSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.dashboard.ReportActivityYearSummary;
 import com.kernotec.farm.report.rest.dto.response.dashboard.ReportDashboardTotalResponse;
 import com.kernotec.farm.report.rest.dto.response.farm.FarmReportTotalResponse;
@@ -35,6 +37,7 @@ public class ReportDashboardController {
     private final ReactionSummaryService reactionSummaryService;
     private final ReportActivityService reportActivityService;
     private final PublishingSummaryService publishingSummaryService;
+    private final CommentSummaryService commentSummaryService;
 
     @Operation(summary = "Get activity total details grouped by farms")
     @PostMapping("dashboard/farms/activities/total")
@@ -129,11 +132,31 @@ public class ReportDashboardController {
             .data(PublishingSummaryResponse.builder()
                 .totalPublications(
                     reportActivityService.getTotalActivitiesByTypeToSummary(
-                        null, filterRequest,
-                        "publishings"
-                    ))
+                        null, filterRequest, "publishings"))
                 .totalsByContext(
                     publishingSummaryService.getTotalPublicationsByContext(null, filterRequest))
+                .build())
+            .build();
+    }
+
+    @Operation(summary = "total comments grouped by publishing context")
+    @PostMapping("dashboard/activities/comments/total")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<CommentGroupContextSummaryResponse> getTotalCommentsByContext(
+        @RequestBody ReportDashboardRequest request)
+    {
+        return SingleResponse.<CommentGroupContextSummaryResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(CommentGroupContextSummaryResponse.builder()
+                .totalComments(reportActivityService.getTotalActivitiesByTypeToSummary(
+                    null, ActivitySummaryByAccountRequest.builder()
+                        .socialNetworkId(request.getSocialNetworkId())
+                        .authUserId(request.getAuthUserId())
+                        .monthDate(request.getMonthDate())
+                        .zoneId(request.getZoneId())
+                        .build(), "comments"
+                ))
+                .totalsByContext(commentSummaryService.getTotalCommentsByContext(request))
                 .build())
             .build();
     }
