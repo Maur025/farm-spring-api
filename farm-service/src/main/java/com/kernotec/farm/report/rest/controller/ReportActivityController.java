@@ -214,13 +214,15 @@ public class ReportActivityController {
         response.setHeader(
             "Content-Disposition", "attachment; filename=report-activities-ratings.xlsx");
 
+        String reportTitle = "Clasificación de actividades";
+
         excelExportCmd.withRequest(ExcelExportCmd.Request.builder()
                 .response(response)
-                .reportTitle("test-activities-ratings")
+                .reportTitle(reportTitle)
                 .callback(sheet -> activityRatingExcelExportCmd.withRequest(
                         ActivityRatingExcelExportCmd.Request.builder()
                             .sheet(sheet)
-                            .reportTitle("test-activities-ratings")
+                            .reportTitle(reportTitle)
                             .filterRequest(request)
                             .sortBy(sortBy)
                             .descending(descending)

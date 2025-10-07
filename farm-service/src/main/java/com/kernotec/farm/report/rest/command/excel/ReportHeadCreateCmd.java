@@ -22,7 +22,7 @@ public class ReportHeadCreateCmd extends AbstractCommand<ReportHeadCreateCmd.Req
 
         excelUtil.fillRowSingleColumn(
             sheet, request.reportTitle() == null ? "Activity Report" : request.reportTitle(), true,
-            rowNum
+            rowNum++
         );
 
         excelUtil.fillRowSingleColumn(
