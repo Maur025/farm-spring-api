@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -138,9 +139,7 @@ public class ReportDashboardController {
             .data(PublishingSummaryResponse.builder()
                 .totalPublications(
                     reportActivityService.getTotalActivitiesByTypeToSummary(
-                        null, filterRequest,
-                        "publishings"
-                    ))
+                        null, filterRequest, "publishings"))
                 .totalsByContext(
                     publishingSummaryService.getTotalPublicationsByContext(null, filterRequest))
                 .build())
@@ -210,6 +209,32 @@ public class ReportDashboardController {
                         .build(), "follows"
                 ))
                 .totalsByRegion(pageSummaryService.getTotalActivitiesPageGroupedByRegion(request))
+                .build())
+            .build();
+    }
+
+    @Operation(summary = "total groups by region")
+    @GetMapping("dashboard/groups/regions/total")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<GroupSummaryResponse> getTotalGroupsRegion() {
+        return SingleResponse.<GroupSummaryResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(GroupSummaryResponse.builder()
+                .totalGroups(groupSummaryService.countAllGroups())
+                .totalsByRegion(groupSummaryService.getGroupsCountGroupByRegion())
+                .build())
+            .build();
+    }
+
+    @Operation(summary = "total profiles by region")
+    @GetMapping("dashboard/profiles/regions/total")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<PageSummaryResponse> getTotalProfilesRegion() {
+        return SingleResponse.<PageSummaryResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(PageSummaryResponse.builder()
+                .totalPages(pageSummaryService.countAllProfiles())
+                .totalsByRegion(pageSummaryService.getProfilesCountGroupByRegion())
                 .build())
             .build();
     }

@@ -37,7 +37,7 @@ public class ActivityRatingExcelExportCmd extends
                 .reportTitle(request.reportTitle())
                 .authUsername(request.authUsername())
                 .zoneId(filterRequest.getZoneId())
-                .searchDateDetail(filterRequest.getSearchCriteria())
+                .searchCriteria(filterRequest.getSearchCriteria())
                 .searchDateDetail(reportActivityService.getReportDateDetail(filterRequest))
                 .build())
             .execute();
