@@ -249,4 +249,17 @@ public class ReportActivityController {
                 .build())
             .execute();
     }
+
+    @Operation(summary = "rating activities with filters export to pdf")
+    @PostMapping("activities/ratings/pdf")
+    @ResponseStatus(HttpStatus.OK)
+    public void exportActivitiesRatingsToPdf(HttpServletResponse response,
+        @RequestBody ReportRatingRequest request, Authentication authentication,
+        @RequestParam(defaultValue = "inline") ReportDispositionEnum disposition)
+    {
+
+        response.setContentType("application/pdf");
+        response.setHeader(
+            "Content-Disposition", disposition + "; filename=report-activities-ratings.pdf");
+    }
 }

@@ -15,4 +15,6 @@ public class AccountSpecificationCriteria {
     private String keyword;
     private AccountTypeEnum accountType;
     private String linkSearch;
+
+    private String zoneId;
 }

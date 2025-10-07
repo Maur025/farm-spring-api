@@ -7,6 +7,8 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -92,5 +94,79 @@ public class CommonSpecification {
         }
 
         return monthsOfYearList.toArray(ZonedDateTime[][]::new);
+    }
+
+    public static ZoneId getZoneId(String zoneId) {
+        return ZoneId.of(zoneId != null ? zoneId : ZoneId.systemDefault()
+            .toString());
+    }
+
+    public static Predicate simpleDatePredicate(CriteriaBuilder cb, Path<ZonedDateTime> datePath,
+        ZonedDateTime simpleDateInput, String zoneId)
+    {
+        ZoneId userZoneId = getZoneId(zoneId);
+        LocalDate simpleLocalDate = simpleDateInput.toLocalDate();
+
+        ZonedDateTime startOfDay = simpleLocalDate.atStartOfDay(userZoneId);
+
+        ZonedDateTime endOfDay = simpleLocalDate.atTime(LocalTime.MAX)
+            .atZone(userZoneId);
+
+        log.info("Applying simple date filter from {} to {}", startOfDay, endOfDay);
+
+        return cb.between(datePath, startOfDay, endOfDay);
+    }
+
+    public static Predicate dateRangePredicate(CriteriaBuilder cb, Path<ZonedDateTime> datePath,
+        ZonedDateTime fromDate, ZonedDateTime toDate, String zoneId)
+    {
+        ZoneId userZoneId = getZoneId(zoneId);
+
+        LocalDate fromLocalDate = fromDate.toLocalDate();
+        ZonedDateTime startOfFromDate = fromLocalDate.atStartOfDay(userZoneId);
+
+        LocalDate toLocalDate = toDate.toLocalDate();
+        ZonedDateTime endOfToDate = toLocalDate.atTime(LocalTime.MAX)
+            .atZone(userZoneId);
+
+        log.info("Applying date range filter from {} to {}", startOfFromDate, endOfToDate);
+
+        return cb.between(datePath, startOfFromDate, endOfToDate);
+    }
+
+    public static Predicate monthDatePredicate(CriteriaBuilder cb, Path<ZonedDateTime> datePath,
+        ZonedDateTime monthDateInput, String zoneId)
+    {
+        ZoneId userZoneId = getZoneId(zoneId);
+
+        LocalDate monthLocalDate = monthDateInput.withDayOfMonth(1)
+            .toLocalDate();
+
+        ZonedDateTime startOfMonth = monthLocalDate.atStartOfDay(userZoneId);
+
+        ZonedDateTime endOfMonth = startOfMonth.plusMonths(1)
+            .minusNanos(1);
+
+        log.info("Applying month date filter from {} to {}", startOfMonth, endOfMonth);
+
+        return cb.between(datePath, startOfMonth, endOfMonth);
+    }
+
+    public static Predicate yearDatePredicate(CriteriaBuilder cb, Path<ZonedDateTime> datePath,
+        ZonedDateTime yearDateInput, String zoneId)
+    {
+        ZoneId userZoneId = getZoneId(zoneId);
+
+        LocalDate yearLocalDate = yearDateInput.withDayOfYear(1)
+            .toLocalDate();
+
+        ZonedDateTime startOfYear = yearLocalDate.atStartOfDay(userZoneId);
+
+        ZonedDateTime endOfYear = startOfYear.plusYears(1)
+            .minusNanos(1);
+
+        log.info("Applying year date filter from {} to {}", startOfYear, endOfYear);
+
+        return cb.between(datePath, startOfYear, endOfYear);
     }
 }

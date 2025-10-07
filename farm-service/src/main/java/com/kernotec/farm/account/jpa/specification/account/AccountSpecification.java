@@ -47,6 +47,19 @@ public record AccountSpecification(AccountSpecificationCriteria criteria) implem
         return joinMap.get(AccountSpecificationJoinEnum.DEVICE_JOIN);
     }
 
+    private Join<?, ?> getOrCreateActivityJoin(
+        Map<AccountSpecificationJoinEnum, Join<?, ?>> joinMap, Root<?> root)
+    {
+        if (!joinMap.containsKey(AccountSpecificationJoinEnum.ACTIVITY_JOIN)) {
+            joinMap.put(
+                AccountSpecificationJoinEnum.ACTIVITY_JOIN,
+                root.join("activities", JoinType.LEFT)
+            );
+        }
+
+        return joinMap.get(AccountSpecificationJoinEnum.ACTIVITY_JOIN);
+    }
+
     @Override
     public Predicate toPredicate(Root<Account> root, CriteriaQuery<?> query, CriteriaBuilder cb)
     {
@@ -138,8 +151,14 @@ public record AccountSpecification(AccountSpecificationCriteria criteria) implem
         return this;
     }
 
-    private Optional<Predicate> addLinkSearchFilter(Root<Account> root, CriteriaBuilder cb) {
+    private Optional<Predicate> addLinkSearchFilter(Root<Account> root, CriteriaBuilder cb)
+    {
         return Optional.ofNullable(criteria.getLinkSearch())
             .map(link -> cb.equal(root.get("accountLink"), link));
+    }
+
+    public AccountSpecification withZoneId(String zoneId) {
+        this.criteria.setZoneId(zoneId);
+        return this;
     }
 }
