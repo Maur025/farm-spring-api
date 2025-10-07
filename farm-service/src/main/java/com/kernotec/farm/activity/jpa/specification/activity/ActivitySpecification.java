@@ -10,9 +10,6 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -208,20 +205,10 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
 
     private Optional<Predicate> addSimpleDateFilter(Root<Activity> root, CriteriaBuilder cb) {
         return Optional.ofNullable(criteria.getSimpleDate())
-            .map(simpleDate -> {
-                ZoneId userZoneId = getZoneId();
-                LocalDate simpleLocalDate = simpleDate.toLocalDate();
-
-                ZonedDateTime startOfDay = simpleLocalDate.atStartOfDay(userZoneId);
-
-                ZonedDateTime endOfDay = simpleLocalDate.atTime(LocalTime.MAX)
-                    .atZone(userZoneId);
-
-                log.info("startOfDay: {}", startOfDay);
-                log.info("endOfDay: {}", endOfDay);
-
-                return cb.between(root.get("activityDate"), startOfDay, endOfDay);
-            });
+            .map(simpleDate -> CommonSpecification.simpleDatePredicate(
+                cb, root.get("activityDate"),
+                simpleDate, criteria.getZoneId()
+            ));
     }
 
     public ActivitySpecification withDateRange(ZonedDateTime fromDate, ZonedDateTime toDate) {
@@ -235,19 +222,11 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         ZonedDateTime to = criteria.getToDate();
 
         if (from != null && to != null) {
-            ZoneId userZoneId = getZoneId();
-            LocalDate fromLocalDate = from.toLocalDate();
-            ZonedDateTime startOfFromDate = fromLocalDate.atStartOfDay(userZoneId);
-
-            LocalDate toLocalDate = to.toLocalDate();
-
-            ZonedDateTime endOfToDate = toLocalDate.atTime(LocalTime.MAX)
-                .atZone(userZoneId);
-
-            log.info("from Date: {}", startOfFromDate);
-            log.info("to Date: {}", endOfToDate);
-
-            return Optional.of(cb.between(root.get("activityDate"), startOfFromDate, endOfToDate));
+            return Optional.of(
+                CommonSpecification.dateRangePredicate(
+                    cb, root.get("activityDate"), from, to,
+                    criteria().getZoneId()
+                ));
         }
 
         return Optional.empty();
@@ -260,22 +239,10 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
 
     private Optional<Predicate> addMonthDateFilter(Root<Activity> root, CriteriaBuilder cb) {
         return Optional.ofNullable(criteria.getMonthDate())
-            .map(monthDate -> {
-                ZoneId userZoneId = getZoneId();
-
-                LocalDate monthLocalDate = monthDate.withDayOfMonth(1)
-                    .toLocalDate();
-
-                ZonedDateTime startOfMonth = monthLocalDate.atStartOfDay(userZoneId);
-
-                ZonedDateTime endOfMonth = startOfMonth.plusMonths(1)
-                    .minusNanos(1);
-
-                log.info("startOfMonth: {}", startOfMonth);
-                log.info("endOfMonth: {}", endOfMonth);
-
-                return cb.between(root.get("activityDate"), startOfMonth, endOfMonth);
-            });
+            .map(monthDate -> CommonSpecification.monthDatePredicate(
+                cb, root.get("activityDate"),
+                monthDate, criteria.getZoneId()
+            ));
     }
 
     public ActivitySpecification withYearDate(ZonedDateTime yearDate) {
@@ -285,21 +252,10 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
 
     private Optional<Predicate> addYearDateFilter(Root<Activity> root, CriteriaBuilder cb) {
         return Optional.ofNullable(criteria.getYearDate())
-            .map(yearDate -> {
-                ZoneId userZoneId = getZoneId();
-                LocalDate yearLocalDate = yearDate.withDayOfYear(1)
-                    .toLocalDate();
-
-                ZonedDateTime startOfYear = yearLocalDate.atStartOfDay(userZoneId);
-
-                ZonedDateTime endOfYear = startOfYear.plusYears(1)
-                    .minusNanos(1);
-
-                log.info("startOfYear: {}", startOfYear);
-                log.info("endOfYear: {}", endOfYear);
-
-                return cb.between(root.get("activityDate"), startOfYear, endOfYear);
-            });
+            .map(yearDate -> CommonSpecification.yearDatePredicate(
+                cb, root.get("activityDate"),
+                yearDate, criteria.getZoneId()
+            ));
     }
 
     public ActivitySpecification withKeyword(String keyword) {
@@ -331,12 +287,6 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
         return this;
     }
 
-    private ZoneId getZoneId() {
-        return ZoneId.of(this.criteria.getZoneId() != null ? this.criteria.getZoneId()
-            : ZoneId.systemDefault()
-                .toString());
-    }
-
     public ActivitySpecification withOrderBy(String orderBy, boolean isDescending) {
         if (orderBy == null || orderBy.isBlank()) {
             return this;
@@ -354,9 +304,10 @@ public record ActivitySpecification(ActivitySpecificationCriteria criteria) impl
 
     private Optional<Predicate> addTemporaryDateFilter(Root<Activity> root, CriteriaBuilder cb) {
         return Optional.ofNullable(criteria.getTemporaryDateEnum())
-            .map(temporaryDate -> CommonSpecification.addTimeLapsePredicateByEnum(
-                cb, getZoneId(),
-                temporaryDate, root.get("activityDate")
-            ));
+            .map(
+                temporaryDate -> CommonSpecification.addTimeLapsePredicateByEnum(
+                    cb, CommonSpecification.getZoneId(criteria.getZoneId()), temporaryDate,
+                    root.get("activityDate")
+                ));
     }
 }

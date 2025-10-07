@@ -1,17 +1,15 @@
 package com.kernotec.farm.report.jpa.service;
 
 import com.kernotec.farm.account.jpa.entity.Account;
-import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
-import com.kernotec.farm.account.jpa.specification.account.AccountSpecification;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.repository.ActivityRepository;
 import com.kernotec.farm.activity.jpa.specification.activity.ActivitySpecification;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.entity.Farm;
-import com.kernotec.farm.inventory.jpa.specification.device.DeviceSpecification;
 import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.parametric.jpa.enums.ActivityTypeCodeEnum;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
+import com.kernotec.farm.report.rest.dto.request.FilterDateRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportRatingRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
@@ -153,7 +151,7 @@ public class ReportActivityService {
         ));
     }
 
-    public String getReportDateDetail(ReportActivityRequest filterRequest) {
+    public <T extends FilterDateRequest> String getReportDateDetail(T filterRequest) {
         var reportTypeStr = new StringBuilder();
         reportTypeStr.append("Por fechas: ");
 
@@ -210,28 +208,25 @@ public class ReportActivityService {
         CriteriaQuery<ReportRatingResponse> ratingAccountQuery = cb.createQuery(
             ReportRatingResponse.class);
 
-        Root<Account> accountRoot = ratingAccountQuery.from(Account.class);
-        Join<Account, Activity> activityJoin = accountRoot.join("activities", JoinType.INNER);
+        Root<Activity> activityRoot = ratingAccountQuery.from(Activity.class);
+        Join<Activity, Account> accountJoin = activityRoot.join("account", JoinType.INNER);
 
-        Expression<Long> totalActivities = cb.countDistinct(activityJoin.get("id"));
+        Expression<Long> totalActivities = cb.countDistinct(activityRoot.get("id"));
 
         ratingAccountQuery.select(cb.construct(
             ReportRatingResponse.class,
             // ratingById
-            accountRoot.get("id"),
+            accountJoin.get("id"),
             // ratingByName
-            accountRoot.get("username"), totalActivities
+            accountJoin.get("username"), totalActivities
         ));
 
-        ratingAccountQuery.groupBy(accountRoot.get("id"), accountRoot.get("username"));
+        ratingAccountQuery.groupBy(accountJoin.get("id"), accountJoin.get("username"));
 
         ratingAccountQuery.orderBy(
             isDescending ? cb.desc(totalActivities) : cb.asc(totalActivities));
 
-        ratingAccountQuery.where(AccountSpecification.builder()
-            .withSocialNetworkId(filterRequest.getSocialNetworkId())
-            .withAccountType(AccountTypeEnum.INTERNAL)
-            .toPredicate(accountRoot, ratingAccountQuery, cb));
+        setCommonWhereRating(activityRoot, ratingAccountQuery, cb, filterRequest);
 
         return entityManager.createQuery(ratingAccountQuery)
             .setMaxResults(filterRequest.getLimit())
@@ -244,28 +239,26 @@ public class ReportActivityService {
         CriteriaQuery<ReportRatingResponse> ratingDeviceQuery = cb.createQuery(
             ReportRatingResponse.class);
 
-        Root<Device> deviceRoot = ratingDeviceQuery.from(Device.class);
-        Join<Device, Account> accountJoin = deviceRoot.join("accounts", JoinType.INNER);
-        Join<Account, Activity> activityJoin = accountJoin.join("activities", JoinType.INNER);
+        Root<Activity> activityRoot = ratingDeviceQuery.from(Activity.class);
+        Join<Activity, Account> accountJoin = activityRoot.join("account", JoinType.INNER);
+        Join<Account, Device> deviceJoin = accountJoin.join("devices", JoinType.INNER);
 
-        Expression<Long> totalActivities = cb.countDistinct(activityJoin.get("id"));
+        Expression<Long> totalActivities = cb.countDistinct(activityRoot.get("id"));
 
         ratingDeviceQuery.select(cb.construct(
             ReportRatingResponse.class,
             // ratingById
-            deviceRoot.get("id"),
+            deviceJoin.get("id"),
             // ratingByName
-            deviceRoot.get("deviceNumber"), totalActivities
+            deviceJoin.get("deviceNumber"), totalActivities
         ));
 
-        ratingDeviceQuery.groupBy(deviceRoot.get("id"), deviceRoot.get("deviceNumber"));
+        ratingDeviceQuery.groupBy(deviceJoin.get("id"), deviceJoin.get("deviceNumber"));
 
         ratingDeviceQuery.orderBy(
             isDescending ? cb.desc(totalActivities) : cb.asc(totalActivities));
 
-        ratingDeviceQuery.where(DeviceSpecification.builder()
-            .withSocialNetworkId(filterRequest.getSocialNetworkId())
-            .toPredicate(deviceRoot, ratingDeviceQuery, cb));
+        setCommonWhereRating(activityRoot, ratingDeviceQuery, cb, filterRequest);
 
         return entityManager.createQuery(ratingDeviceQuery)
             .setMaxResults(filterRequest.getLimit())
@@ -278,24 +271,26 @@ public class ReportActivityService {
         CriteriaQuery<ReportRatingResponse> ratingFarmQuery = cb.createQuery(
             ReportRatingResponse.class);
 
-        Root<Farm> farmRoot = ratingFarmQuery.from(Farm.class);
-        Join<Farm, Device> deviceJoin = farmRoot.join("devices", JoinType.INNER);
-        Join<Device, Account> accountJoin = deviceJoin.join("accounts", JoinType.INNER);
-        Join<Account, Activity> activityJoin = accountJoin.join("activities", JoinType.INNER);
+        Root<Activity> activityRoot = ratingFarmQuery.from(Activity.class);
+        Join<Activity, Account> accountJoin = activityRoot.join("account", JoinType.INNER);
+        Join<Account, Device> deviceJoin = accountJoin.join("devices", JoinType.INNER);
+        Join<Device, Farm> farmJoin = deviceJoin.join("farm", JoinType.INNER);
 
-        Expression<Long> totalActivities = cb.countDistinct(activityJoin.get("id"));
+        Expression<Long> totalActivities = cb.countDistinct(activityRoot.get("id"));
 
         ratingFarmQuery.select(cb.construct(
             ReportRatingResponse.class,
             // ratingById
-            farmRoot.get("id"),
+            farmJoin.get("id"),
             // ratingByName
-            farmRoot.get("name"), totalActivities
+            farmJoin.get("name"), totalActivities
         ));
 
-        ratingFarmQuery.groupBy(farmRoot.get("id"), farmRoot.get("name"));
+        ratingFarmQuery.groupBy(farmJoin.get("id"), farmJoin.get("name"));
 
         ratingFarmQuery.orderBy(isDescending ? cb.desc(totalActivities) : cb.asc(totalActivities));
+
+        setCommonWhereRating(activityRoot, ratingFarmQuery, cb, filterRequest);
 
         return entityManager.createQuery(ratingFarmQuery)
             .setMaxResults(filterRequest.getLimit())
@@ -331,14 +326,24 @@ public class ReportActivityService {
         ratingAuthUserQuery.orderBy(
             isDescending ? cb.desc(totalActivities) : cb.asc(totalActivities));
 
-        ratingAuthUserQuery.where(ActivitySpecification.builder()
-            .includeOnlyUserActivities(true)
-            .withSocialNetworkId(filterRequest.getSocialNetworkId())
-            .toPredicate(activityRoot, ratingAuthUserQuery, cb));
+        setCommonWhereRating(activityRoot, ratingAuthUserQuery, cb, filterRequest);
 
         return entityManager.createQuery(ratingAuthUserQuery)
             .setMaxResults(filterRequest.getLimit())
             .getResultList();
+    }
+
+    private void setCommonWhereRating(Root<Activity> root, CriteriaQuery<?> ratingQuery,
+        CriteriaBuilder cb, ReportRatingRequest filterRequest)
+    {
+        ratingQuery.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withZoneId(filterRequest.getZoneId())
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withSimpleDate(filterRequest.getSimpleDate())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withDateRange(filterRequest.getFromDate(), filterRequest.getToDate())
+            .toPredicate(root, ratingQuery, cb));
     }
 
     public Long getTotalActivitiesByTypeToSummary(UUID accountId,
