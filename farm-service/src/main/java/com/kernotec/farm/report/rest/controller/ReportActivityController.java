@@ -7,6 +7,7 @@ import com.kernotec.core.rest.dto.response.SingleResponse;
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.rest.dto.response.activity.ActivityResponse;
 import com.kernotec.farm.activity.rest.mapper.activity.ActivityResponseMapper;
+import com.kernotec.farm.report.jpa.enums.RatingTypeEnum;
 import com.kernotec.farm.report.jpa.enums.ReportDispositionEnum;
 import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
@@ -200,13 +201,31 @@ public class ReportActivityController {
             .build();
     }
 
+    @Operation(summary = "get rating of activities to test pdf report")
+    @GetMapping("activities/ratings/report")
+    @ResponseStatus(HttpStatus.OK)
+    public SingleResponse<ReportRatingGroupListResponse> getActivitiesRatingsToPdf(
+        @RequestParam(required = false) RatingTypeEnum ratingType,
+        @RequestParam(defaultValue = "5") Integer limit)
+    {
+        var request = new ReportRatingRequest();
+        request.setRatingType(ratingType);
+        request.setLimit(limit);
+
+        return SingleResponse.<ReportRatingGroupListResponse>builder()
+            .code(HttpStatus.OK.value())
+            .data(ReportRatingGroupListResponse.builder()
+                .ratingMoreActivities(reportActivityService.getActivitiesRatings(request, true))
+                .ratingLessActivities(reportActivityService.getActivitiesRatings(request, false))
+                .build())
+            .build();
+    }
+
     @Operation(summary = "rating activities with filters export to excel")
     @PostMapping("activities/ratings/excel")
     @ResponseStatus(HttpStatus.OK)
     public void exportActivitiesRatingsToExcel(HttpServletResponse response,
-        @RequestBody ReportRatingRequest request,
-        @RequestParam(defaultValue = "activityDate") String sortBy,
-        @RequestParam(defaultValue = "true") boolean descending, Authentication authentication)
+        @RequestBody ReportRatingRequest request, Authentication authentication)
     {
 
         response.setContentType(
@@ -224,8 +243,6 @@ public class ReportActivityController {
                             .sheet(sheet)
                             .reportTitle(reportTitle)
                             .filterRequest(request)
-                            .sortBy(sortBy)
-                            .descending(descending)
                             .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
                             .build())
                     .execute())

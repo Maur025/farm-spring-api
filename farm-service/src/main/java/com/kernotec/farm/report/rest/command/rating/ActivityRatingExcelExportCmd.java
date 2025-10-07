@@ -89,8 +89,8 @@ public class ActivityRatingExcelExportCmd extends
     }
 
     @Builder
-    public record Request(Sheet sheet, String reportTitle, String sortBy, boolean descending,
-                          ReportRatingRequest filterRequest, String authUsername)
+    public record Request(Sheet sheet, String reportTitle, ReportRatingRequest filterRequest,
+                          String authUsername)
     {
 
     }
