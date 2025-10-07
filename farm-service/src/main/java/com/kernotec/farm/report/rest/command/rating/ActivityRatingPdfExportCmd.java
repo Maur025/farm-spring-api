@@ -1,39 +1,37 @@
-package com.kernotec.farm.report.rest.command.activity;
+package com.kernotec.farm.report.rest.command.rating;
 
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.rest.command.pdf.PdfBuildJasperParamCmd;
-import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
+import com.kernotec.farm.report.rest.dto.request.ReportRatingRequest;
 import com.kernotec.farm.util.PdfUtil;
 import com.kernotec.farm.util.ResourceUtil;
 import java.io.IOException;
 import java.util.Map;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JsonDataSource;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
-public class ReportActivityPdfExportCmd extends
-    AbstractTransactionalRequiredCommand<ReportActivityPdfExportCmd.Request, byte[]>
+public class ActivityRatingPdfExportCmd extends
+    AbstractTransactionalRequiredCommand<ActivityRatingPdfExportCmd.Request, byte[]>
 {
 
-    private final ReportActivityService reportActivityService;
     private final PdfUtil pdfUtil;
     private final PdfBuildJasperParamCmd pdfBuildJasperParamCmd;
+    private final ReportActivityService reportActivityService;
 
     @Override
     protected byte[] run(Request request) {
-        ReportActivityRequest filterRequest = request.filterRequest();
+        ReportRatingRequest filterRequest = request.filterRequest();
 
         String jsonResponseData = pdfUtil.consumeUrlAndGetData(
-            "reports/activities/report/unpaginated", request.token(),
-            () -> buildParamsToUrl(filterRequest, request.sortBy(), request.isDescending())
+            "reports/activities/ratings/report",
+            request.token(), () -> buildParamsToUrl(filterRequest)
         );
 
         JsonDataSource jsonDataSource = pdfUtil.getJsonDataSourceFromJsonString(jsonResponseData);
@@ -49,33 +47,21 @@ public class ReportActivityPdfExportCmd extends
             .execute();
 
         try {
-            String jasperFilePath = ResourceUtil.getAbsolutePath("MyReports/ActivityReport.jasper");
+            String jasperFilePath = ResourceUtil.getAbsolutePath(
+                "MyReports/ActivityRatingReport.jasper");
 
             return JasperRunManager.runReportToPdf(jasperFilePath, params, jsonDataSource);
-        } catch (IOException | JRException ex) {
-            throw new RuntimeException(ex);
+        } catch (IOException | JRException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private StringBuilder buildParamsToUrl(ReportActivityRequest filterRequest, String sortBy,
-        boolean isDescending)
+    private StringBuilder buildParamsToUrl(ReportRatingRequest filterRequest)
     {
         var queryParams = new StringBuilder();
-        pdfUtil.addUrlParam(queryParams, "descending", String.valueOf(isDescending));
-
-        if (sortBy != null) {
-            pdfUtil.addUrlParam(queryParams, "sortBy", sortBy);
-        }
 
         if (filterRequest.getZoneId() != null) {
             pdfUtil.addUrlParam(queryParams, "zoneId", filterRequest.getZoneId());
-        }
-
-        if (filterRequest.getUserAuthId() != null) {
-            pdfUtil.addUrlParam(
-                queryParams, "userAuthId", filterRequest.getUserAuthId()
-                    .toString()
-            );
         }
 
         if (filterRequest.getSocialNetworkId() != null) {
@@ -85,30 +71,16 @@ public class ReportActivityPdfExportCmd extends
             );
         }
 
-        if (filterRequest.getActivityTypeId() != null) {
+        if (filterRequest.getRatingType() != null) {
             pdfUtil.addUrlParam(
-                queryParams, "activityTypeId", filterRequest.getActivityTypeId()
+                queryParams, "ratingType", filterRequest.getRatingType()
                     .toString()
             );
         }
 
-        if (filterRequest.getFarmId() != null) {
+        if (filterRequest.getLimit() != null) {
             pdfUtil.addUrlParam(
-                queryParams, "farmId", filterRequest.getFarmId()
-                    .toString()
-            );
-        }
-
-        if (filterRequest.getDeviceId() != null) {
-            pdfUtil.addUrlParam(
-                queryParams, "deviceId", filterRequest.getDeviceId()
-                    .toString()
-            );
-        }
-
-        if (filterRequest.getAccountId() != null) {
-            pdfUtil.addUrlParam(
-                queryParams, "accountId", filterRequest.getAccountId()
+                queryParams, "limit", filterRequest.getLimit()
                     .toString()
             );
         }
@@ -141,19 +113,12 @@ public class ReportActivityPdfExportCmd extends
             );
         }
 
-        if (filterRequest.getYearDate() != null) {
-            pdfUtil.addUrlParam(
-                queryParams, "yearDate", filterRequest.getYearDate()
-                    .toString()
-            );
-        }
-
         return queryParams;
     }
 
     @Builder
-    public record Request(String token, ReportActivityRequest filterRequest, String sortBy,
-                          boolean isDescending, String authUsername, String titleReport)
+    public record Request(String token, ReportRatingRequest filterRequest, String authUsername,
+                          String titleReport)
     {
 
     }

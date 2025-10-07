@@ -14,7 +14,9 @@ import com.kernotec.farm.report.rest.ApiSpec.ReportSpec;
 import com.kernotec.farm.report.rest.command.activity.ReportActivityExcelExportCmd;
 import com.kernotec.farm.report.rest.command.activity.ReportActivityPdfExportCmd;
 import com.kernotec.farm.report.rest.command.excel.ExcelExportCmd;
+import com.kernotec.farm.report.rest.command.pdf.PdfExportCmd;
 import com.kernotec.farm.report.rest.command.rating.ActivityRatingExcelExportCmd;
+import com.kernotec.farm.report.rest.command.rating.ActivityRatingPdfExportCmd;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.report.rest.dto.request.ReportRatingRequest;
 import com.kernotec.farm.report.rest.dto.response.activity.ActivityTypeTotalResponse;
@@ -54,6 +56,8 @@ public class ReportActivityController {
     private final ReportActivityPdfExportCmd reportActivityPdfExportCmd;
     private final ActivityRatingExcelExportCmd activityRatingExcelExportCmd;
     private final ExcelExportCmd excelExportCmd;
+    private final PdfExportCmd pdfExportCmd;
+    private final ActivityRatingPdfExportCmd activityRatingPdfExportCmd;
 
     @Operation(summary = "Activity report with filters")
     @PostMapping("activities/report")
@@ -139,13 +143,10 @@ public class ReportActivityController {
         @RequestParam(defaultValue = "activityDate") String sortBy,
         @RequestParam(defaultValue = "true") boolean descending, Authentication authentication)
     {
-        response.setContentType(
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=report-activities.xlsx");
-
         excelExportCmd.withRequest(ExcelExportCmd.Request.builder()
                 .response(response)
                 .reportTitle(titleReport)
+                .fileName("report-activities.xlsx")
                 .callback(sheet -> reportActivityExcelExportCmd.withRequest(
                         ReportActivityExcelExportCmd.Request.builder()
                             .sheet(sheet)
@@ -170,18 +171,20 @@ public class ReportActivityController {
         @RequestParam(defaultValue = "true") boolean descending, Authentication authentication,
         @RequestParam(defaultValue = "inline") ReportDispositionEnum disposition)
     {
-        response.setContentType("application/pdf");
-        response.setHeader(
-            "Content-Disposition", disposition.toString() + "; filename=report-activities.pdf");
-
-        reportActivityPdfExportCmd.withRequest(ReportActivityPdfExportCmd.Request.builder()
+        pdfExportCmd.withRequest(PdfExportCmd.Request.builder()
                 .response(response)
-                .titleReport(titleReport)
-                .token(authUtil.getAuthTokenFromAuthentication(authentication))
-                .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
-                .filterRequest(filterRequest)
-                .sortBy(sortBy)
-                .isDescending(descending)
+                .disposition(disposition)
+                .fileName("report-activities.pdf")
+                .callbackGetReportBytes(() -> reportActivityPdfExportCmd.withRequest(
+                        ReportActivityPdfExportCmd.Request.builder()
+                            .titleReport(titleReport)
+                            .token(authUtil.getAuthTokenFromAuthentication(authentication))
+                            .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
+                            .filterRequest(filterRequest)
+                            .sortBy(sortBy)
+                            .isDescending(descending)
+                            .build())
+                    .execute())
                 .build())
             .execute();
     }
@@ -206,11 +209,23 @@ public class ReportActivityController {
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<ReportRatingGroupListResponse> getActivitiesRatingsToPdf(
         @RequestParam(required = false) RatingTypeEnum ratingType,
-        @RequestParam(defaultValue = "5") Integer limit)
+        @RequestParam(defaultValue = "5") Integer limit,
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) ZonedDateTime simpleDate,
+        @RequestParam(required = false) ZonedDateTime fromDate,
+        @RequestParam(required = false) ZonedDateTime toDate,
+        @RequestParam(required = false) ZonedDateTime monthDate,
+        @RequestParam(required = false) String zoneId)
     {
         var request = new ReportRatingRequest();
         request.setRatingType(ratingType);
         request.setLimit(limit);
+        request.setSocialNetworkId(socialNetworkId);
+        request.setSimpleDate(simpleDate);
+        request.setFromDate(fromDate);
+        request.setToDate(toDate);
+        request.setMonthDate(monthDate);
+        request.setZoneId(zoneId);
 
         return SingleResponse.<ReportRatingGroupListResponse>builder()
             .code(HttpStatus.OK.value())
@@ -227,17 +242,12 @@ public class ReportActivityController {
     public void exportActivitiesRatingsToExcel(HttpServletResponse response,
         @RequestBody ReportRatingRequest request, Authentication authentication)
     {
-
-        response.setContentType(
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader(
-            "Content-Disposition", "attachment; filename=report-activities-ratings.xlsx");
-
         String reportTitle = "Clasificación de actividades";
 
         excelExportCmd.withRequest(ExcelExportCmd.Request.builder()
                 .response(response)
                 .reportTitle(reportTitle)
+                .fileName("report-activities-ratings.xlsx")
                 .callback(sheet -> activityRatingExcelExportCmd.withRequest(
                         ActivityRatingExcelExportCmd.Request.builder()
                             .sheet(sheet)
@@ -258,8 +268,19 @@ public class ReportActivityController {
         @RequestParam(defaultValue = "inline") ReportDispositionEnum disposition)
     {
 
-        response.setContentType("application/pdf");
-        response.setHeader(
-            "Content-Disposition", disposition + "; filename=report-activities-ratings.pdf");
+        pdfExportCmd.withRequest(PdfExportCmd.Request.builder()
+                .response(response)
+                .disposition(disposition)
+                .fileName("report-activities-ratings.pdf")
+                .callbackGetReportBytes(() -> activityRatingPdfExportCmd.withRequest(
+                        ActivityRatingPdfExportCmd.Request.builder()
+                            .token(authUtil.getAuthTokenFromAuthentication(authentication))
+                            .filterRequest(request)
+                            .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
+                            .titleReport("Clasificación de actividades")
+                            .build())
+                    .execute())
+                .build())
+            .execute();
     }
 }

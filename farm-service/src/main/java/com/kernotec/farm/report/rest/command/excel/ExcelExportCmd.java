@@ -20,14 +20,21 @@ public class ExcelExportCmd extends
 
     @Override
     protected Void run(Request request) {
-        try (var workbook = new SXSSFWorkbook(500); OutputStream out = request.response()
-            .getOutputStream())
-        {
+        HttpServletResponse response = request.response();
+
+        try (var workbook = new SXSSFWorkbook(500); OutputStream out = response.getOutputStream()) {
             Sheet sheet = workbook.createSheet(
                 request.reportTitle() == null ? "Report" : request.reportTitle());
 
             request.callback()
                 .accept(sheet);
+
+            response.setContentType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader(
+                "Content-Disposition",
+                String.format("attachment; filename=\"%s\"", request.fileName())
+            );
 
             workbook.write(out);
             out.flush();
@@ -40,7 +47,7 @@ public class ExcelExportCmd extends
 
     @Builder
     public record Request(@NotNull Consumer<Sheet> callback, @NotNull HttpServletResponse response,
-                          String reportTitle)
+                          String reportTitle, String fileName)
     {
 
     }
