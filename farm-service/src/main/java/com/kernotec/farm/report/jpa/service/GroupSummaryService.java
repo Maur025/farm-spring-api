@@ -196,4 +196,36 @@ public class GroupSummaryService {
         return entityManager.createQuery(groupsRegionQuery)
             .getResultList();
     }
+
+    public Long countAllGroups() {
+        CriteriaQuery<Long> countGroupsQuery = cb.createQuery(Long.class);
+        Root<Group> groupRoot = countGroupsQuery.from(Group.class);
+
+        countGroupsQuery.select(cb.countDistinct(groupRoot.get("id")));
+
+        return entityManager.createQuery(countGroupsQuery)
+            .getSingleResult();
+    }
+
+    public List<GroupRegionSummaryResponse> getGroupsCountGroupByRegion() {
+        CriteriaQuery<GroupRegionSummaryResponse> groupsRegionQuery = cb.createQuery(
+            GroupRegionSummaryResponse.class);
+        Root<Group> groupRoot = groupsRegionQuery.from(Group.class);
+        Join<Group, Region> regionJoin = groupRoot.join("region", JoinType.INNER);
+
+        groupsRegionQuery.select(cb.construct(
+            GroupRegionSummaryResponse.class,
+            // regionName
+            regionJoin.get("name"),
+            // regionId
+            regionJoin.get("id"),
+            // totalGroupsByRegion
+            cb.countDistinct(groupRoot.get("id"))
+        ));
+
+        groupsRegionQuery.groupBy(regionJoin.get("name"), regionJoin.get("id"));
+
+        return entityManager.createQuery(groupsRegionQuery)
+            .getResultList();
+    }
 }

@@ -193,4 +193,36 @@ public class PageSummaryService {
         return entityManager.createQuery(pageRegionQuery)
             .getResultList();
     }
+
+    public Long countAllProfiles() {
+        CriteriaQuery<Long> countProfilesQuery = cb.createQuery(Long.class);
+        Root<Profile> profileRoot = countProfilesQuery.from(Profile.class);
+
+        countProfilesQuery.select(cb.countDistinct(profileRoot.get("id")));
+
+        return entityManager.createQuery(countProfilesQuery)
+            .getSingleResult();
+    }
+
+    public List<PageRegionSummaryResponse> getProfilesCountGroupByRegion() {
+        CriteriaQuery<PageRegionSummaryResponse> countProfilesByRegionQuery = cb.createQuery(
+            PageRegionSummaryResponse.class);
+        Root<Profile> profileRoot = countProfilesByRegionQuery.from(Profile.class);
+        Join<Profile, Region> regionJoin = profileRoot.join("region", JoinType.INNER);
+
+        countProfilesByRegionQuery.select(cb.construct(
+            PageRegionSummaryResponse.class,
+            // regionName
+            regionJoin.get("name"),
+            // regionId
+            regionJoin.get("id"),
+            // totalPagesByRegion
+            cb.countDistinct(profileRoot.get("id"))
+        ));
+
+        countProfilesByRegionQuery.groupBy(regionJoin.get("name"), regionJoin.get("id"));
+
+        return entityManager.createQuery(countProfilesByRegionQuery)
+            .getResultList();
+    }
 }
