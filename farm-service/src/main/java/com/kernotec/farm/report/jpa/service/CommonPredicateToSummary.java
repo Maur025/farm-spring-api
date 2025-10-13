@@ -3,15 +3,14 @@ package com.kernotec.farm.report.jpa.service;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
-import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.response.account.AccountSummaryTableResponse;
+import com.kernotec.farm.util.CommonSpecification;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -64,31 +63,7 @@ public class CommonPredicateToSummary {
     }
 
     /**
-     * Generates common predicates to filter activities by account and social network, and applies a
-     * time lapse filter if provided. Used for activity summary queries.
-     *
-     * @param activityRoot  Root entity for Activity in the query.
-     * @param accountId     Unique identifier of the account.
-     * @param filterRequest Request object containing filter parameters.
-     * @return List of predicates for activity filtering.
-     */
-    public List<Predicate> getCommonActivityPredicates(Root<Activity> activityRoot, UUID accountId,
-        ActivitySummaryByAccountRequest filterRequest)
-    {
-        Join<Activity, Account> accountJoin = activityRoot.join("account");
-
-        List<Predicate> predicateList = new ArrayList<>();
-        predicateList.add(cb.equal(activityRoot.get("accountId"), accountId));
-        predicateList.add(
-            cb.equal(accountJoin.get("socialNetworkId"), filterRequest.getSocialNetworkId()));
-
-        addTimeLapsePredicate(filterRequest, predicateList, activityRoot.get("activityDate"));
-
-        return predicateList;
-    }
-
-    /**
-     * Adds a time lapse predicate to the given predicate list, based on the filter request. Applies
+     * Adds a time-lapse predicate to the given predicate list, based on the filter request. Applies
      * date range filtering for activity summaries, considering the user's time zone.
      *
      * @param filterRequest          Request object containing date filter and time zone.
@@ -98,7 +73,6 @@ public class CommonPredicateToSummary {
     public void addTimeLapsePredicate(ActivitySummaryByAccountRequest filterRequest,
         List<Predicate> predicateList, Path<ZonedDateTime> zonedDateTimeToCompare)
     {
-
         if (filterRequest.getFilterDate() == null || filterRequest.getZoneId() == null
             || filterRequest.getZoneId()
             .isBlank())
@@ -110,25 +84,10 @@ public class CommonPredicateToSummary {
 
         ZoneId userZone = ZoneId.of(filterRequest.getZoneId());
 
-        ZonedDateTime to = ZonedDateTime.now(userZone);
-        ZonedDateTime toStartOfDay = to.toLocalDate()
-            .atStartOfDay(userZone);
-        ZonedDateTime toEndOfDay = toStartOfDay.plusDays(1)
-            .minusNanos(1);
-
-        ZonedDateTime from = switch (filterRequest.getFilterDate()) {
-            case ALL -> ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, userZone);
-            case LAST_WEEK -> to.minusWeeks(1);
-            case LAST_MONTH -> to.minusMonths(1);
-            case LAST_THREE_MONTHS -> to.minusMonths(3);
-        };
-
-        ZonedDateTime fromStartOfDay = from.toLocalDate()
-            .atStartOfDay(userZone);
-
-        log.info("Applying time lapse filter from {} to {}", fromStartOfDay, toEndOfDay);
-
-        predicateList.add(cb.between(zonedDateTimeToCompare, fromStartOfDay, toEndOfDay));
+        predicateList.add(CommonSpecification.addTimeLapsePredicateByEnum(
+            cb, userZone,
+            filterRequest.getFilterDate(), zonedDateTimeToCompare
+        ));
     }
 
     /**

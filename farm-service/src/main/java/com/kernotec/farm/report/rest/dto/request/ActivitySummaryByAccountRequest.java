@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kernotec.core.rest.dto.request.BaseRequest;
 import com.kernotec.farm.report.jpa.enums.TemporyDateForRequestEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,11 +18,10 @@ import org.springframework.data.domain.Pageable;
 @AllArgsConstructor
 public class ActivitySummaryByAccountRequest extends BaseRequest {
 
-    @NotNull
     private UUID socialNetworkId;
-    @NotNull
     private TemporyDateForRequestEnum filterDate;
-    @NotNull
+    private ZonedDateTime monthDate;
+    private UUID authUserId;
     private String zoneId;
 
     @JsonIgnore

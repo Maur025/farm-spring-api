@@ -30,6 +30,11 @@ public class AccountCreateCmd extends
         account.setSocialNetworkId(request.getSocialNetworkId());
         account.setType(request.getType());
 
+        account.setIsEnabled(request.getIsEnabled() == null || request.getIsEnabled());
+
+        account.setAccountLink(request.getAccountLink());
+        account.setIdentityUsername(request.getIdentityUsername());
+
         account = accountService.save(account);
         return account.getId();
     }
@@ -48,5 +53,8 @@ public class AccountCreateCmd extends
         private final UUID socialNetworkId;
         @NotNull
         private final AccountTypeEnum type;
+        private final Boolean isEnabled;
+        private final String accountLink;
+        private final String identityUsername;
     }
 }

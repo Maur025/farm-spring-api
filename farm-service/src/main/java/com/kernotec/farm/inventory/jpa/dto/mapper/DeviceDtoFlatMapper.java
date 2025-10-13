@@ -13,6 +13,8 @@ public interface DeviceDtoFlatMapper {
     @Mapping(target = "farm", ignore = true)
     @Mapping(target = "chips", ignore = true)
     @Mapping(target = "accounts", ignore = true)
+    @Mapping(target = "deviceImeis", ignore = true)
+    @Mapping(target = "deviceConnections", ignore = true)
     DeviceDto toDto(Device device);
 
     List<DeviceDto> toDto(List<Device> deviceList);

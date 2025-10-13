@@ -2,6 +2,7 @@ package com.kernotec.farm.report.jpa.service;
 
 import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Reaction;
+import com.kernotec.farm.activity.jpa.specification.activity.ActivitySpecification;
 import com.kernotec.farm.parametric.jpa.entity.ReactionType;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
 import com.kernotec.farm.report.rest.dto.response.account.ReactionSummaryResponse;
@@ -12,7 +13,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 public class ReactionSummaryService {
 
     private final EntityManager entityManager;
-    private final CommonPredicateToSummary commonPredicateToSummary;
+    private final ReportActivityService reportActivityService;
 
     private CriteriaBuilder cb;
 
@@ -37,28 +37,13 @@ public class ReactionSummaryService {
         ActivitySummaryByAccountRequest filterRequest)
     {
         return ReactionSummaryResponse.builder()
-            .totalReactions(getTotalReactions(accountId, filterRequest))
+            .totalReactions(
+                reportActivityService.getTotalActivitiesByTypeToSummary(
+                    accountId, filterRequest,
+                    "reactions"
+                ))
             .totalsByType(getTotalReactionsByType(accountId, filterRequest))
             .build();
-    }
-
-    private Long getTotalReactions(UUID accountId, ActivitySummaryByAccountRequest filterRequest) {
-        CriteriaQuery<Long> queryOfTotalReactions = cb.createQuery(Long.class);
-        Root<Activity> activityRoot = queryOfTotalReactions.from(Activity.class);
-
-        Join<Activity, Reaction> reactionJoin = activityRoot.join("reactions", JoinType.INNER);
-
-        queryOfTotalReactions.select(cb.countDistinct(reactionJoin.get("id")));
-
-        queryOfTotalReactions.where(
-            commonPredicateToSummary.getCommonActivityPredicates(
-                    activityRoot, accountId,
-                    filterRequest
-                )
-                .toArray(Predicate[]::new));
-
-        return entityManager.createQuery(queryOfTotalReactions)
-            .getSingleResult();
     }
 
     private List<ReactionTypeSummaryResponse> getTotalReactionsByType(UUID accountId,
@@ -84,12 +69,15 @@ public class ReactionSummaryService {
             cb.countDistinct(reactionJoin.get("id"))
         ));
 
-        queryReactionsByType.where(cb.and(
-            commonPredicateToSummary.getCommonActivityPredicates(
-                    activityRoot, accountId,
-                    filterRequest
-                )
-                .toArray(Predicate[]::new)));
+        queryReactionsByType.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withZoneId(filterRequest.getZoneId())
+            .withAccountId(accountId)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withTemporaryDate(filterRequest.getFilterDate())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withUserAuthId(filterRequest.getAuthUserId())
+            .toPredicate(activityRoot, queryReactionsByType, cb));
 
         queryReactionsByType.groupBy(
             reactionTypeJoin.get("id"), reactionTypeJoin.get("name"), reactionTypeJoin.get("code"));

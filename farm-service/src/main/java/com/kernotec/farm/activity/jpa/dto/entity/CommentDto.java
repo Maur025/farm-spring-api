@@ -12,7 +12,7 @@ import lombok.Setter;
 public class CommentDto extends AuditEntityDto {
 
     private String comment;
-    private boolean isAgreeComment = false;
+    private boolean isAgreeComment;
 
     private UUID activityId;
     private ActivityDto activity;

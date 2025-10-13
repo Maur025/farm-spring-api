@@ -67,6 +67,7 @@ public class ImportExcelDataGetDtoCmd extends
         importExcelDataDto.setFarmType(csvData[28].isBlank() ? null : csvData[28]);
         /*importExcelDataDto.setBirthDateRegister(csvData[29].isBlank() ? null : csvData[29]);
         importExcelDataDto.setBirthDateFake(csvData[30].isBlank() ? null : csvData[30]);*/
+        importExcelDataDto.setFacebookAccountLink(csvData[31].isBlank() ? null : csvData[31]);
 
         return importExcelDataDto;
     }

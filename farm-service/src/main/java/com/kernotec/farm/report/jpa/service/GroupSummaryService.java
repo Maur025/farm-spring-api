@@ -3,11 +3,15 @@ package com.kernotec.farm.report.jpa.service;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
+import com.kernotec.farm.activity.jpa.entity.Activity;
 import com.kernotec.farm.activity.jpa.entity.Group;
+import com.kernotec.farm.activity.jpa.entity.GroupMembership;
+import com.kernotec.farm.activity.jpa.specification.activity.ActivitySpecification;
 import com.kernotec.farm.parametric.jpa.entity.GroupState;
 import com.kernotec.farm.parametric.jpa.entity.Region;
 import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
 import com.kernotec.farm.report.rest.dto.request.ActivitySummaryByAccountRequest;
+import com.kernotec.farm.report.rest.dto.request.ReportDashboardRequest;
 import com.kernotec.farm.report.rest.dto.response.account.AccountSummaryTableResponse;
 import com.kernotec.farm.report.rest.dto.response.account.GroupRegionSummaryResponse;
 import com.kernotec.farm.report.rest.dto.response.account.GroupSummaryResponse;
@@ -155,5 +159,73 @@ public class GroupSummaryService {
         }
 
         return predicateList;
+    }
+
+    public List<GroupRegionSummaryResponse> getTotalActivitiesGroupByRegion(
+        ReportDashboardRequest filterRequest)
+    {
+        CriteriaQuery<GroupRegionSummaryResponse> groupsRegionQuery = cb.createQuery(
+            GroupRegionSummaryResponse.class);
+
+        Root<Activity> activityRoot = groupsRegionQuery.from(Activity.class);
+        Join<Activity, GroupMembership> groupMembershipJoin = activityRoot.join(
+            "groupMemberships", JoinType.INNER);
+        Join<GroupMembership, Group> groupJoin = groupMembershipJoin.join("group", JoinType.LEFT);
+        Join<Group, Region> regionJoin = groupJoin.join("region", JoinType.LEFT);
+
+        groupsRegionQuery.select(cb.construct(
+            GroupRegionSummaryResponse.class,
+            // regionName
+            regionJoin.get("name"),
+            // regionId
+            regionJoin.get("id"),
+            // totalGroupsByRegion
+            cb.countDistinct(groupMembershipJoin.get("id"))
+        ));
+
+        groupsRegionQuery.groupBy(regionJoin.get("name"), regionJoin.get("id"));
+
+        groupsRegionQuery.where(ActivitySpecification.builder()
+            .includeOnlyUserActivities(true)
+            .withSocialNetworkId(filterRequest.getSocialNetworkId())
+            .withUserAuthId(filterRequest.getAuthUserId())
+            .withMonthDate(filterRequest.getMonthDate())
+            .withZoneId(filterRequest.getZoneId())
+            .toPredicate(activityRoot, groupsRegionQuery, cb));
+
+        return entityManager.createQuery(groupsRegionQuery)
+            .getResultList();
+    }
+
+    public Long countAllGroups() {
+        CriteriaQuery<Long> countGroupsQuery = cb.createQuery(Long.class);
+        Root<Group> groupRoot = countGroupsQuery.from(Group.class);
+
+        countGroupsQuery.select(cb.countDistinct(groupRoot.get("id")));
+
+        return entityManager.createQuery(countGroupsQuery)
+            .getSingleResult();
+    }
+
+    public List<GroupRegionSummaryResponse> getGroupsCountGroupByRegion() {
+        CriteriaQuery<GroupRegionSummaryResponse> groupsRegionQuery = cb.createQuery(
+            GroupRegionSummaryResponse.class);
+        Root<Group> groupRoot = groupsRegionQuery.from(Group.class);
+        Join<Group, Region> regionJoin = groupRoot.join("region", JoinType.INNER);
+
+        groupsRegionQuery.select(cb.construct(
+            GroupRegionSummaryResponse.class,
+            // regionName
+            regionJoin.get("name"),
+            // regionId
+            regionJoin.get("id"),
+            // totalGroupsByRegion
+            cb.countDistinct(groupRoot.get("id"))
+        ));
+
+        groupsRegionQuery.groupBy(regionJoin.get("name"), regionJoin.get("id"));
+
+        return entityManager.createQuery(groupsRegionQuery)
+            .getResultList();
     }
 }

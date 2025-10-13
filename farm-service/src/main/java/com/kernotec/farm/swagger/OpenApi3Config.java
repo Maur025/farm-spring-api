@@ -1,6 +1,7 @@
 package com.kernotec.farm.swagger;
 
-import com.kernotec.farm.swagger.KernotecApiDefinition.OpenApiInfo;
+import com.kernotec.farm.config.KernotecApiDefinition;
+import com.kernotec.farm.config.KernotecApiDefinition.OpenApiInfo;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
