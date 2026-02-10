@@ -77,7 +77,7 @@ public class GroupMembershipController {
     @GetMapping("{groupMembershipId}")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<GroupMembershipResponse> findById(
-        @PathVariable("groupMembershipId") UUID groupMembershipId)
+        @PathVariable UUID groupMembershipId)
     {
         GroupMembership groupMembership = groupMembershipService.findByIdThrow(groupMembershipId);
 
@@ -91,7 +91,7 @@ public class GroupMembershipController {
     @PutMapping("{groupMembershipId}")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<GroupMembershipResponse> update(
-        @PathVariable("groupMembershipId") UUID groupMembershipId,
+        @PathVariable UUID groupMembershipId,
         @RequestBody GroupMembershipUpdateRequest request)
     {
         processGroupMembershipUpdateRequestCmd.withRequest(

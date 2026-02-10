@@ -4,9 +4,11 @@ import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
+import com.kernotec.farm.common.dto.response.MinimalResponse;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.service.DeviceService;
 import com.kernotec.farm.inventory.rest.ApiSpec.DeviceSpec;
+import com.kernotec.farm.inventory.rest.dto.response.device.DeviceMinResponse;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
 import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseFilterMapper;
 import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseMapper;
@@ -68,31 +70,35 @@ public class DeviceController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<DeviceResponse> findAllUnpaginated() {
-        List<Device> deviceList = deviceService.findAll();
+        Pageable pageable = PageableUtil.of(0, 200, "createdAt", true);
+        Page<Device> devicePage = deviceService.findAll(pageable);
 
         return PageResponse.<DeviceResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(deviceResponseMapper.toResponse(deviceList))
+            .data(deviceResponseMapper.toResponse(devicePage.getContent()))
             .build();
     }
 
     @Operation(summary = "Find all devices with minimal data")
     @GetMapping("minimal")
     @ResponseStatus(HttpStatus.OK)
-    public PageResponse<DeviceResponse> findAllMinimal(@RequestParam(required = false) UUID farmId)
+    public MinimalResponse<List<DeviceMinResponse>> findAllMinimal(
+        @RequestParam(required = false) UUID farmId, @RequestParam(required = false) String keyword)
     {
-        List<Device> deviceList = deviceService.findAllWithMinData(farmId);
+        Pageable pageable = PageableUtil.of(0, 200, "deviceNumberLong", false);
+        Page<DeviceMinResponse> deviceMinResponsePage = deviceService.findAllWithMinData(
+            farmId, keyword, pageable);
 
-        return PageResponse.<DeviceResponse>builder()
+        return MinimalResponse.<List<DeviceMinResponse>>builder()
             .code(HttpStatus.OK.value())
-            .data(deviceResponseMinMapper.toResponse(deviceList))
+            .data(deviceMinResponsePage.getContent())
             .build();
     }
 
     @Operation(summary = "Find device by id")
     @GetMapping("{deviceId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<DeviceResponse> findById(@PathVariable("deviceId") UUID deviceId) {
+    public SingleResponse<DeviceResponse> findById(@PathVariable UUID deviceId) {
         Device device = deviceService.findByIdThrow(deviceId);
 
         return SingleResponse.<DeviceResponse>builder()

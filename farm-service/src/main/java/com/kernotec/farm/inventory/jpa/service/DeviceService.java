@@ -5,7 +5,7 @@ import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.repository.DeviceRepository;
 import com.kernotec.farm.inventory.jpa.specification.device.DeviceSpecification;
-import java.util.List;
+import com.kernotec.farm.inventory.rest.dto.response.device.DeviceMinResponse;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -38,11 +38,12 @@ public class DeviceService extends BaseServiceImpl<Device, UUID> {
         );
     }
 
-    public List<Device> findAllWithMinData(UUID farmId) {
+    public Page<DeviceMinResponse> findAllWithMinData(UUID farmId, String keyword,
+        Pageable pageable)
+    {
+        String keywordStr = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
 
-        return repository.findAll(DeviceSpecification.builder()
-            .withFarmId(farmId)
-            .withOrderBy("deviceNumber", false));
+        return repository.findAllMinData(farmId, keywordStr, pageable);
     }
 
     public Optional<Device> findByDeviceNumber(String deviceNumber) {

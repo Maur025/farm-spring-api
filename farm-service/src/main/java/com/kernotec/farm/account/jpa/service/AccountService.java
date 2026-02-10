@@ -57,7 +57,8 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
     public Page<AccountMinResponse> findAllWithMinData(UUID socialNetworkId, String keyword,
         Pageable pageable)
     {
-        return repository.findAllMinData(socialNetworkId, keyword, pageable);
+        String keywordStr = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+        return repository.findAllMinData(socialNetworkId, keywordStr, pageable);
     }
 
     public Optional<Account> findByAccountLinkAndSocialNetworkId(String accountLink,

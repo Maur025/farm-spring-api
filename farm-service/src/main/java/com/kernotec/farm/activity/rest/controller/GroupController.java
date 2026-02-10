@@ -11,7 +11,6 @@ import com.kernotec.farm.activity.rest.dto.response.group.GroupResponse;
 import com.kernotec.farm.activity.rest.mapper.group.GroupResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -58,18 +57,19 @@ public class GroupController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<GroupResponse> findAllUnpaginated() {
-        List<Group> groupList = groupService.findAll();
+        Pageable pageable = PageableUtil.of(0, 500, "createdAt", true);
+        Page<Group> groupPage = groupService.findAll(pageable);
 
         return PageResponse.<GroupResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(groupResponseMapper.toResponse(groupList))
+            .data(groupResponseMapper.toResponse(groupPage.getContent()))
             .build();
     }
 
     @Operation(summary = "Find group by id")
     @GetMapping("{groupId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<GroupResponse> findById(@PathVariable("groupId") UUID groupId) {
+    public SingleResponse<GroupResponse> findById(@PathVariable UUID groupId) {
         Group group = groupService.findByIdThrow(groupId);
 
         return SingleResponse.<GroupResponse>builder()

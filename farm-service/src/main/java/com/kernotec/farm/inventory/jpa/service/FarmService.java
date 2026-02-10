@@ -4,9 +4,12 @@ import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.inventory.jpa.entity.Farm;
 import com.kernotec.farm.inventory.jpa.repository.FarmRepository;
+import com.kernotec.farm.inventory.rest.dto.response.farm.FarmMinResponse;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -27,5 +30,12 @@ public class FarmService extends BaseServiceImpl<Farm, UUID> {
 
     public Optional<Farm> findByCode(String code) {
         return repository.findByCode(code);
+    }
+
+    public Page<FarmMinResponse> findAllMinData(String keyword, Pageable pageable)
+    {
+        String keywordStr = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+
+        return repository.findAllMinData(keywordStr, pageable);
     }
 }
