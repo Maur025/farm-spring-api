@@ -4,9 +4,11 @@ import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
+import com.kernotec.farm.common.dto.response.MinimalResponse;
 import com.kernotec.farm.parametric.jpa.entity.PublishingType;
 import com.kernotec.farm.parametric.jpa.service.PublishingTypeService;
 import com.kernotec.farm.parametric.rest.ApiSpec.PublishingTypeSpec;
+import com.kernotec.farm.parametric.rest.dto.response.publishing.type.PublishingTypeMinResponse;
 import com.kernotec.farm.parametric.rest.dto.response.publishing.type.PublishingTypeResponse;
 import com.kernotec.farm.parametric.rest.mapper.publishing.type.PublishingTypeResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,19 +61,35 @@ public class PublishingTypeController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<PublishingTypeResponse> findAllUnpaginated() {
-        List<PublishingType> publishingTypeList = publishingTypeService.findAll();
+        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Page<PublishingType> publishingTypeList = publishingTypeService.findAll(pageable);
 
         return PageResponse.<PublishingTypeResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(publishingTypeResponseMapper.toResponse(publishingTypeList))
+            .data(publishingTypeResponseMapper.toResponse(publishingTypeList.getContent()))
+            .build();
+    }
+
+    @Operation(summary = "Find minimal data of all publishing types")
+    @GetMapping("minimal")
+    @ResponseStatus(HttpStatus.OK)
+    public MinimalResponse<List<PublishingTypeMinResponse>> findAllMinimal(
+        @RequestParam(required = false) String keyword)
+    {
+        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Page<PublishingTypeMinResponse> publishingTypeMinResponsePage = publishingTypeService.findAllMinData(
+            keyword, pageable);
+
+        return MinimalResponse.<List<PublishingTypeMinResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .data(publishingTypeMinResponsePage.getContent())
             .build();
     }
 
     @Operation(summary = "Find publishing types by id")
     @GetMapping("{publishingTypeId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<PublishingTypeResponse> findById(
-        @PathVariable("publishingTypeId") UUID publishingTypeId)
+    public SingleResponse<PublishingTypeResponse> findById(@PathVariable UUID publishingTypeId)
     {
         PublishingType publishingType = publishingTypeService.findByIdThrow(publishingTypeId);
 
