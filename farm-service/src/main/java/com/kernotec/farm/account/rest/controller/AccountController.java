@@ -13,10 +13,12 @@ import com.kernotec.farm.account.rest.command.account.ProcessAccountUpdateReques
 import com.kernotec.farm.account.rest.dto.request.account.AccountExtensionRequest;
 import com.kernotec.farm.account.rest.dto.request.account.AccountReplaceRequest;
 import com.kernotec.farm.account.rest.dto.request.account.AccountUpdateRequest;
+import com.kernotec.farm.account.rest.dto.response.account.AccountMinResponse;
 import com.kernotec.farm.account.rest.dto.response.account.AccountResponse;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseFlatMapper;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseMapper;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseMinMapper;
+import com.kernotec.farm.common.dto.response.MinimalResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -95,24 +97,18 @@ public class AccountController {
     @Operation(summary = "Find all accounts with minimal data")
     @GetMapping("minimal")
     @ResponseStatus(HttpStatus.OK)
-    public PageResponse<AccountResponse> findAllMinimal(
-        @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
-        @RequestParam(defaultValue = "createdAt") String sortBy,
-        @RequestParam(defaultValue = "true") boolean descending,
-        @RequestParam(required = false) UUID socialNetworkId)
+    public MinimalResponse<List<AccountMinResponse>> findAllMinimal(
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) String keyword)
     {
-        Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
+        Pageable pageable = PageableUtil.of(0, 500, "username", false);
 
-        Page<Account> accountPage = accountService.findAllWithMinData(socialNetworkId, pageable);
+        Page<AccountMinResponse> accountPage = accountService.findAllWithMinData(
+            socialNetworkId, keyword, pageable);
 
-        return PageResponse.<AccountResponse>builder()
+        return MinimalResponse.<List<AccountMinResponse>>builder()
             .code(HttpStatus.OK.value())
-            .data(accountResponseMinMapper.toResponse(accountPage.getContent()))
-            .pagination(PaginationResponse.builder()
-                .pages(accountPage.getTotalPages())
-                .count(accountPage.getTotalElements())
-                .build())
+            .data(accountPage.getContent())
             .build();
     }
 
@@ -120,18 +116,19 @@ public class AccountController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<AccountResponse> findAllUnpaginated() {
-        List<Account> accountList = accountService.findAll();
+        Pageable pageable = PageableUtil.of(0, 500, "createdAt", true);
+        Page<Account> accountPage = accountService.findAll(pageable);
 
         return PageResponse.<AccountResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(accountResponseMapper.toResponse(accountList))
+            .data(accountResponseMapper.toResponse(accountPage.getContent()))
             .build();
     }
 
     @Operation(summary = "Find account by id")
     @GetMapping("{accountId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<AccountResponse> findById(@PathVariable("accountId") UUID accountId) {
+    public SingleResponse<AccountResponse> findById(@PathVariable UUID accountId) {
         Account account = accountService.findByIdThrow(accountId);
 
         return SingleResponse.<AccountResponse>builder()
@@ -143,7 +140,7 @@ public class AccountController {
     @Operation(summary = "Replace account and current disable")
     @PostMapping("{accountId}/replace")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<AccountResponse> replaceAccount(@PathVariable("accountId") UUID accountId,
+    public SingleResponse<AccountResponse> replaceAccount(@PathVariable UUID accountId,
         @RequestBody AccountReplaceRequest request)
     {
         UUID newAccountId = accountReplaceRequestCmd.withRequest(
@@ -162,8 +159,8 @@ public class AccountController {
     @Operation(summary = "Add additional data to account")
     @PostMapping("{accountId}/extension")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<AccountResponse> addExtensionData(
-        @PathVariable("accountId") UUID accountId, @RequestBody AccountExtensionRequest request)
+    public SingleResponse<AccountResponse> addExtensionData(@PathVariable UUID accountId,
+        @RequestBody AccountExtensionRequest request)
     {
         UUID accountExtensionId = accountExtensionCreateCmd.withRequest(
                 AccountExtensionCreateCmd.Request.builder()
@@ -181,7 +178,7 @@ public class AccountController {
     @Operation(summary = "Update account data")
     @PutMapping("{accountId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<AccountResponse> updateAccount(@PathVariable("accountId") UUID accountId,
+    public SingleResponse<AccountResponse> updateAccount(@PathVariable UUID accountId,
         @RequestBody AccountUpdateRequest request)
     {
         processAccountUpdateRequestCmd.withRequest(ProcessAccountUpdateRequestCmd.Request.builder()
