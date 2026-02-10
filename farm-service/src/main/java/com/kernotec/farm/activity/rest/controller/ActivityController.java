@@ -92,22 +92,10 @@ public class ActivityController {
             .build();
     }
 
-    @Operation(summary = "Find all Activities no paginated")
-    @GetMapping("unpaginated")
-    @ResponseStatus(HttpStatus.OK)
-    public PageResponse<ActivityResponse> findAllNoPaginated() {
-        List<Activity> activityList = activityService.findAll();
-
-        return PageResponse.<ActivityResponse>builder()
-            .code(HttpStatus.OK.value())
-            .data(activityResponseMapper.toResponse(activityList))
-            .build();
-    }
-
     @Operation(summary = "Find activity by id")
     @GetMapping("{activityId}")
     @ResponseStatus
-    public SingleResponse<ActivityResponse> findById(@PathVariable("activityId") UUID activityId) {
+    public SingleResponse<ActivityResponse> findById(@PathVariable UUID activityId) {
         Activity activity = activityService.findByIdThrow(activityId);
 
         return SingleResponse.<ActivityResponse>builder()
@@ -135,7 +123,7 @@ public class ActivityController {
     @Operation(summary = "Update activity")
     @PutMapping("{activityId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<ActivityResponse> update(@PathVariable("activityId") UUID activityId,
+    public SingleResponse<ActivityResponse> update(@PathVariable UUID activityId,
         @RequestBody ActivityUpdateRequest request)
     {
         processActivityUpdateRequestCmd.withRequest(
@@ -154,7 +142,7 @@ public class ActivityController {
     @Operation(summary = "Delete activity")
     @DeleteMapping("{activityId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<ActivityResponse> delete(@PathVariable("activityId") UUID activityId) {
+    public SingleResponse<ActivityResponse> delete(@PathVariable UUID activityId) {
         processActivityDeleteRequestCmd.withRequest(
                 ProcessActivityDeleteRequestCmd.Request.builder()
                     .activityId(activityId)

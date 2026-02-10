@@ -164,4 +164,12 @@
 
   <include file="db/changelog/2025/09/26-01-changelog-130.xml"/>
   <include file="db/changelog/2025/09/27-01-changelog-131.xml"/>
+  <include file="db/changelog/2026/02/10-01-changelog-132.xml"/>
+
+  <!-- sync device number as long -->
+  <changeSet id="1770752927117-1" author="Maur025">
+    <sqlFile path="data/device/device_update1.sql" relativeToChangelogFile="true"/>
+  </changeSet>
+
+  <include file="db/changelog/2026/02/10-01-changelog-133.xml"/>
 </databaseChangeLog>

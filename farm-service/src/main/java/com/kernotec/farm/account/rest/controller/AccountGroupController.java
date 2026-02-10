@@ -68,7 +68,7 @@ public class AccountGroupController {
     @GetMapping("{accountGroupId}")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<AccountGroupResponse> findById(
-        @PathVariable("accountGroupId") UUID accountGroupId)
+        @PathVariable UUID accountGroupId)
     {
         AccountGroup accountGroup = accountGroupService.findByIdThrow(accountGroupId);
 
@@ -82,7 +82,7 @@ public class AccountGroupController {
     @PostMapping("{accountGroupId}/leave")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<AccountGroupResponse> leaveGroup(
-        @PathVariable("accountGroupId") UUID accountGroupId,
+        @PathVariable UUID accountGroupId,
         @RequestBody AccountGroupLeaveRequest request)
     {
         accountGroupLeaveCmd.withRequest(AccountGroupLeaveCmd.Request.builder()

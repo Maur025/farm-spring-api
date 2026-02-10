@@ -68,7 +68,7 @@ public class FriendController {
     @Operation(summary = "Find friend by id")
     @GetMapping("{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<FriendResponse> findById(@PathVariable("friendId") UUID friendId) {
+    public SingleResponse<FriendResponse> findById(@PathVariable UUID friendId) {
         Friend friend = friendService.findByIdThrow(friendId);
 
         return SingleResponse.<FriendResponse>builder()
@@ -80,7 +80,7 @@ public class FriendController {
     @Operation(summary = "Break friendship by id")
     @PostMapping("{friendId}/break-relationship")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<FriendResponse> breakRelationship(@PathVariable("friendId") UUID friendId,
+    public SingleResponse<FriendResponse> breakRelationship(@PathVariable UUID friendId,
         @RequestBody FriendBreakRelationshipRequest request)
     {
         friendBreakRelationshipCmd.withRequest(FriendBreakRelationshipCmd.Request.builder()

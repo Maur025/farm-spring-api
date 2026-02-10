@@ -24,6 +24,8 @@ public class DeviceCreateCmd extends
 
         device.setName(request.getName());
         device.setDeviceNumber(request.getDeviceNumber());
+        device.setDeviceNumberLong(Long.valueOf(request.getDeviceNumber()
+            .trim()));
         device.setModel(request.getModel());
         device.setBrand(request.getBrand());
         device.setSerialNumber(request.getSerialNumber());

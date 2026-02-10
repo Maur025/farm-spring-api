@@ -32,6 +32,9 @@ public class Device extends BaseAuditEntity {
     @Column(name = "device_number", nullable = false, length = 150)
     private String deviceNumber;
 
+    @Column(name = "device_number_long", nullable = false)
+    private Long deviceNumberLong;
+
     @Column(name = "model", length = 150)
     private String model;
 
@@ -54,7 +57,7 @@ public class Device extends BaseAuditEntity {
     @OrderBy("phoneNumber ASC")
     private Set<Chip> chips;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "device_accounts",
                joinColumns = @JoinColumn(name = "device_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "account_id", referencedColumnName = "id"))

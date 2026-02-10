@@ -6,6 +6,7 @@ import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.repository.AccountRepository;
 import com.kernotec.farm.account.jpa.specification.account.AccountSpecification;
+import com.kernotec.farm.account.rest.dto.response.account.AccountMinResponse;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -53,12 +54,11 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
         );
     }
 
-    public Page<Account> findAllWithMinData(UUID socialNetworkId, Pageable pageable) {
-        return repository.findAll(
-            AccountSpecification.builder()
-                .withSocialNetworkId(socialNetworkId)
-                .withAccountType(AccountTypeEnum.INTERNAL), pageable
-        );
+    public Page<AccountMinResponse> findAllWithMinData(UUID socialNetworkId, String keyword,
+        Pageable pageable)
+    {
+        String keywordStr = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+        return repository.findAllMinData(socialNetworkId, keywordStr, pageable);
     }
 
     public Optional<Account> findByAccountLinkAndSocialNetworkId(String accountLink,
