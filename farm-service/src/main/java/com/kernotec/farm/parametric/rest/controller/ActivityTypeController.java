@@ -3,9 +3,11 @@ package com.kernotec.farm.parametric.rest.controller;
 import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
+import com.kernotec.farm.common.dto.response.MinimalResponse;
 import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.parametric.jpa.service.ActivityTypeService;
 import com.kernotec.farm.parametric.rest.ApiSpec.ActivityTypeSpec;
+import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeMinResponse;
 import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeResponse;
 import com.kernotec.farm.parametric.rest.mapper.activity.type.ActivityTypeResponseFlatMapper;
 import com.kernotec.farm.parametric.rest.mapper.activity.type.ActivityTypeResponseMapper;
@@ -61,13 +63,31 @@ public class ActivityTypeController {
     public PageResponse<ActivityTypeResponse> findAllUnpaginated(
         @RequestParam(required = false) UUID socialNetworkId)
     {
-        List<ActivityType> activityTypeList = activityTypeService.findAllWithFilters(
-            socialNetworkId);
+        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Page<ActivityType> activityTypePage = activityTypeService.findAllWithFilters(
+            socialNetworkId, pageable);
 
         return PageResponse.<ActivityTypeResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(socialNetworkId == null ? activityTypeResponseMapper.toResponse(activityTypeList)
-                : activityTypeResponseFlatMapper.toResponse(activityTypeList))
+            .data(socialNetworkId == null ? activityTypeResponseMapper.toResponse(
+                activityTypePage.getContent())
+                : activityTypeResponseFlatMapper.toResponse(activityTypePage.getContent()))
+            .build();
+    }
+
+    @Operation(summary = "Find minimal all Activity Types data")
+    @GetMapping("minimal")
+    public MinimalResponse<List<ActivityTypeMinResponse>> findAllMinimal(
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) String keyword)
+    {
+        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Page<ActivityTypeMinResponse> activityTypeMinResponsePage = activityTypeService.findAllMinData(
+            socialNetworkId, keyword, pageable);
+
+        return MinimalResponse.<List<ActivityTypeMinResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .data(activityTypeMinResponsePage.getContent())
             .build();
     }
 }

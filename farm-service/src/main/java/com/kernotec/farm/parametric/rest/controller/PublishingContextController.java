@@ -4,9 +4,11 @@ import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
+import com.kernotec.farm.common.dto.response.MinimalResponse;
 import com.kernotec.farm.parametric.jpa.entity.PublishingContext;
 import com.kernotec.farm.parametric.jpa.service.PublishingContextService;
 import com.kernotec.farm.parametric.rest.ApiSpec.PublishingContextSpec;
+import com.kernotec.farm.parametric.rest.dto.response.publishing.context.PublishingContextMinResponse;
 import com.kernotec.farm.parametric.rest.dto.response.publishing.context.PublishingContextResponse;
 import com.kernotec.farm.parametric.rest.mapper.publishing.context.PublishingContextResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,11 +61,28 @@ public class PublishingContextController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<PublishingContextResponse> findAllUnpaginated() {
-        List<PublishingContext> publishingContextList = publishingContextService.findAll();
+        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Page<PublishingContext> publishingContextPage = publishingContextService.findAll(pageable);
 
         return PageResponse.<PublishingContextResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(publishingContextResponseMapper.toResponse(publishingContextList))
+            .data(publishingContextResponseMapper.toResponse(publishingContextPage.getContent()))
+            .build();
+    }
+
+    @Operation(summary = "Find minimal all publishing contexts data")
+    @GetMapping("minimal")
+    @ResponseStatus(HttpStatus.OK)
+    public MinimalResponse<List<PublishingContextMinResponse>> findAllMinimal(
+        @RequestParam(required = false) String keyword)
+    {
+        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Page<PublishingContextMinResponse> publishingContextMinResponsePage = publishingContextService.findAllMinData(
+            keyword, pageable);
+
+        return MinimalResponse.<List<PublishingContextMinResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .data(publishingContextMinResponsePage.getContent())
             .build();
     }
 
@@ -71,7 +90,7 @@ public class PublishingContextController {
     @GetMapping("{publishingContextId}")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<PublishingContextResponse> findById(
-        @PathVariable("publishingContextId") UUID publishingContextId)
+        @PathVariable UUID publishingContextId)
     {
         PublishingContext publishingContext = publishingContextService.findByIdThrow(
             publishingContextId);
