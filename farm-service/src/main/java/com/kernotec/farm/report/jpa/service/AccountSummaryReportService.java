@@ -56,6 +56,4 @@ public class AccountSummaryReportService {
             .commentSummary(commentSummaryService.getCommentSummary(accountId, filterRequest))
             .build();
     }
-
-
 }

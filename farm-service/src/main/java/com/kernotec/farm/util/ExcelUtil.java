@@ -1,10 +1,13 @@
 package com.kernotec.farm.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -17,23 +20,21 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springdoc.webmvc.ui.SwaggerConfigResource;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ExcelUtil {
 
     private final SwaggerConfigResource swaggerConfigResource;
 
-    public void fillExcelRow(Row row, boolean isBold, List<String> values, boolean withBackground) {
+    public void fillExcelRow(Row row, List<String> values, CellStyle style) {
         int columnCount = 0;
 
         for (String value : values) {
             Cell cell = row.createCell(columnCount);
             cell.setCellValue(value);
 
-            cell.setCellStyle(getCellStyle(
-                row.getSheet()
-                    .getWorkbook(), isBold, withBackground
-            ));
+            cell.setCellStyle(style);
 
             columnCount++;
         }
@@ -86,8 +87,18 @@ public class ExcelUtil {
         return zoneId != null ? ZoneId.of(zoneId) : ZoneId.systemDefault();
     }
 
-    public void fillRowSingleColumn(Sheet sheet, String value, boolean isBold, int indexRow) {
+    public void fillRowSingleColumn(Sheet sheet, String value, int indexRow, CellStyle style) {
         Row row = sheet.createRow(indexRow);
-        fillExcelRow(row, isBold, List.of(value), false);
+        fillExcelRow(row, List.of(value), style);
+    }
+
+    public File createTempFile(String prefix, String suffix) {
+        try {
+            return File.createTempFile(prefix, suffix);
+        } catch (IOException ex) {
+            log.error(
+                "Error creating temp file, with prefix:{}, with suffix:{}", prefix, suffix, ex);
+            throw new RuntimeException(ex);
+        }
     }
 }

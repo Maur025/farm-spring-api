@@ -82,6 +82,7 @@ public class ReportActivityController {
             .build();
     }
 
+    /* Only Use jasper reports */
     @Operation(summary = "Activity report with filters (no pagination)")
     @GetMapping("activities/report/unpaginated")
     public PageResponse<ActivityResponse> getActivitiesReportUnpaginated(
@@ -146,10 +147,10 @@ public class ReportActivityController {
         excelExportCmd.withRequest(ExcelExportCmd.Request.builder()
                 .response(response)
                 .reportTitle(titleReport)
-                .fileName("report-activities.xlsx")
-                .callback(sheet -> reportActivityExcelExportCmd.withRequest(
+                .fileName("report-activities")
+                .callback(workbook -> reportActivityExcelExportCmd.withRequest(
                         ReportActivityExcelExportCmd.Request.builder()
-                            .sheet(sheet)
+                            .workbook(workbook)
                             .filterRequest(filterRequest)
                             .sortBy(sortBy)
                             .descending(descending)
@@ -174,7 +175,7 @@ public class ReportActivityController {
         pdfExportCmd.withRequest(PdfExportCmd.Request.builder()
                 .response(response)
                 .disposition(disposition)
-                .fileName("report-activities.pdf")
+                .fileName("report-activities")
                 .callbackGetReportBytes(() -> reportActivityPdfExportCmd.withRequest(
                         ReportActivityPdfExportCmd.Request.builder()
                             .titleReport(titleReport)
@@ -247,10 +248,10 @@ public class ReportActivityController {
         excelExportCmd.withRequest(ExcelExportCmd.Request.builder()
                 .response(response)
                 .reportTitle(reportTitle)
-                .fileName("report-activities-ratings.xlsx")
-                .callback(sheet -> activityRatingExcelExportCmd.withRequest(
+                .fileName("report-activities-ratings")
+                .callback(workbook -> activityRatingExcelExportCmd.withRequest(
                         ActivityRatingExcelExportCmd.Request.builder()
-                            .sheet(sheet)
+                            .workbook(workbook)
                             .reportTitle(reportTitle)
                             .filterRequest(request)
                             .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
@@ -271,7 +272,7 @@ public class ReportActivityController {
         pdfExportCmd.withRequest(PdfExportCmd.Request.builder()
                 .response(response)
                 .disposition(disposition)
-                .fileName("report-activities-ratings.pdf")
+                .fileName("report-activities-ratings")
                 .callbackGetReportBytes(() -> activityRatingPdfExportCmd.withRequest(
                         ActivityRatingPdfExportCmd.Request.builder()
                             .token(authUtil.getAuthTokenFromAuthentication(authentication))

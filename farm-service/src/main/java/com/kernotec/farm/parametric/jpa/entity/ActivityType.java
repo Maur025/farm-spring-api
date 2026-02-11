@@ -3,6 +3,7 @@ package com.kernotec.farm.parametric.jpa.entity;
 import com.kernotec.core.jpa.entity.BaseAuditEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -26,7 +27,7 @@ public class ActivityType extends BaseAuditEntity {
     @Column(name = "code", nullable = false)
     private String code;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "social_network_actions",
                joinColumns = @JoinColumn(name = "activity_type_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "social_network_id",

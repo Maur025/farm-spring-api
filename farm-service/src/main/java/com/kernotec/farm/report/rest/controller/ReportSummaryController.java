@@ -46,12 +46,12 @@ public class ReportSummaryController {
     private final ReactionSummaryService reactionSummaryService;
     private final CommentSummaryService commentSummaryService;
 
+    /* TODO: Remove when migrate to other endpoints is complete */
     @Operation(summary = "Get activity summary by account")
     @PostMapping("account/{accountId}/activities/summary")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<ActivitySummaryResponse> getActivitySummaryByAccount(
-        @PathVariable("accountId") UUID accountId,
-        @RequestBody ActivitySummaryByAccountRequest request)
+        @PathVariable UUID accountId, @RequestBody ActivitySummaryByAccountRequest request)
     {
         return SingleResponse.<ActivitySummaryResponse>builder()
             .code(HttpStatus.OK.value())
@@ -63,8 +63,7 @@ public class ReportSummaryController {
     @PostMapping("account/{accountId}/friends/summary")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<FriendSummaryResponse> getFriendSummaryByAccount(
-        @PathVariable("accountId") UUID accountId,
-        @RequestBody ActivitySummaryByAccountRequest request,
+        @PathVariable UUID accountId, @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "5") Integer size,
         @RequestParam(defaultValue = "name") String sortBy,
@@ -86,8 +85,7 @@ public class ReportSummaryController {
     @PostMapping("account/{accountId}/groups/summary")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<GroupSummaryResponse> getGroupSummaryByAccount(
-        @PathVariable("accountId") UUID accountId,
-        @RequestBody ActivitySummaryByAccountRequest request,
+        @PathVariable UUID accountId, @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "5") Integer size,
         @RequestParam(defaultValue = "name") String sortBy,
@@ -108,8 +106,7 @@ public class ReportSummaryController {
     @Operation(summary = "Get page summary by account")
     @PostMapping("account/{accountId}/pages/summary")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<PageSummaryResponse> getPageSummaryByAccount(
-        @PathVariable("accountId") UUID accountId,
+    public SingleResponse<PageSummaryResponse> getPageSummaryByAccount(@PathVariable UUID accountId,
         @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "5") Integer size,
@@ -132,8 +129,7 @@ public class ReportSummaryController {
     @PostMapping("account/{accountId}/publications/summary")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<PublishingSummaryResponse> getPublishingSummaryByAccount(
-        @PathVariable("accountId") UUID accountId,
-        @RequestBody ActivitySummaryByAccountRequest request,
+        @PathVariable UUID accountId, @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "5") Integer size,
         @RequestParam(defaultValue = "name") String sortBy,
@@ -155,8 +151,7 @@ public class ReportSummaryController {
     @PostMapping("account/{accountId}/reactions/summary")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<ReactionSummaryResponse> getReactionSummaryByAccount(
-        @PathVariable("accountId") UUID accountId,
-        @RequestBody ActivitySummaryByAccountRequest request)
+        @PathVariable UUID accountId, @RequestBody ActivitySummaryByAccountRequest request)
     {
         return SingleResponse.<ReactionSummaryResponse>builder()
             .code(HttpStatus.OK.value())
@@ -168,8 +163,7 @@ public class ReportSummaryController {
     @PostMapping("account/{accountId}/comments/summary")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<CommentSummaryResponse> getCommentSummaryByAccount(
-        @PathVariable("accountId") UUID accountId,
-        @RequestBody ActivitySummaryByAccountRequest request,
+        @PathVariable UUID accountId, @RequestBody ActivitySummaryByAccountRequest request,
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "5") Integer size,
         @RequestParam(defaultValue = "name") String sortBy,

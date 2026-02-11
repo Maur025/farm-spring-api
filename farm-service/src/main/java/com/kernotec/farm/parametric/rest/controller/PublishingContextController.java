@@ -61,7 +61,7 @@ public class PublishingContextController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<PublishingContextResponse> findAllUnpaginated() {
-        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
         Page<PublishingContext> publishingContextPage = publishingContextService.findAll(pageable);
 
         return PageResponse.<PublishingContextResponse>builder()
@@ -76,7 +76,7 @@ public class PublishingContextController {
     public MinimalResponse<List<PublishingContextMinResponse>> findAllMinimal(
         @RequestParam(required = false) String keyword)
     {
-        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
         Page<PublishingContextMinResponse> publishingContextMinResponsePage = publishingContextService.findAllMinData(
             keyword, pageable);
 

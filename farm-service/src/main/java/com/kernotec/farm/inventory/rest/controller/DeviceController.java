@@ -12,7 +12,6 @@ import com.kernotec.farm.inventory.rest.dto.response.device.DeviceMinResponse;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceResponse;
 import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseFilterMapper;
 import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseMapper;
-import com.kernotec.farm.inventory.rest.mapper.device.DeviceResponseMinMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -37,7 +36,6 @@ public class DeviceController {
     private final DeviceService deviceService;
     private final DeviceResponseMapper deviceResponseMapper;
     private final DeviceResponseFilterMapper deviceResponseFilterMapper;
-    private final DeviceResponseMinMapper deviceResponseMinMapper;
 
     @Operation(summary = "Find all Devices")
     @GetMapping
@@ -70,7 +68,7 @@ public class DeviceController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<DeviceResponse> findAllUnpaginated() {
-        Pageable pageable = PageableUtil.of(0, 200, "createdAt", true);
+        Pageable pageable = PageableUtil.of(0, 30, "createdAt", true);
         Page<Device> devicePage = deviceService.findAll(pageable);
 
         return PageResponse.<DeviceResponse>builder()
@@ -85,7 +83,7 @@ public class DeviceController {
     public MinimalResponse<List<DeviceMinResponse>> findAllMinimal(
         @RequestParam(required = false) UUID farmId, @RequestParam(required = false) String keyword)
     {
-        Pageable pageable = PageableUtil.of(0, 200, "deviceNumberLong", false);
+        Pageable pageable = PageableUtil.of(0, 30, "deviceNumberLong", false);
         Page<DeviceMinResponse> deviceMinResponsePage = deviceService.findAllWithMinData(
             farmId, keyword, pageable);
 

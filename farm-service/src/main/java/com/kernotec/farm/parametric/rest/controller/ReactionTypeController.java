@@ -3,9 +3,11 @@ package com.kernotec.farm.parametric.rest.controller;
 import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
+import com.kernotec.farm.common.dto.response.MinimalResponse;
 import com.kernotec.farm.parametric.jpa.entity.ReactionType;
 import com.kernotec.farm.parametric.jpa.service.ReactionTypeService;
 import com.kernotec.farm.parametric.rest.ApiSpec.ReactionTypeSpec;
+import com.kernotec.farm.parametric.rest.dto.response.reaction.type.ReactionTypeMinResponse;
 import com.kernotec.farm.parametric.rest.dto.response.reaction.type.ReactionTypeResponse;
 import com.kernotec.farm.parametric.rest.mapper.reaction.type.ReactionTypeResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,12 +61,32 @@ public class ReactionTypeController {
     public PageResponse<ReactionTypeResponse> findAllUnpaginated(
         @RequestParam(required = false) UUID socialNetworkId)
     {
-        List<ReactionType> reactionTypeList = reactionTypeService.findAllWithFilters(
-            socialNetworkId);
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
+
+        Page<ReactionType> reactionTypePage = reactionTypeService.findAllWithFilters(
+            socialNetworkId, pageable);
 
         return PageResponse.<ReactionTypeResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(reactionTypeResponseMapper.toResponse(reactionTypeList))
+            .data(reactionTypeResponseMapper.toResponse(reactionTypePage.getContent()))
+            .build();
+    }
+
+    @Operation(summary = "Find minimal data of all reaction types")
+    @GetMapping("minimal")
+    @ResponseStatus(HttpStatus.OK)
+    public MinimalResponse<List<ReactionTypeMinResponse>> findAllMinimal(
+        @RequestParam(required = false) UUID socialNetworkId,
+        @RequestParam(required = false) String keyword)
+    {
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
+
+        Page<ReactionTypeMinResponse> reactionTypeMinResponsePage = reactionTypeService.findAllMinData(
+            socialNetworkId, keyword, pageable);
+
+        return MinimalResponse.<List<ReactionTypeMinResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .data(reactionTypeMinResponsePage.getContent())
             .build();
     }
 }
