@@ -57,7 +57,7 @@ public class GroupController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<GroupResponse> findAllUnpaginated() {
-        Pageable pageable = PageableUtil.of(0, 500, "createdAt", true);
+        Pageable pageable = PageableUtil.of(0, 30, "createdAt", true);
         Page<Group> groupPage = groupService.findAll(pageable);
 
         return PageResponse.<GroupResponse>builder()

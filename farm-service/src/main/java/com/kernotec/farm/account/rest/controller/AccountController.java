@@ -84,7 +84,7 @@ public class AccountController {
         @RequestParam(required = false) UUID ignoreAccountId,
         @RequestParam(required = false) String link)
     {
-        Pageable pageable = PageableUtil.of(0, 30, "createdAt", true);
+        Pageable pageable = PageableUtil.of(0, 20, "createdAt", true);
         Page<Account> accountPage = accountService.searchByUsernameOrLink(
             username, socialNetworkId, ignoreAccountId, link, pageable);
 
@@ -101,7 +101,7 @@ public class AccountController {
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) String keyword)
     {
-        Pageable pageable = PageableUtil.of(0, 500, "username", false);
+        Pageable pageable = PageableUtil.of(0, 30, "username", false);
 
         Page<AccountMinResponse> accountPage = accountService.findAllWithMinData(
             socialNetworkId, keyword, pageable);
@@ -116,7 +116,7 @@ public class AccountController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<AccountResponse> findAllUnpaginated() {
-        Pageable pageable = PageableUtil.of(0, 500, "createdAt", true);
+        Pageable pageable = PageableUtil.of(0, 30, "createdAt", true);
         Page<Account> accountPage = accountService.findAll(pageable);
 
         return PageResponse.<AccountResponse>builder()

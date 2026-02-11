@@ -63,7 +63,7 @@ public class ActivityTypeController {
     public PageResponse<ActivityTypeResponse> findAllUnpaginated(
         @RequestParam(required = false) UUID socialNetworkId)
     {
-        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
         Page<ActivityType> activityTypePage = activityTypeService.findAllWithFilters(
             socialNetworkId, pageable);
 
@@ -81,7 +81,7 @@ public class ActivityTypeController {
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) String keyword)
     {
-        Pageable pageable = PageableUtil.of(0, 500, "name", false);
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
         Page<ActivityTypeMinResponse> activityTypeMinResponsePage = activityTypeService.findAllMinData(
             socialNetworkId, keyword, pageable);
 

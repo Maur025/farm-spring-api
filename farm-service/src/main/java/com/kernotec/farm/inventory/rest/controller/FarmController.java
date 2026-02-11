@@ -30,7 +30,7 @@ public class FarmController {
     public MinimalResponse<List<FarmMinResponse>> findAllMinimal(
         @RequestParam(required = false) String keyword)
     {
-        Pageable pageable = PageableUtil.of(0, 500, "createdAt", false);
+        Pageable pageable = PageableUtil.of(0, 30, "createdAt", false);
         Page<FarmMinResponse> farmPage = farmService.findAllMinData(keyword, pageable);
 
         return MinimalResponse.<List<FarmMinResponse>>builder()

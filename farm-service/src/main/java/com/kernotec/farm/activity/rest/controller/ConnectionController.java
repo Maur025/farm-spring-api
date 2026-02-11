@@ -76,7 +76,7 @@ public class ConnectionController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<ConnectionResponse> findAllUnpaginated() {
-        Pageable pageable = PageableUtil.of(0, 500, "createdAt", true);
+        Pageable pageable = PageableUtil.of(0, 30, "createdAt", true);
 
         Page<Connection> connectionPage = connectionService.findAll(pageable);
 
