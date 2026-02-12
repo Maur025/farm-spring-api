@@ -14,4 +14,5 @@ public class GroupMembershipFindAllFilterRequest {
     private UUID accountId;
     private RequestStateCodeEnum requestStateCode;
     private GroupActionEnum action;
+    private String keyword;
 }

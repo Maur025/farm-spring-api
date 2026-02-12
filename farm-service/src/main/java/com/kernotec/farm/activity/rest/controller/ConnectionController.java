@@ -50,7 +50,8 @@ public class ConnectionController {
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) UUID accountId,
         @RequestParam(required = false) RequestStateCodeEnum requestStateCode,
-        @RequestParam(required = false) ConnectionActionEnum action)
+        @RequestParam(required = false) ConnectionActionEnum action,
+        @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
         Page<Connection> connectionPage = connectionService.findAllWithFilters(
@@ -59,6 +60,7 @@ public class ConnectionController {
                 .accountId(accountId)
                 .requestStateCode(requestStateCode)
                 .action(action)
+                .keyword(keyword)
                 .build(), pageable
         );
 

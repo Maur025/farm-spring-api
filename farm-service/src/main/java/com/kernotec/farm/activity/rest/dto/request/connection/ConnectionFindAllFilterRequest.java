@@ -14,4 +14,5 @@ public class ConnectionFindAllFilterRequest {
     private UUID accountId;
     private RequestStateCodeEnum requestStateCode;
     private ConnectionActionEnum action;
+    private String keyword;
 }
