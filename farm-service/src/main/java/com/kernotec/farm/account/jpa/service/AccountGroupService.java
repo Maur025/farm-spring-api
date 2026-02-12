@@ -2,10 +2,11 @@ package com.kernotec.farm.account.jpa.service;
 
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
+import com.kernotec.farm.account.exception.AccountGroupException;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.entity.AccountGroup;
 import com.kernotec.farm.account.jpa.repository.AccountGroupRepository;
-import com.kernotec.farm.account.exception.AccountGroupException;
+import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.parametric.jpa.entity.GroupState;
 import com.kernotec.farm.parametric.jpa.enums.GroupStateCodeEnum;
 import jakarta.persistence.criteria.Join;
@@ -39,7 +40,7 @@ public class AccountGroupService extends BaseServiceImpl<AccountGroup, UUID> {
     }
 
     public Page<AccountGroup> findAllWithFilters(UUID accountId, UUID socialNetworkId,
-        GroupStateCodeEnum groupStateCode, Pageable pageable)
+        GroupStateCodeEnum groupStateCode, String keyword, Pageable pageable)
     {
         return repository.findAll(
             (Specification<AccountGroup>) (root, query, cb) -> {
@@ -62,6 +63,15 @@ public class AccountGroupService extends BaseServiceImpl<AccountGroup, UUID> {
 
                     predicateList.add(
                         cb.equal(groupStateJoin.get("code"), groupStateCode.toString()));
+                }
+
+                if (keyword != null && !keyword.isBlank()) {
+                    String pattern = "%" + keyword.trim()
+                        .toLowerCase() + "%";
+
+                    Join<AccountGroup, Group> groupJoin = root.join("group", JoinType.INNER);
+
+                    predicateList.add(cb.or(cb.like(cb.lower(groupJoin.get("name")), pattern)));
                 }
 
                 query.distinct(true);

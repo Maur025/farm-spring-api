@@ -4,6 +4,7 @@ import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.activity.jpa.entity.Activity;
+import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.activity.jpa.entity.GroupMembership;
 import com.kernotec.farm.activity.jpa.repository.GroupMembershipRepository;
 import com.kernotec.farm.activity.rest.dto.request.group.membership.GroupMembershipFindAllFilterRequest;
@@ -73,6 +74,17 @@ public class GroupMembershipService extends BaseServiceImpl<GroupMembership, UUI
 
                 if (filterRequest.getAction() != null) {
                     predicateList.add(cb.equal(root.get("action"), filterRequest.getAction()));
+                }
+
+                if (filterRequest.getKeyword() != null && !filterRequest.getKeyword()
+                    .isBlank())
+                {
+                    String pattern = "%" + filterRequest.getKeyword()
+                        .toLowerCase() + "%";
+
+                    Join<GroupMembership, Group> groupJoin = root.join("group", JoinType.INNER);
+
+                    predicateList.add(cb.or(cb.like(cb.lower(groupJoin.get("name")), pattern)));
                 }
 
                 return cb.and(predicateList.toArray(Predicate[]::new));

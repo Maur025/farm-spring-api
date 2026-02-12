@@ -8,6 +8,7 @@ import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.activity.jpa.service.GroupService;
 import com.kernotec.farm.activity.rest.ApiSpec.GroupSpec;
 import com.kernotec.farm.activity.rest.dto.response.group.GroupResponse;
+import com.kernotec.farm.activity.rest.mapper.group.GroupResponseFlatMapper;
 import com.kernotec.farm.activity.rest.mapper.group.GroupResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +32,7 @@ public class GroupController {
 
     private final GroupService groupService;
     private final GroupResponseMapper groupResponseMapper;
+    private final GroupResponseFlatMapper groupResponseFlatMapper;
 
     @Operation(summary = "Find all groups")
     @GetMapping
@@ -89,7 +91,7 @@ public class GroupController {
 
         return PageResponse.<GroupResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(groupResponseMapper.toResponse(groupPage.getContent()))
+            .data(groupResponseFlatMapper.toResponse(groupPage.getContent()))
             .build();
     }
 }

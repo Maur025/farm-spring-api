@@ -25,6 +25,7 @@ import com.kernotec.farm.util.AuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -194,7 +195,7 @@ public class ReportActivityController {
     @PostMapping("activities/ratings/report")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<ReportRatingGroupListResponse> getActivitiesRatings(
-        @RequestBody ReportRatingRequest request)
+        @RequestBody @Valid ReportRatingRequest request)
     {
         return SingleResponse.<ReportRatingGroupListResponse>builder()
             .code(HttpStatus.OK.value())

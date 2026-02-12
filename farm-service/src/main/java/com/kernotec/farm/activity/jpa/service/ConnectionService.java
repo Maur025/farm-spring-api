@@ -79,6 +79,19 @@ public class ConnectionService extends BaseServiceImpl<Connection, UUID> {
                     predicateList.add(cb.equal(root.get("action"), filterRequest.getAction()));
                 }
 
+                if (filterRequest.getKeyword() != null && !filterRequest.getKeyword()
+                    .isBlank())
+                {
+                    String pattern = "%" + filterRequest.getKeyword()
+                        .toLowerCase() + "%";
+
+                    Join<Connection, Account> potentialFriendJoin = root.join(
+                        "potentialFriendAccount", JoinType.INNER);
+
+                    predicateList.add(
+                        cb.or(cb.like(cb.lower(potentialFriendJoin.get("username")), pattern)));
+                }
+
                 return cb.and(predicateList.toArray(Predicate[]::new));
             }, pageable
         );

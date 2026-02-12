@@ -3,6 +3,7 @@ package com.kernotec.farm.report.rest.dto.request;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.farm.report.jpa.enums.RatingTypeEnum;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ReportRatingRequest extends FilterDateRequest {
 
+    @NotNull
     private RatingTypeEnum ratingType;
+
     private UUID socialNetworkId;
     private Integer limit;
     private String searchCriteria;
