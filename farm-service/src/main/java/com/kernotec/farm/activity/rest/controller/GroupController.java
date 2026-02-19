@@ -8,10 +8,10 @@ import com.kernotec.farm.activity.jpa.entity.Group;
 import com.kernotec.farm.activity.jpa.service.GroupService;
 import com.kernotec.farm.activity.rest.ApiSpec.GroupSpec;
 import com.kernotec.farm.activity.rest.dto.response.group.GroupResponse;
+import com.kernotec.farm.activity.rest.mapper.group.GroupResponseFlatMapper;
 import com.kernotec.farm.activity.rest.mapper.group.GroupResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +32,7 @@ public class GroupController {
 
     private final GroupService groupService;
     private final GroupResponseMapper groupResponseMapper;
+    private final GroupResponseFlatMapper groupResponseFlatMapper;
 
     @Operation(summary = "Find all groups")
     @GetMapping
@@ -58,18 +59,19 @@ public class GroupController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<GroupResponse> findAllUnpaginated() {
-        List<Group> groupList = groupService.findAll();
+        Pageable pageable = PageableUtil.of(0, 30, "createdAt", true);
+        Page<Group> groupPage = groupService.findAll(pageable);
 
         return PageResponse.<GroupResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(groupResponseMapper.toResponse(groupList))
+            .data(groupResponseMapper.toResponse(groupPage.getContent()))
             .build();
     }
 
     @Operation(summary = "Find group by id")
     @GetMapping("{groupId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<GroupResponse> findById(@PathVariable("groupId") UUID groupId) {
+    public SingleResponse<GroupResponse> findById(@PathVariable UUID groupId) {
         Group group = groupService.findByIdThrow(groupId);
 
         return SingleResponse.<GroupResponse>builder()
@@ -89,7 +91,7 @@ public class GroupController {
 
         return PageResponse.<GroupResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(groupResponseMapper.toResponse(groupPage.getContent()))
+            .data(groupResponseFlatMapper.toResponse(groupPage.getContent()))
             .build();
     }
 }

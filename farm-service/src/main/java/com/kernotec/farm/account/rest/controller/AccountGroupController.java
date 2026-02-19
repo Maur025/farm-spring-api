@@ -48,11 +48,12 @@ public class AccountGroupController {
         @RequestParam(defaultValue = "true") boolean descending,
         @RequestParam(required = false) UUID accountId,
         @RequestParam(required = false) UUID socialNetworkId,
-        @RequestParam(required = false) GroupStateCodeEnum groupStateCode)
+        @RequestParam(required = false) GroupStateCodeEnum groupStateCode,
+        @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
         Page<AccountGroup> accountGroupPage = accountGroupService.findAllWithFilters(
-            accountId, socialNetworkId, groupStateCode, pageable);
+            accountId, socialNetworkId, groupStateCode, keyword, pageable);
 
         return PageResponse.<AccountGroupResponse>builder()
             .code(HttpStatus.OK.value())
@@ -67,8 +68,7 @@ public class AccountGroupController {
     @Operation(summary = "Find account group by id")
     @GetMapping("{accountGroupId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<AccountGroupResponse> findById(
-        @PathVariable("accountGroupId") UUID accountGroupId)
+    public SingleResponse<AccountGroupResponse> findById(@PathVariable UUID accountGroupId)
     {
         AccountGroup accountGroup = accountGroupService.findByIdThrow(accountGroupId);
 
@@ -81,8 +81,7 @@ public class AccountGroupController {
     @Operation(summary = "Leave group")
     @PostMapping("{accountGroupId}/leave")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<AccountGroupResponse> leaveGroup(
-        @PathVariable("accountGroupId") UUID accountGroupId,
+    public SingleResponse<AccountGroupResponse> leaveGroup(@PathVariable UUID accountGroupId,
         @RequestBody AccountGroupLeaveRequest request)
     {
         accountGroupLeaveCmd.withRequest(AccountGroupLeaveCmd.Request.builder()

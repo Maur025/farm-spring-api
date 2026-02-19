@@ -7,11 +7,13 @@ import com.kernotec.farm.parametric.jpa.entity.ActivityType;
 import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.parametric.jpa.enums.ActivityTypeCodeEnum;
 import com.kernotec.farm.parametric.jpa.repository.ActivityTypeRepository;
+import com.kernotec.farm.parametric.rest.dto.response.activity.type.ActivityTypeMinResponse;
 import jakarta.persistence.criteria.Join;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,16 +34,18 @@ public class ActivityTypeService extends BaseServiceImpl<ActivityType, UUID> {
         return repository;
     }
 
-    public List<ActivityType> findAllWithFilters(UUID socialNetworkId) {
+    public Page<ActivityType> findAllWithFilters(UUID socialNetworkId, Pageable pageable) {
         if (socialNetworkId == null) {
-            return repository.findAll();
+            return repository.findAll(pageable);
         }
 
-        return repository.findAll((Specification<ActivityType>) (root, query, cb) -> {
-            Join<ActivityType, SocialNetwork> socialNetworkJoin = root.join("socialNetworks");
+        return repository.findAll(
+            (Specification<ActivityType>) (root, query, cb) -> {
+                Join<ActivityType, SocialNetwork> socialNetworkJoin = root.join("socialNetworks");
 
-            return cb.or(cb.equal(socialNetworkJoin.get("id"), socialNetworkId));
-        });
+                return cb.or(cb.equal(socialNetworkJoin.get("id"), socialNetworkId));
+            }, pageable
+        );
     }
 
     public Optional<ActivityType> findByCode(ActivityTypeCodeEnum code) {
@@ -51,6 +55,16 @@ public class ActivityTypeService extends BaseServiceImpl<ActivityType, UUID> {
     public ActivityType findByCodeThrow(ActivityTypeCodeEnum code) {
         return findByCode(code).orElseThrow(
             () -> new ActivityTypeException(
-                "code.not.found", "'" + code + "'", HttpStatus.NOT_FOUND.value()));
+                "code.not.found", "'" + code + "'",
+                HttpStatus.NOT_FOUND.value()
+            ));
+    }
+
+    public Page<ActivityTypeMinResponse> findAllMinData(UUID socialNetworkId, String keyword,
+        Pageable pageable)
+    {
+        String keywordStr = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+
+        return repository.findAllMinData(socialNetworkId, keywordStr, pageable);
     }
 }

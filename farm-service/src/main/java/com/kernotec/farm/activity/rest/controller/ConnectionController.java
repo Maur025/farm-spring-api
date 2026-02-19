@@ -16,7 +16,6 @@ import com.kernotec.farm.activity.rest.mapper.connection.ConnectionResponseMappe
 import com.kernotec.farm.parametric.jpa.enums.RequestStateCodeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,7 +50,8 @@ public class ConnectionController {
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) UUID accountId,
         @RequestParam(required = false) RequestStateCodeEnum requestStateCode,
-        @RequestParam(required = false) ConnectionActionEnum action)
+        @RequestParam(required = false) ConnectionActionEnum action,
+        @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
         Page<Connection> connectionPage = connectionService.findAllWithFilters(
@@ -60,6 +60,7 @@ public class ConnectionController {
                 .accountId(accountId)
                 .requestStateCode(requestStateCode)
                 .action(action)
+                .keyword(keyword)
                 .build(), pageable
         );
 
@@ -77,19 +78,20 @@ public class ConnectionController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<ConnectionResponse> findAllUnpaginated() {
-        List<Connection> connectionList = connectionService.findAll();
+        Pageable pageable = PageableUtil.of(0, 30, "createdAt", true);
+
+        Page<Connection> connectionPage = connectionService.findAll(pageable);
 
         return PageResponse.<ConnectionResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(connectionResponseMapper.toResponse(connectionList))
+            .data(connectionResponseMapper.toResponse(connectionPage.getContent()))
             .build();
     }
 
     @Operation(summary = "Find connection by id")
     @GetMapping("{connectionId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<ConnectionResponse> findById(
-        @PathVariable("connectionId") UUID connectionId)
+    public SingleResponse<ConnectionResponse> findById(@PathVariable UUID connectionId)
     {
         Connection connection = connectionService.findByIdThrow(connectionId);
 
@@ -102,8 +104,7 @@ public class ConnectionController {
     @Operation(summary = "Update connection")
     @PutMapping("{connectionId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<ConnectionResponse> update(
-        @PathVariable("connectionId") UUID connectionId,
+    public SingleResponse<ConnectionResponse> update(@PathVariable UUID connectionId,
         @RequestBody ConnectionUpdateRequest request)
     {
         processConnectionUpdateRequestCmd.withRequest(

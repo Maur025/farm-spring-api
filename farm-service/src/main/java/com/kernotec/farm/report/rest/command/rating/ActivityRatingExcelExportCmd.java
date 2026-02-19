@@ -6,12 +6,16 @@ import com.kernotec.farm.report.rest.command.excel.ReportHeadCreateCmd;
 import com.kernotec.farm.report.rest.dto.request.ReportRatingRequest;
 import com.kernotec.farm.report.rest.dto.response.rating.ReportRatingResponse;
 import com.kernotec.farm.util.ExcelUtil;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -24,11 +28,21 @@ public class ActivityRatingExcelExportCmd extends
     private final ExcelUtil excelUtil;
     private final ReportHeadCreateCmd reportHeadCreateCmd;
     private final ReportActivityService reportActivityService;
+    private final Map<ActivityRatingStyleEnum, CellStyle> cellStyles = new HashMap<>();
 
     @Override
     protected Void run(Request request) {
-        Sheet sheet = request.sheet();
+        Sheet sheet = request.workbook.createSheet("Reporte actividades por clasificación");
         ReportRatingRequest filterRequest = request.filterRequest();
+
+        cellStyles.put(
+            ActivityRatingStyleEnum.HEADER, excelUtil.getCellStyle(request.workbook, true, true));
+        cellStyles.put(
+            ActivityRatingStyleEnum.CONTENT,
+            excelUtil.getCellStyle(request.workbook, false, false)
+        );
+        cellStyles.put(
+            ActivityRatingStyleEnum.BOLD, excelUtil.getCellStyle(request.workbook, true, false));
 
         excelUtil.setColumnsSize(sheet, List.of(6, 40, 30));
 
@@ -61,11 +75,14 @@ public class ActivityRatingExcelExportCmd extends
     private int setTableWithData(Sheet sheet, int rowIdx, Request request, String subTitle,
         boolean isDescending)
     {
-        excelUtil.fillRowSingleColumn(sheet, subTitle, true, rowIdx++);
+        excelUtil.fillRowSingleColumn(
+            sheet, subTitle, rowIdx++, cellStyles.get(ActivityRatingStyleEnum.BOLD));
 
         Row headerRow = sheet.createRow(rowIdx++);
         excelUtil.fillExcelRow(
-            headerRow, true, List.of("#", "Nombre", "Cantidad de actividades"), true);
+            headerRow, List.of("#", "Nombre", "Cantidad de actividades"),
+            cellStyles.get(ActivityRatingStyleEnum.HEADER)
+        );
 
         List<ReportRatingResponse> ratingResponseList = reportActivityService.getActivitiesRatings(
             request.filterRequest(), isDescending);
@@ -77,11 +94,11 @@ public class ActivityRatingExcelExportCmd extends
             rowCount++;
 
             excelUtil.fillExcelRow(
-                row, false, List.of(
+                row, List.of(
                     String.valueOf(rowCount), reportRatingResponse.getRatingByName(),
                     reportRatingResponse.getTotalActivities()
                         .toString()
-                ), false
+                ), cellStyles.get(ActivityRatingStyleEnum.CONTENT)
             );
         }
 
@@ -89,8 +106,8 @@ public class ActivityRatingExcelExportCmd extends
     }
 
     @Builder
-    public record Request(Sheet sheet, String reportTitle, ReportRatingRequest filterRequest,
-                          String authUsername)
+    public record Request(SXSSFWorkbook workbook, String reportTitle,
+                          ReportRatingRequest filterRequest, String authUsername)
     {
 
     }

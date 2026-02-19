@@ -76,7 +76,7 @@ public class Account extends BaseAuditEntity {
                inverseJoinColumns = @JoinColumn(name = "chip_id", referencedColumnName = "id"))
     private Set<Chip> chips;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "account_observations",
                joinColumns = @JoinColumn(name = "account_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "observation_id",

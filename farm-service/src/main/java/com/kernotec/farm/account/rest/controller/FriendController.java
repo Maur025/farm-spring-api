@@ -49,11 +49,12 @@ public class FriendController {
         @RequestParam(required = false) UUID accountId,
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) AccountTypeEnum friendAccountType,
-        @RequestParam(required = false) FriendStateCodeEnum friendStateCode)
+        @RequestParam(required = false) FriendStateCodeEnum friendStateCode,
+        @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
         Page<Friend> friendPage = friendService.findAllWithFilters(
-            accountId, socialNetworkId, friendAccountType, friendStateCode, pageable);
+            accountId, socialNetworkId, friendAccountType, friendStateCode, keyword, pageable);
 
         return PageResponse.<FriendResponse>builder()
             .code(HttpStatus.OK.value())
@@ -68,7 +69,7 @@ public class FriendController {
     @Operation(summary = "Find friend by id")
     @GetMapping("{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<FriendResponse> findById(@PathVariable("friendId") UUID friendId) {
+    public SingleResponse<FriendResponse> findById(@PathVariable UUID friendId) {
         Friend friend = friendService.findByIdThrow(friendId);
 
         return SingleResponse.<FriendResponse>builder()
@@ -80,7 +81,7 @@ public class FriendController {
     @Operation(summary = "Break friendship by id")
     @PostMapping("{friendId}/break-relationship")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<FriendResponse> breakRelationship(@PathVariable("friendId") UUID friendId,
+    public SingleResponse<FriendResponse> breakRelationship(@PathVariable UUID friendId,
         @RequestBody FriendBreakRelationshipRequest request)
     {
         friendBreakRelationshipCmd.withRequest(FriendBreakRelationshipCmd.Request.builder()

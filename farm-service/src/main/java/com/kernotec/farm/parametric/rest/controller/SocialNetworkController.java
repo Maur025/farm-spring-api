@@ -4,9 +4,11 @@ import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
 import com.kernotec.core.rest.dto.response.SingleResponse;
+import com.kernotec.farm.common.dto.response.MinimalResponse;
 import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.parametric.jpa.service.SocialNetworkService;
 import com.kernotec.farm.parametric.rest.ApiSpec.SocialNetworkSpec;
+import com.kernotec.farm.parametric.rest.dto.response.social.network.SocialNetworkMinResponse;
 import com.kernotec.farm.parametric.rest.dto.response.social.network.SocialNetworkResponse;
 import com.kernotec.farm.parametric.rest.mapper.social.network.SocialNetworkResponseFlatMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,20 +64,40 @@ public class SocialNetworkController {
         @RequestParam(required = false) Boolean isHasAccounts,
         @RequestParam(required = false) Boolean isHasActivityTypes)
     {
-        List<SocialNetwork> socialNetworkList = socialNetworkService.findAllWithFilters(
-            isHasAccounts, isHasActivityTypes);
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
+
+        Page<SocialNetwork> socialNetworkPage = socialNetworkService.findAllWithFilters(
+            isHasAccounts, isHasActivityTypes, pageable);
 
         return PageResponse.<SocialNetworkResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(socialNetworkResponseFlatMapper.toResponse(socialNetworkList))
+            .data(socialNetworkResponseFlatMapper.toResponse(socialNetworkPage.getContent()))
+            .build();
+    }
+
+    @Operation(summary = "Find minimal data of all social networks")
+    @GetMapping("minimal")
+    @ResponseStatus(HttpStatus.OK)
+    public MinimalResponse<List<SocialNetworkMinResponse>> findAllMinimal(
+        @RequestParam(required = false) Boolean isHasAccounts,
+        @RequestParam(required = false) Boolean isHasActivityTypes,
+        @RequestParam(required = false) String keyword)
+    {
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
+
+        Page<SocialNetworkMinResponse> socialNetworkMinResponsePage = socialNetworkService.findAllMinData(
+            isHasAccounts, isHasActivityTypes, keyword, pageable);
+
+        return MinimalResponse.<List<SocialNetworkMinResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .data(socialNetworkMinResponsePage.getContent())
             .build();
     }
 
     @Operation(summary = "Find Social Networks by Id")
     @GetMapping("{socialNetworkId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<SocialNetworkResponse> findById(
-        @PathVariable("socialNetworkId") UUID socialNetworkId)
+    public SingleResponse<SocialNetworkResponse> findById(@PathVariable UUID socialNetworkId)
     {
         SocialNetwork socialNetwork = socialNetworkService.findByIdThrow(socialNetworkId);
 

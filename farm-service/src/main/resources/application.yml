@@ -85,3 +85,9 @@ oauth2-config:
   host: ${APP_SERVER_URL_AUTH:http://localhost:7784}
   realm: ${APP_OAUTH2_REALM:farm-auth}
   secret-key: ${OAUTH2_JWT_SECRET:secret-key}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

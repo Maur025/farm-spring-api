@@ -39,7 +39,8 @@ public class FriendService extends BaseServiceImpl<Friend, UUID> {
     }
 
     public Page<Friend> findAllWithFilters(UUID accountId, UUID socialNetworkId,
-        AccountTypeEnum friendAccountType, FriendStateCodeEnum friendStateCode, Pageable pageable)
+        AccountTypeEnum friendAccountType, FriendStateCodeEnum friendStateCode, String keyword,
+        Pageable pageable)
     {
         return repository.findAll(
             (Specification<Friend>) (root, query, cb) -> {
@@ -69,6 +70,16 @@ public class FriendService extends BaseServiceImpl<Friend, UUID> {
 
                     predicateList.add(
                         cb.equal(friendStateJoin.get("code"), friendStateCode.toString()));
+                }
+
+                if (keyword != null && !keyword.isBlank()) {
+                    String pattern = "%" + keyword.toLowerCase() + "%";
+
+                    Join<Friend, Account> friendAccountJoin = root.join(
+                        "friendAccount", JoinType.INNER);
+
+                    predicateList.add(
+                        cb.or(cb.like(cb.lower(friendAccountJoin.get("username")), pattern)));
                 }
 
                 query.distinct(true);

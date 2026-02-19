@@ -3,9 +3,11 @@ package com.kernotec.farm.parametric.rest.controller;
 import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.core.rest.dto.response.PageResponse;
 import com.kernotec.core.rest.dto.response.PaginationResponse;
+import com.kernotec.farm.common.dto.response.MinimalResponse;
 import com.kernotec.farm.parametric.jpa.entity.Region;
 import com.kernotec.farm.parametric.jpa.service.RegionService;
 import com.kernotec.farm.parametric.rest.ApiSpec.RegionSpec;
+import com.kernotec.farm.parametric.rest.dto.response.region.RegionMinRespone;
 import com.kernotec.farm.parametric.rest.dto.response.region.RegionResponse;
 import com.kernotec.farm.parametric.rest.mapper.region.RegionResponseMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,11 +57,28 @@ public class RegionController {
     @GetMapping("unpaginated")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<RegionResponse> findAllUnpaginated() {
-        List<Region> regionList = regionService.findAll();
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
+        Page<Region> regionPage = regionService.findAll(pageable);
 
         return PageResponse.<RegionResponse>builder()
             .code(HttpStatus.OK.value())
-            .data(regionResponseMapper.toResponse(regionList))
+            .data(regionResponseMapper.toResponse(regionPage.getContent()))
+            .build();
+    }
+
+    @Operation(summary = "Find minimal data of all regions")
+    @GetMapping("minimal")
+    @ResponseStatus(HttpStatus.OK)
+    public MinimalResponse<List<RegionMinRespone>> findAllMinimal(
+        @RequestParam(required = false) String keyword)
+    {
+        Pageable pageable = PageableUtil.of(0, 30, "name", false);
+        Page<RegionMinRespone> regionMinResponePage = regionService.findAllMinData(
+            keyword, pageable);
+
+        return MinimalResponse.<List<RegionMinRespone>>builder()
+            .code(HttpStatus.OK.value())
+            .data(regionMinResponePage.getContent())
             .build();
     }
 }

@@ -51,7 +51,8 @@ public class GroupMembershipController {
         @RequestParam(required = false) UUID socialNetworkId,
         @RequestParam(required = false) UUID accountId,
         @RequestParam(required = false) RequestStateCodeEnum requestStateCode,
-        @RequestParam(required = false) GroupActionEnum action)
+        @RequestParam(required = false) GroupActionEnum action,
+        @RequestParam(required = false) String keyword)
     {
         Pageable pageable = PageableUtil.of(page, size, sortBy, descending);
         Page<GroupMembership> groupMembershipPage = groupMembershipService.findAllWithFilters(
@@ -60,6 +61,7 @@ public class GroupMembershipController {
                 .accountId(accountId)
                 .requestStateCode(requestStateCode)
                 .action(action)
+                .keyword(keyword)
                 .build(), pageable
         );
 
@@ -76,8 +78,7 @@ public class GroupMembershipController {
     @Operation(summary = "Find membership by id")
     @GetMapping("{groupMembershipId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<GroupMembershipResponse> findById(
-        @PathVariable("groupMembershipId") UUID groupMembershipId)
+    public SingleResponse<GroupMembershipResponse> findById(@PathVariable UUID groupMembershipId)
     {
         GroupMembership groupMembership = groupMembershipService.findByIdThrow(groupMembershipId);
 
@@ -90,8 +91,7 @@ public class GroupMembershipController {
     @Operation(summary = "Update group membership")
     @PutMapping("{groupMembershipId}")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResponse<GroupMembershipResponse> update(
-        @PathVariable("groupMembershipId") UUID groupMembershipId,
+    public SingleResponse<GroupMembershipResponse> update(@PathVariable UUID groupMembershipId,
         @RequestBody GroupMembershipUpdateRequest request)
     {
         processGroupMembershipUpdateRequestCmd.withRequest(

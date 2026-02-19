@@ -25,12 +25,16 @@ import com.kernotec.farm.report.jpa.service.ReportActivityService;
 import com.kernotec.farm.report.rest.command.excel.ReportHeadCreateCmd;
 import com.kernotec.farm.report.rest.dto.request.ReportActivityRequest;
 import com.kernotec.farm.util.ExcelUtil;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,6 +46,8 @@ public class ReportActivityExcelExportCmd extends
     AbstractTransactionalRequiredCommand<ReportActivityExcelExportCmd.Request, Void>
 {
 
+    private final Map<ReportActivityStyleEnum, CellStyle> cellStyles = new HashMap<>();
+
     private final ReportActivityService reportActivityService;
     private final ActivityDtoMapper activityDtoMapper;
     private final ExcelUtil excelUtil;
@@ -49,8 +55,15 @@ public class ReportActivityExcelExportCmd extends
 
     @Override
     protected Void run(Request request) {
-        Sheet sheet = request.sheet();
+        Sheet sheet = request.workbook.createSheet("Reporte de Actividades");
         ReportActivityRequest filterRequest = request.filterRequest();
+
+        cellStyles.put(
+            ReportActivityStyleEnum.HEADER, excelUtil.getCellStyle(request.workbook, true, true));
+        cellStyles.put(
+            ReportActivityStyleEnum.CONTENT,
+            excelUtil.getCellStyle(request.workbook, false, false)
+        );
 
         excelUtil.setColumnsSize(sheet, List.of(5, 10, 14, 25, 14, 14, 36, 25, 20));
 
@@ -61,19 +74,20 @@ public class ReportActivityExcelExportCmd extends
                 .zoneId(filterRequest.getZoneId())
                 .searchCriteria(filterRequest.getSearchCriteria())
                 .searchDateDetail(reportActivityService.getReportDateDetail(filterRequest))
+                .cellStyles(cellStyles)
                 .build())
             .execute();
 
         Row headerRow = sheet.createRow(headerRowNum++);
         excelUtil.fillExcelRow(
-            headerRow, true, List.of(
+            headerRow, List.of(
                 "#", "Granja", "Dispositivo", "Cuenta", "Actividad", "Red Social", "Detalle",
                 "Complemento", "Fecha"
-            ), true
+            ), cellStyles.get(ReportActivityStyleEnum.HEADER)
         );
 
         int page = 0;
-        int size = 100;
+        int size = 500;
 
         int rowCount = 0;
         Page<Activity> activityPage;
@@ -104,7 +118,8 @@ public class ReportActivityExcelExportCmd extends
                     detailAndComplement[0], detailAndComplement[1], activityDateStr
                 );
 
-                excelUtil.fillExcelRow(row, false, rowValues, false);
+                excelUtil.fillExcelRow(
+                    row, rowValues, cellStyles.get(ReportActivityStyleEnum.CONTENT));
             }
 
             page++;
@@ -288,8 +303,9 @@ public class ReportActivityExcelExportCmd extends
     }
 
     @Builder
-    public record Request(Sheet sheet, ReportActivityRequest filterRequest, String sortBy,
-                          boolean descending, String titleReport, String authUsername)
+    public record Request(SXSSFWorkbook workbook, ReportActivityRequest filterRequest,
+                          String sortBy, boolean descending, String titleReport,
+                          String authUsername)
     {
 
     }

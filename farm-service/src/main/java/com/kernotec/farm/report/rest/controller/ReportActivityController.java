@@ -25,6 +25,7 @@ import com.kernotec.farm.util.AuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -82,6 +83,7 @@ public class ReportActivityController {
             .build();
     }
 
+    /* Only Use jasper reports */
     @Operation(summary = "Activity report with filters (no pagination)")
     @GetMapping("activities/report/unpaginated")
     public PageResponse<ActivityResponse> getActivitiesReportUnpaginated(
@@ -146,10 +148,10 @@ public class ReportActivityController {
         excelExportCmd.withRequest(ExcelExportCmd.Request.builder()
                 .response(response)
                 .reportTitle(titleReport)
-                .fileName("report-activities.xlsx")
-                .callback(sheet -> reportActivityExcelExportCmd.withRequest(
+                .fileName("report-activities")
+                .callback(workbook -> reportActivityExcelExportCmd.withRequest(
                         ReportActivityExcelExportCmd.Request.builder()
-                            .sheet(sheet)
+                            .workbook(workbook)
                             .filterRequest(filterRequest)
                             .sortBy(sortBy)
                             .descending(descending)
@@ -174,7 +176,7 @@ public class ReportActivityController {
         pdfExportCmd.withRequest(PdfExportCmd.Request.builder()
                 .response(response)
                 .disposition(disposition)
-                .fileName("report-activities.pdf")
+                .fileName("report-activities")
                 .callbackGetReportBytes(() -> reportActivityPdfExportCmd.withRequest(
                         ReportActivityPdfExportCmd.Request.builder()
                             .titleReport(titleReport)
@@ -193,7 +195,7 @@ public class ReportActivityController {
     @PostMapping("activities/ratings/report")
     @ResponseStatus(HttpStatus.OK)
     public SingleResponse<ReportRatingGroupListResponse> getActivitiesRatings(
-        @RequestBody ReportRatingRequest request)
+        @RequestBody @Valid ReportRatingRequest request)
     {
         return SingleResponse.<ReportRatingGroupListResponse>builder()
             .code(HttpStatus.OK.value())
@@ -247,10 +249,10 @@ public class ReportActivityController {
         excelExportCmd.withRequest(ExcelExportCmd.Request.builder()
                 .response(response)
                 .reportTitle(reportTitle)
-                .fileName("report-activities-ratings.xlsx")
-                .callback(sheet -> activityRatingExcelExportCmd.withRequest(
+                .fileName("report-activities-ratings")
+                .callback(workbook -> activityRatingExcelExportCmd.withRequest(
                         ActivityRatingExcelExportCmd.Request.builder()
-                            .sheet(sheet)
+                            .workbook(workbook)
                             .reportTitle(reportTitle)
                             .filterRequest(request)
                             .authUsername(authUtil.getAuthNameFromAuthentication(authentication))
@@ -271,7 +273,7 @@ public class ReportActivityController {
         pdfExportCmd.withRequest(PdfExportCmd.Request.builder()
                 .response(response)
                 .disposition(disposition)
-                .fileName("report-activities-ratings.pdf")
+                .fileName("report-activities-ratings")
                 .callbackGetReportBytes(() -> activityRatingPdfExportCmd.withRequest(
                         ActivityRatingPdfExportCmd.Request.builder()
                             .token(authUtil.getAuthTokenFromAuthentication(authentication))

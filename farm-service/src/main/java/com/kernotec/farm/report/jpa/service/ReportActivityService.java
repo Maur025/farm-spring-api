@@ -194,6 +194,10 @@ public class ReportActivityService {
     public List<ReportRatingResponse> getActivitiesRatings(ReportRatingRequest filterRequest,
         boolean isDescending)
     {
+        if (filterRequest.getLimit() == null) {
+            filterRequest.setLimit(3);
+        }
+
         return switch (filterRequest.getRatingType()) {
             case ACCOUNT -> getActivitiesRatingByAccount(filterRequest, isDescending);
             case DEVICE -> getActivitiesRatingByDevice(filterRequest, isDescending);
