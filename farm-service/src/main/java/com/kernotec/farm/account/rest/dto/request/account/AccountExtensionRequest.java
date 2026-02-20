@@ -3,6 +3,7 @@ package com.kernotec.farm.account.rest.dto.request.account;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kernotec.core.rest.dto.request.BaseRequest;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,5 +14,6 @@ import lombok.Setter;
 @JsonInclude(Include.NON_NULL)
 public class AccountExtensionRequest extends BaseRequest {
 
+    @NotNull
     private String referenceEmail;
 }
