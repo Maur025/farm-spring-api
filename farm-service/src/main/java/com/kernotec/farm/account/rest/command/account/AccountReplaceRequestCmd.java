@@ -4,6 +4,8 @@ import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
 import com.kernotec.farm.account.command.account.AccountCreateCmd;
 import com.kernotec.farm.account.command.account.AccountGetDtoCmd;
 import com.kernotec.farm.account.command.account.AccountUpdateCmd;
+import com.kernotec.farm.account.command.account.extension.AccountExtensionCreateCmd;
+import com.kernotec.farm.account.command.account.extension.log.AccountExtensionLogCreateCmd;
 import com.kernotec.farm.account.command.assigned.chip.AssignedChipCreateCmd;
 import com.kernotec.farm.account.command.device.account.DeviceAccountCreateCmd;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
@@ -34,6 +36,8 @@ public class AccountReplaceRequestCmd extends
     private final DeviceAccountCreateCmd deviceAccountCreateCmd;
     private final AccountUpdateCmd accountUpdateCmd;
     private final PersonFindOrCreateCmd personFindOrCreateCmd;
+    private final AccountExtensionCreateCmd accountExtensionCreateCmd;
+    private final AccountExtensionLogCreateCmd accountExtensionLogCreateCmd;
 
     @Override
     protected UUID run(Request request) {
@@ -111,7 +115,28 @@ public class AccountReplaceRequestCmd extends
                 .build())
             .execute();
 
+        addReferenceEmailInNewAccount(newAccountId, replaceRequest.getReferenceEmail());
+
         return newAccountId;
+    }
+
+    private void addReferenceEmailInNewAccount(UUID newAccountId, String referenceEmail) {
+        if (referenceEmail == null || referenceEmail.isBlank()) {
+            return;
+        }
+
+        accountExtensionCreateCmd.withRequest(
+                AccountExtensionCreateCmd.Request.builder()
+                    .accountId(newAccountId)
+                    .referenceEmail(referenceEmail)
+                    .build())
+            .execute();
+
+        accountExtensionLogCreateCmd.withRequest(AccountExtensionLogCreateCmd.Request.builder()
+                .accountId(newAccountId)
+                .referenceEmailValue(referenceEmail)
+                .build())
+            .execute();
     }
 
     @Builder

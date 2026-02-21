@@ -23,4 +23,6 @@ public class AccountReplaceRequest extends BaseRequest {
     private Boolean replacePerson;
     private String fakeName;
     private String fakeLastName;
+
+    private String referenceEmail;
 }
