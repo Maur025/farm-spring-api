@@ -4,6 +4,7 @@ import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceMinResponse;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,4 +26,6 @@ public interface DeviceRepository extends BaseRepository<Device, UUID> {
         """)
     Page<DeviceMinResponse> findAllMinData(@Param("farmId") UUID farmId,
         @Param("keyword") String keyword, Pageable pageable);
+
+    Page<Device> findAllByDeviceNumberIn(Set<String> deviceNumbers, Pageable pageable);
 }

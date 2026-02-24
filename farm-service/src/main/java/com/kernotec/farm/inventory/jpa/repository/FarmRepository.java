@@ -4,6 +4,7 @@ import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.farm.inventory.jpa.entity.Farm;
 import com.kernotec.farm.inventory.rest.dto.response.farm.FarmMinResponse;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,4 +24,6 @@ public interface FarmRepository extends BaseRepository<Farm, UUID> {
         AND (:keyword IS NULL OR LOWER(f.name) LIKE LOWER(CONCAT('%',:keyword,'%')))
         """)
     Page<FarmMinResponse> findAllMinData(@Param("keyword") String keyword, Pageable pageable);
+
+    Page<Farm> findAllByCodeIn(Set<String> codes, Pageable pageable);
 }

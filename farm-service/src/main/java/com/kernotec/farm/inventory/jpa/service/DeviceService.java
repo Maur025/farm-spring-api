@@ -2,11 +2,13 @@ package com.kernotec.farm.inventory.jpa.service;
 
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
+import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.farm.inventory.jpa.entity.Device;
 import com.kernotec.farm.inventory.jpa.repository.DeviceRepository;
 import com.kernotec.farm.inventory.jpa.specification.device.DeviceSpecification;
 import com.kernotec.farm.inventory.rest.dto.response.device.DeviceMinResponse;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,5 +50,11 @@ public class DeviceService extends BaseServiceImpl<Device, UUID> {
 
     public Optional<Device> findByDeviceNumber(String deviceNumber) {
         return repository.findByDeviceNumber(deviceNumber);
+    }
+
+    public Page<Device> findAllByDeviceNumberIn(Set<String> deviceNumbers) {
+        Pageable pageable = PageableUtil.of(0, deviceNumbers.size(), "deviceNumber", false);
+
+        return repository.findAllByDeviceNumberIn(deviceNumbers, pageable);
     }
 }
