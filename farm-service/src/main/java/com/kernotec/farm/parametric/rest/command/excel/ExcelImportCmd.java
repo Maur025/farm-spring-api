@@ -1,13 +1,15 @@
 package com.kernotec.farm.parametric.rest.command.excel;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kernotec.core.command.AbstractTransactionalRequiredCommand;
-import com.kernotec.core.util.JsonUtil;
 import com.kernotec.farm.parametric.rest.dto.ImportExcelDataDto;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvValidationException;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,11 @@ public class ExcelImportCmd extends
     AbstractTransactionalRequiredCommand<ExcelImportCmd.Request, Void>
 {
 
+    private static final int BATCH_SIZE = 50;
+
     private final ImportExcelDataGetDtoCmd importExcelDataGetDtoCmd;
     private final ImportExcelRegisterInDbCmd importExcelRegisterInDbCmd;
+    private final ImportCsvPersistBatchInDbCmd importCsvPersistBatchInDbCmd;
 
     @Override
     protected Void run(Request request) {
@@ -35,6 +40,8 @@ public class ExcelImportCmd extends
 
             String[] csvRow;
 
+            List<ImportExcelDataDto> importExcelDataDtoBatch = new ArrayList<>(BATCH_SIZE);
+
             while ((csvRow = reader.readNext()) != null) {
                 ImportExcelDataDto importExcelDataDto = importExcelDataGetDtoCmd.withRequest(
                         ImportExcelDataGetDtoCmd.Request.builder()
@@ -42,19 +49,36 @@ public class ExcelImportCmd extends
                             .build())
                     .execute();
 
-                importExcelRegisterInDbCmd.withRequest(ImportExcelRegisterInDbCmd.Request.builder()
-                        .importExcelDataDto(importExcelDataDto)
-                        .build())
-                    .execute();
+                /*String strJson = JsonUtil.toString(new ObjectMapper(), importExcelDataDto);
+                log.info("IMPORT DTO DATA: {}", strJson);*/
 
-                String strJson = JsonUtil.toString(new ObjectMapper(), importExcelDataDto);
-                log.info("IMPORT DTO DATA: {}", strJson);
+                importExcelDataDtoBatch.add(importExcelDataDto);
+
+                if (importExcelDataDtoBatch.size() >= BATCH_SIZE) {
+                    addBatchToSave(importExcelDataDtoBatch);
+                }
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+
+            if (!importExcelDataDtoBatch.isEmpty()) {
+                addBatchToSave(importExcelDataDtoBatch);
+            }
+
+            throw new RuntimeException("TEST TO NO SAVE DATA");
+        } catch (IOException | CsvValidationException ex) {
+            log.error("Error loading data in DB: {}", ex.getMessage(), ex);
+            throw new RuntimeException(ex);
         }
 
-        return null;
+        //return null;
+    }
+
+    private void addBatchToSave(List<ImportExcelDataDto> importExcelDataDtoBatch) {
+        importCsvPersistBatchInDbCmd.withRequest(ImportCsvPersistBatchInDbCmd.Request.builder()
+                .importExcelDataDtoList(new ArrayList<>(importExcelDataDtoBatch))
+                .build())
+            .execute();
+
+        importExcelDataDtoBatch.clear();
     }
 
     @Builder

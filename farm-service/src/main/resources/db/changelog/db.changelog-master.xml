@@ -172,4 +172,5 @@
   </changeSet>
 
   <include file="db/changelog/2026/02/10-01-changelog-133.xml"/>
+  <include file="db/changelog/2026/02/20-01-changelog-134.xml"/>
 </databaseChangeLog>

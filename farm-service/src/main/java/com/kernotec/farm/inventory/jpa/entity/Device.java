@@ -2,6 +2,7 @@ package com.kernotec.farm.inventory.jpa.entity;
 
 import com.kernotec.core.jpa.entity.BaseAuditEntity;
 import com.kernotec.farm.account.jpa.entity.Account;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -64,11 +65,11 @@ public class Device extends BaseAuditEntity {
     @Where(clause = "deleted is false AND is_enabled is true")
     private Set<Account> accounts;
 
-    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Where(clause = "deleted is false")
     private Set<DeviceImei> deviceImeis;
 
-    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Where(clause = "deleted is false")
     private Set<DeviceConnection> deviceConnections;
 }

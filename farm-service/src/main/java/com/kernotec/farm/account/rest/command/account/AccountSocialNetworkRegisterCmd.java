@@ -7,13 +7,16 @@ import com.kernotec.farm.account.command.account.observation.AccountObservationC
 import com.kernotec.farm.account.command.assigned.chip.AssignedChipCreateCmd;
 import com.kernotec.farm.account.command.device.account.DeviceAccountCreateCmd;
 import com.kernotec.farm.account.command.observation.ObservationCreateCmd;
+import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
+import com.kernotec.farm.account.jpa.service.AccountService;
 import com.kernotec.farm.parametric.jpa.entity.SocialNetwork;
 import com.kernotec.farm.parametric.jpa.enums.SocialNetworkEnum;
 import com.kernotec.farm.parametric.jpa.service.SocialNetworkService;
 import com.kernotec.farm.util.LinkUtil;
 import jakarta.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,6 +40,7 @@ public class AccountSocialNetworkRegisterCmd extends
     private final AccountObservationCreateCmd accountObservationCreateCmd;
     private final AccountExtensionCreateCmd accountExtensionCreateCmd;
     private final LinkUtil linkUtil;
+    private final AccountService accountService;
 
     @Override
     protected Void run(Request request) {
@@ -53,16 +57,10 @@ public class AccountSocialNetworkRegisterCmd extends
             default -> null;
         };
 
-        UUID accountId = accountCreateCmd.withRequest(AccountCreateCmd.Request.builder()
-                .username(request.getUsername())
-                .password(request.getPassword() == null ? "N/A" : request.getPassword())
-                .personId(request.getPersonId())
-                .socialNetworkId(socialNetwork.getId())
-                .type(request.getAccountType())
-                .accountLink(request.getAccountLink())
-                .identityUsername(identityUsername)
-                .build())
-            .execute();
+        log.info("RED SOCIAL: {}", socialNetwork.getCode());
+        UUID accountId = getOrCreateAccountId(request, socialNetwork.getId(), identityUsername);
+
+        log.info("ACCOUNT ID: {}", accountId);
 
         deviceAccountCreateCmd.withRequest(DeviceAccountCreateCmd.Request.builder()
                 .accountId(accountId)
@@ -105,6 +103,39 @@ public class AccountSocialNetworkRegisterCmd extends
             .execute();
 
         return null;
+    }
+
+    private UUID getOrCreateAccountId(Request request, UUID socialNetworkId,
+        String identityUsername)
+    {
+        log.info("account Link: {}", request.getAccountLink());
+
+        if (request.getAccountLink() == null) {
+            return createAccount(request, socialNetworkId, identityUsername);
+        }
+
+        log.info("BUSCANDO CUENTA");
+
+        Optional<Account> accountOptional = accountService.findByAccountLinkAndSocialNetworkId(
+            request.accountLink, socialNetworkId);
+
+        log.info("EXISTE LA CUENTA : {} ", accountOptional.isPresent());
+
+        return accountOptional.map(Account::getId)
+            .orElse(createAccount(request, socialNetworkId, identityUsername));
+    }
+
+    private UUID createAccount(Request request, UUID socialNetworkId, String identityUsername) {
+        return accountCreateCmd.withRequest(AccountCreateCmd.Request.builder()
+                .username(request.getUsername())
+                .password(request.getPassword() == null ? "N/A" : request.getPassword())
+                .personId(request.getPersonId())
+                .socialNetworkId(socialNetworkId)
+                .type(request.getAccountType())
+                .accountLink(request.getAccountLink())
+                .identityUsername(identityUsername)
+                .build())
+            .execute();
     }
 
     @Builder

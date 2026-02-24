@@ -10,6 +10,7 @@ import com.kernotec.farm.account.jpa.service.AccountService;
 import com.kernotec.farm.account.rest.ApiSpec.AccountSpec;
 import com.kernotec.farm.account.rest.command.account.AccountReplaceRequestCmd;
 import com.kernotec.farm.account.rest.command.account.ProcessAccountUpdateRequestCmd;
+import com.kernotec.farm.account.rest.command.account.extension.ProcessAccountExtensionCreateRequestCmd;
 import com.kernotec.farm.account.rest.dto.request.account.AccountExtensionRequest;
 import com.kernotec.farm.account.rest.dto.request.account.AccountReplaceRequest;
 import com.kernotec.farm.account.rest.dto.request.account.AccountUpdateRequest;
@@ -17,7 +18,6 @@ import com.kernotec.farm.account.rest.dto.response.account.AccountMinResponse;
 import com.kernotec.farm.account.rest.dto.response.account.AccountResponse;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseFlatMapper;
 import com.kernotec.farm.account.rest.mapper.account.AccountResponseMapper;
-import com.kernotec.farm.account.rest.mapper.account.AccountResponseMinMapper;
 import com.kernotec.farm.common.dto.response.MinimalResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,10 +46,10 @@ public class AccountController {
     private final AccountService accountService;
     private final AccountResponseMapper accountResponseMapper;
     private final AccountResponseFlatMapper accountResponseFlatMapper;
-    private final AccountResponseMinMapper accountResponseMinMapper;
     private final AccountReplaceRequestCmd accountReplaceRequestCmd;
     private final AccountExtensionCreateCmd accountExtensionCreateCmd;
     private final ProcessAccountUpdateRequestCmd processAccountUpdateRequestCmd;
+    private final ProcessAccountExtensionCreateRequestCmd processAccountExtensionCreateRequestCmd;
 
     @Operation(summary = "Find all accounts")
     @GetMapping
@@ -162,10 +162,10 @@ public class AccountController {
     public SingleResponse<AccountResponse> addExtensionData(@PathVariable UUID accountId,
         @RequestBody AccountExtensionRequest request)
     {
-        UUID accountExtensionId = accountExtensionCreateCmd.withRequest(
-                AccountExtensionCreateCmd.Request.builder()
+        UUID accountExtensionId = processAccountExtensionCreateRequestCmd.withRequest(
+                ProcessAccountExtensionCreateRequestCmd.Request.builder()
                     .accountId(accountId)
-                    .referenceEmail(request.getReferenceEmail())
+                    .accountExtensionRequest(request)
                     .build())
             .execute();
 

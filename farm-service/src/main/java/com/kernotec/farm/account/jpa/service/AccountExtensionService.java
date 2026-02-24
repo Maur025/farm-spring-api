@@ -23,4 +23,8 @@ public class AccountExtensionService extends BaseServiceImpl<AccountExtension, U
     protected BaseRepository<AccountExtension, UUID> repository() {
         return repository;
     }
+
+    public void deleteAllByAccountId(UUID accountId) {
+        repository.deleteAllByAccountId(accountId);
+    }
 }
