@@ -2,12 +2,14 @@ package com.kernotec.farm.account.jpa.service;
 
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.core.jpa.service.BaseServiceImpl;
+import com.kernotec.core.jpa.util.PageableUtil;
 import com.kernotec.farm.account.jpa.entity.Account;
 import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.jpa.repository.AccountRepository;
 import com.kernotec.farm.account.jpa.specification.account.AccountSpecification;
 import com.kernotec.farm.account.rest.dto.response.account.AccountMinResponse;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -65,5 +67,15 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
         UUID socialNetworkId)
     {
         return repository.findByAccountLinkAndSocialNetworkId(accountLink, socialNetworkId);
+    }
+
+    public Page<Account> findAllByUsernameInAndType(Set<String> usernameSet, AccountTypeEnum type) {
+        Pageable pageable = PageableUtil.of(0, usernameSet.size(), "username", false);
+        return repository.findAllByUsernameInAndType(usernameSet, type, pageable);
+    }
+
+    public Page<Account> findAllByAccountLinkIn(Set<String> accountLinkSet) {
+        Pageable pageable = PageableUtil.of(0, accountLinkSet.size() * 2, "accountLink", false);
+        return repository.findAllByAccountLinkIn(accountLinkSet, pageable);
     }
 }

@@ -38,10 +38,10 @@ public class Chip extends BaseAuditEntity {
                 updatable = false)
     private Operator operator;
 
-    @Column(name = "registration_person_id", nullable = false)
+    @Column(name = "registration_person_id")
     private UUID registrationPersonId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "registration_person_id", referencedColumnName = "id", insertable = false,
                 updatable = false)
     private RegistrationPerson registrationPerson;

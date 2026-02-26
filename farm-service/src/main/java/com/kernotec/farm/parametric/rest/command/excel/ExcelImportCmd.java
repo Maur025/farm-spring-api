@@ -73,11 +73,13 @@ public class ExcelImportCmd extends
     }
 
     private void addBatchToSave(List<ImportExcelDataDto> importExcelDataDtoBatch) {
+        log.info("Procesing batch of size: {}", importExcelDataDtoBatch.size());
         importCsvPersistBatchInDbCmd.withRequest(ImportCsvPersistBatchInDbCmd.Request.builder()
                 .importExcelDataDtoList(new ArrayList<>(importExcelDataDtoBatch))
                 .build())
             .execute();
 
+        log.info("Batch of size {} processed SUCCESSFULLY.", importExcelDataDtoBatch.size());
         importExcelDataDtoBatch.clear();
     }
 
