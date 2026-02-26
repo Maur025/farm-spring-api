@@ -2,8 +2,10 @@ package com.kernotec.farm.account.jpa.repository;
 
 import com.kernotec.core.jpa.repository.BaseRepository;
 import com.kernotec.farm.account.jpa.entity.Account;
+import com.kernotec.farm.account.jpa.enums.AccountTypeEnum;
 import com.kernotec.farm.account.rest.dto.response.account.AccountMinResponse;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +28,9 @@ public interface AccountRepository extends BaseRepository<Account, UUID> {
         """)
     Page<AccountMinResponse> findAllMinData(@Param("socialNetworkId") UUID socialNetworkId,
         @Param("keyword") String keyword, Pageable pageable);
+
+    Page<Account> findAllByUsernameInAndType(Set<String> usernameSet, AccountTypeEnum type,
+        Pageable pageable);
+
+    Page<Account> findAllByAccountLinkIn(Set<String> accountLinkSet, Pageable pageable);
 }

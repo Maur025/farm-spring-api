@@ -41,7 +41,6 @@ public class ChipCreateCmd extends
         @NotNull
         private final boolean isDeviceInside;
         private final UUID operatorId;
-        @NotNull
         private final UUID registrationPersonId;
         @NotNull
         private final UUID deviceId;

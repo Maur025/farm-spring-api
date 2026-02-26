@@ -19,8 +19,8 @@ public interface PersonRepository extends BaseRepository<Person, UUID> {
     @Query("""
         SELECT p
         FROM Person p
-        WHERE (p.name, p.lastName) IN :nameAndLastNames
+        WHERE CONCAT(p.name, '|', p.lastName) IN :nameAndLastNames
         """)
     Page<Person> findAllByNameAndLastNameInList(
-        @Param("nameAndLastNames") List<Object[]> nameAndLastNames, Pageable pageable);
+        @Param("nameAndLastNames") List<String> nameAndLastNames, Pageable pageable);
 }

@@ -33,7 +33,7 @@ public class PersonService extends BaseServiceImpl<Person, UUID> {
         return repository.findByNameAndLastName(name, lastName);
     }
 
-    public Page<Person> findAllByNameAndLastNameInList(List<Object[]> nameAndLastNames)
+    public Page<Person> findAllByNameAndLastNameInList(List<String> nameAndLastNames)
     {
         Pageable pageable = PageableUtil.of(0, nameAndLastNames.size(), "name", false);
         return repository.findAllByNameAndLastNameInList(nameAndLastNames, pageable);
