@@ -121,15 +121,21 @@ public class HandleAssignAccount implements HandleImport<AssignAccountRequest> {
                 .type(SocialNetworkEnum.FACEBOOK)
                 .userFn(ImportExcelDataDto::getFacebookUsername)
                 .obsFn(ImportExcelDataDto::getFacebookObservation)
-                .build(), SocialConfig.builder()
+                .build(),
+
+            SocialConfig.builder()
                 .type(SocialNetworkEnum.TIKTOK)
                 .userFn(ImportExcelDataDto::getTiktokUsername)
                 .obsFn(ImportExcelDataDto::getTiktokObservation)
-                .build(), SocialConfig.builder()
+                .build(),
+
+            SocialConfig.builder()
                 .type(SocialNetworkEnum.X)
                 .userFn(ImportExcelDataDto::getXUsername)
                 .obsFn(dto -> null)
-                .build(), SocialConfig.builder()
+                .build(),
+
+            SocialConfig.builder()
                 .type(SocialNetworkEnum.CORREO)
                 .userFn(ImportExcelDataDto::getEmailUsername)
                 .obsFn(dto -> null)
@@ -139,14 +145,18 @@ public class HandleAssignAccount implements HandleImport<AssignAccountRequest> {
 
     private void addAccountAssigments(AccountAddRequest request)
     {
-        if (request.username == null || request.username.equalsIgnoreCase("N/A")) {
+        if (request.username == null || request.username.isBlank()
+            || request.username.equalsIgnoreCase("N/A"))
+        {
             log.debug("facebook username is null, skipping facebook account assign");
             return;
         }
 
         UUID accountId = request.accountMap.get(
             csvImportCommon.getAccountUniqueCode(
-                String.valueOf(request.accountType), request.username));
+                String.valueOf(request.accountType),
+                request.username
+            ));
 
         request.addDeviceAccountFn.accept(accountId);
         request.addAssignedChipFn.accept(accountId);

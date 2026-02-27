@@ -57,7 +57,7 @@ public class HandlePersonRegister implements HandleImport<PersonRegisterRequest>
             .stream()
             .collect(Collectors.toMap(
                 person -> csvImportCommon.getPersonCode(person.getName(), person.getLastName()),
-                Person::getId
+                Person::getId, (existing, replacement) -> existing
             ));
 
         List<Person> personListToSave = new ArrayList<>();
@@ -92,14 +92,22 @@ public class HandlePersonRegister implements HandleImport<PersonRegisterRequest>
 
         Map<UUID, RegistrationPerson> registrationPersonMemoryMap = personRegisterMatchMap.values()
             .stream()
-            .collect(Collectors.toMap(personId -> personId, this::getRegistrationPersonEntity));
+            .collect(
+                Collectors.toMap(
+                    personId -> personId, this::getRegistrationPersonEntity,
+                    (existing, replacement) -> existing
+                ));
 
         Set<UUID> personIds = new HashSet<>(personRegisterMatchMap.values());
 
         Map<UUID, UUID> registrationPersonMatchMap = registrationPersonService.findAllByPersonIdIn(
                 personIds)
             .stream()
-            .collect(Collectors.toMap(RegistrationPerson::getPersonId, RegistrationPerson::getId));
+            .collect(
+                Collectors.toMap(
+                    RegistrationPerson::getPersonId, RegistrationPerson::getId,
+                    (existing, replacement) -> existing
+                ));
 
         List<RegistrationPerson> registrationPersonListToSave = new ArrayList<>();
 

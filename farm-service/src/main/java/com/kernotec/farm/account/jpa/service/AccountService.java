@@ -70,12 +70,13 @@ public class AccountService extends BaseServiceImpl<Account, UUID> {
     }
 
     public Page<Account> findAllByUsernameInAndType(Set<String> usernameSet, AccountTypeEnum type) {
-        Pageable pageable = PageableUtil.of(0, usernameSet.size(), "username", false);
+        Pageable pageable = PageableUtil.of(0, Math.max(usernameSet.size(), 1), "username", false);
         return repository.findAllByUsernameInAndType(usernameSet, type, pageable);
     }
 
     public Page<Account> findAllByAccountLinkIn(Set<String> accountLinkSet) {
-        Pageable pageable = PageableUtil.of(0, accountLinkSet.size() * 2, "accountLink", false);
+        Pageable pageable = PageableUtil.of(
+            0, Math.max(accountLinkSet.size() * 2, 1), "accountLink", false);
         return repository.findAllByAccountLinkIn(accountLinkSet, pageable);
     }
 }

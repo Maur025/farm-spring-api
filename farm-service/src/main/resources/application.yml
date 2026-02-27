@@ -42,12 +42,16 @@ spring:
     properties:
       hibernate:
         default_schema: ${DB_SCHEMA:public}
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
         type:
           json_format_mapper: com.kernotec.core.config.HibernateFormatMapper
         format_sql: false
         dialect: com.kernotec.core.config.PGDialect
-        jdbc:
-          time_zone: UTC
         connection:
           characterEncoding: UTF-8
           charSet: UTF-8

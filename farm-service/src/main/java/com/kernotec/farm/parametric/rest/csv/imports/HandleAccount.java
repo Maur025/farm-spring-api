@@ -1,5 +1,6 @@
 package com.kernotec.farm.parametric.rest.csv.imports;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kernotec.farm.account.command.account.AccountCreateManyCmd;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.dto.mapper.AccountDtoFlatMapper;
@@ -18,7 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,6 +41,8 @@ public class HandleAccount implements HandleImport<AccountRequest> {
     private final AccountCreateManyCmd accountCreateManyCmd;
     private final LinkUtil linkUtil;
 
+    private final ObjectMapper objectMapper;
+
     @Override
     public HandleTypeEnum handleType() {
         return HandleTypeEnum.ACCOUNT;
@@ -46,72 +52,7 @@ public class HandleAccount implements HandleImport<AccountRequest> {
     public Map<String, UUID> handle(AccountRequest request) {
         Map<String, Account> accountMemoryMap = request.importExcelDataDtoBatch()
             .stream()
-            .flatMap(dto -> {
-                List<Account> accounts = new ArrayList<>();
-
-                if (dto.getFacebookUsername() != null) {
-                    UUID socialNetworkId = request.socialNetworkMap()
-                        .get(SocialNetworkEnum.FACEBOOK.toString());
-
-                    Account facebookAccount = getAccountEntity(
-                        dto.getFacebookUsername(), dto.getFacebookPassword(), socialNetworkId,
-                        dto.getFacebookAccountLink(), dto, request.personMap(),
-                        request.inverseSocialNetworkMap()
-                    );
-
-                    accounts.add(facebookAccount);
-                }
-
-                if (dto.getTiktokUsername() != null) {
-                    UUID socialNetworkId = request.socialNetworkMap()
-                        .get(SocialNetworkEnum.TIKTOK.toString());
-
-                    Account tiktokAccount = getAccountEntity(
-                        dto.getTiktokUsername(), dto.getTiktokPassword(), socialNetworkId, dto,
-                        request.personMap()
-                    );
-
-                    accounts.add(tiktokAccount);
-                }
-
-                if (dto.getXUsername() != null) {
-                    UUID socialNetworkId = request.socialNetworkMap()
-                        .get(SocialNetworkEnum.X.toString());
-
-                    Account xAccount = getAccountEntity(
-                        dto.getXUsername(), dto.getXPassword(),
-                        socialNetworkId, dto, request.personMap()
-                    );
-
-                    accounts.add(xAccount);
-                }
-
-                if (dto.getIsHaveWhatsapp() && dto.getPhoneNumber() != null && !dto.getPhoneNumber()
-                    .equalsIgnoreCase("N/A"))
-                {
-                    UUID socialNetworkId = request.socialNetworkMap()
-                        .get(SocialNetworkEnum.WHATSAPP.toString());
-
-                    Account whatsappAccount = getAccountEntity(
-                        dto.getPhoneNumber(), null, socialNetworkId, dto, request.personMap());
-
-                    accounts.add(whatsappAccount);
-                }
-
-                if (dto.getEmailUsername() != null) {
-                    UUID socialNetworkId = request.socialNetworkMap()
-                        .get(SocialNetworkEnum.CORREO.toString());
-
-                    Account emailAccount = getAccountEntity(
-                        dto.getEmailUsername(), dto.getEmailPassword(), socialNetworkId, dto,
-                        request.personMap()
-                    );
-
-                    accounts.add(emailAccount);
-                }
-
-                return accounts.stream();
-            })
+            .flatMap(dto -> getAccountStream(dto, request))
             .collect(Collectors.toMap(
                 account -> csvImportCommon.getAccountUniqueCode(
                     request.inverseSocialNetworkMap()
@@ -162,35 +103,10 @@ public class HandleAccount implements HandleImport<AccountRequest> {
                 ), AccountDto::getId
             ));
 
-        List<Account> accountListToSave = new ArrayList<>();
-
-        for (Account account : accountMemoryMap.values()) {
-            SocialNetworkEnum socialNetworkCode = SocialNetworkEnum.fromValue(
-                request.inverseSocialNetworkMap()
-                    .get(account.getSocialNetworkId()));
-
-            if (SocialNetworkEnum.FACEBOOK.equals(socialNetworkCode)
-                && facebookAccountMatchMap.containsKey(
-                csvImportCommon.getAccountUniqueCode(
-                    socialNetworkCode.toString(),
-                    account.getUsername()
-                )))
-            {
-                continue;
-            }
-
-            if (!SocialNetworkEnum.FACEBOOK.equals(socialNetworkCode)
-                && accountMatchMap.containsKey(
-                csvImportCommon.getAccountUniqueCode(
-                    socialNetworkCode.toString(),
-                    account.getUsername()
-                )))
-            {
-                continue;
-            }
-
-            accountListToSave.add(account);
-        }
+        List<Account> accountListToSave = getAccountListToSave(
+            accountMemoryMap,
+            facebookAccountMatchMap, accountMatchMap, request.inverseSocialNetworkMap()
+        );
 
         if (!accountListToSave.isEmpty()) {
             List<Account> accountListSaved = accountCreateManyCmd.withRequest(
@@ -218,12 +134,47 @@ public class HandleAccount implements HandleImport<AccountRequest> {
         return accountMatchMap;
     }
 
-    private Account getAccountEntity(String username, String password, UUID socialNetworkId,
-        String accountLink, ImportExcelDataDto dto, Map<String, UUID> personMap,
-        Map<UUID, String> inverseSocialNetworkMap)
-    {
-        String socialNetworkCode = inverseSocialNetworkMap.get(socialNetworkId);
-        String identityUsername = switch (SocialNetworkEnum.fromValue(socialNetworkCode)) {
+    private Stream<Account> getAccountStream(ImportExcelDataDto dto, AccountRequest request) {
+        List<SocialConfig> socialConfigs = getSocialConfigs();
+
+        List<Account> accounts = new ArrayList<>();
+
+        UUID personId = getPersonId(
+            dto.getPersonFakeName(), dto.getPersonFakeLastName(), request.personMap());
+
+        for (SocialConfig socialConfig : socialConfigs) {
+            String username = socialConfig.userFn.apply(dto);
+            String password = socialConfig.passwordFn.apply(dto);
+            String link = socialConfig.linkFn.apply(dto);
+            Boolean shouldBeCreated = socialConfig.shouldBeCreatedFn.apply(dto);
+
+            if (!shouldBeCreated) {
+                continue;
+            }
+
+            UUID socialNetworkId = request.socialNetworkMap()
+                .get(socialConfig.type.toString());
+
+            String identityUsername = getIdentityUsername(socialConfig.type, link);
+
+            accounts.add(
+                getAccountEntity(
+                    username, password, link, identityUsername, socialNetworkId, personId));
+        }
+
+        return accounts.stream();
+    }
+
+    private UUID getPersonId(String name, String lastName, Map<String, UUID> personMap) {
+        return personMap.get(csvImportCommon.getPersonCode(name, lastName));
+    }
+
+    private String getIdentityUsername(SocialNetworkEnum socialNetworkCode, String accountLink) {
+        if (accountLink == null || accountLink.isBlank()) {
+            return null;
+        }
+
+        return switch (socialNetworkCode) {
             case FACEBOOK -> linkUtil.getIdentityFacebookOfLink(accountLink);
             case TIKTOK -> {
                 log.info("Tiktok account link:{}", accountLink);
@@ -231,27 +182,16 @@ public class HandleAccount implements HandleImport<AccountRequest> {
             }
             default -> null;
         };
-
-        return getAccountEntity(
-            username, password, accountLink, identityUsername, socialNetworkId, dto, personMap);
-    }
-
-    private Account getAccountEntity(String username, String password, UUID socialNetworkId,
-        ImportExcelDataDto dto, Map<String, UUID> personMap)
-    {
-        return getAccountEntity(username, password, null, null, socialNetworkId, dto, personMap);
     }
 
     private Account getAccountEntity(String username, String password, String accountLink,
-        String identityUsername, UUID socialNetworkId, ImportExcelDataDto dto,
-        Map<String, UUID> personMap)
+        String identityUsername, UUID socialNetworkId, UUID personId)
     {
         var account = new Account();
 
         account.setUsername(username);
         account.setPassword(password == null ? "N/A" : password);
-        account.setPersonId(personMap.get(
-            csvImportCommon.getPersonCode(dto.getPersonFakeName(), dto.getPersonFakeLastName())));
+        account.setPersonId(personId);
         account.setSocialNetworkId(socialNetworkId);
         account.setType(AccountTypeEnum.INTERNAL);
         account.setIsEnabled(true);
@@ -259,5 +199,98 @@ public class HandleAccount implements HandleImport<AccountRequest> {
         account.setIdentityUsername(identityUsername);
 
         return account;
+    }
+
+    private List<Account> getAccountListToSave(Map<String, Account> accountMemoryMap,
+        Map<String, UUID> facebookAccountMatchMap, Map<String, UUID> accountMatchMap,
+        Map<UUID, String> inverseSocialNetworkMap)
+    {
+        List<Account> accountListToSave = new ArrayList<>();
+
+        for (Account account : accountMemoryMap.values()) {
+            SocialNetworkEnum socialNetworkCode = SocialNetworkEnum.fromValue(
+                inverseSocialNetworkMap.get(account.getSocialNetworkId()));
+
+            if (SocialNetworkEnum.FACEBOOK.equals(socialNetworkCode)
+                && facebookAccountMatchMap.containsKey(
+                csvImportCommon.getAccountUniqueCode(
+                    socialNetworkCode.toString(),
+                    account.getUsername()
+                )))
+            {
+                continue;
+            }
+
+            if (!SocialNetworkEnum.FACEBOOK.equals(socialNetworkCode)
+                && accountMatchMap.containsKey(
+                csvImportCommon.getAccountUniqueCode(
+                    socialNetworkCode.toString(),
+                    account.getUsername()
+                )))
+            {
+                continue;
+            }
+
+            accountListToSave.add(account);
+        }
+
+        return accountListToSave;
+    }
+
+    private List<SocialConfig> getSocialConfigs() {
+        return List.of(
+            SocialConfig.builder()
+                .type(SocialNetworkEnum.FACEBOOK)
+                .userFn(ImportExcelDataDto::getFacebookUsername)
+                .passwordFn(ImportExcelDataDto::getFacebookPassword)
+                .linkFn(ImportExcelDataDto::getFacebookAccountLink)
+                .shouldBeCreatedFn(dto -> shouldBeCreated(dto.getFacebookUsername()))
+                .build(),
+
+            SocialConfig.builder()
+                .type(SocialNetworkEnum.TIKTOK)
+                .userFn(ImportExcelDataDto::getTiktokUsername)
+                .passwordFn(ImportExcelDataDto::getTiktokPassword)
+                .linkFn(dto -> null)
+                .shouldBeCreatedFn(dto -> shouldBeCreated(dto.getTiktokUsername()))
+                .build(),
+
+            SocialConfig.builder()
+                .type(SocialNetworkEnum.X)
+                .userFn(ImportExcelDataDto::getXUsername)
+                .passwordFn(ImportExcelDataDto::getXPassword)
+                .linkFn(dto -> null)
+                .shouldBeCreatedFn(dto -> shouldBeCreated(dto.getXUsername()))
+                .build(),
+
+            SocialConfig.builder()
+                .type(SocialNetworkEnum.CORREO)
+                .userFn(ImportExcelDataDto::getEmailUsername)
+                .passwordFn(ImportExcelDataDto::getEmailPassword)
+                .linkFn(dto -> null)
+                .shouldBeCreatedFn(dto -> shouldBeCreated(dto.getEmailUsername()))
+                .build(),
+
+            SocialConfig.builder()
+                .type(SocialNetworkEnum.WHATSAPP)
+                .userFn(ImportExcelDataDto::getPhoneNumber)
+                .passwordFn(dto -> "N/A")
+                .linkFn(dto -> null)
+                .shouldBeCreatedFn(ImportExcelDataDto::getIsHaveWhatsapp)
+                .build()
+        );
+    }
+
+    private Boolean shouldBeCreated(String username) {
+        return username != null && !username.isBlank() && !username.equalsIgnoreCase("N/A");
+    }
+
+    @Builder
+    public record SocialConfig(SocialNetworkEnum type, Function<ImportExcelDataDto, String> userFn,
+                               Function<ImportExcelDataDto, String> passwordFn,
+                               Function<ImportExcelDataDto, String> linkFn,
+                               Function<ImportExcelDataDto, Boolean> shouldBeCreatedFn)
+    {
+
     }
 }
