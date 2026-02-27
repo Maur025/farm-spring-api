@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Deprecated(since = "v.of.2025-02-27")
 public class DeviceFindOrCreateCmd extends
     AbstractTransactionalRequiredCommand<DeviceFindOrCreateCmd.Request, DeviceDto>
 {

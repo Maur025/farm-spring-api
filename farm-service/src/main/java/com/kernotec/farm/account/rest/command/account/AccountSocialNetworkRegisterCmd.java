@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Deprecated(since = "v.of.2025-02-27", forRemoval = true)
 public class AccountSocialNetworkRegisterCmd extends
     AbstractTransactionalRequiredCommand<AccountSocialNetworkRegisterCmd.Request, Void>
 {

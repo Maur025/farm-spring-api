@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Deprecated(since = "v.of.2025-02-27")
 public class FarmFindOrCreateCmd extends
     AbstractTransactionalRequiredCommand<FarmFindOrCreateCmd.Request, FarmDto>
 {
