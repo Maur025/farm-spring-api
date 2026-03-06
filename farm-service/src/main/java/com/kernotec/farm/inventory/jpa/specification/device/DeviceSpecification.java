@@ -45,7 +45,7 @@ public record DeviceSpecification(DeviceSpecificationCriteria criteria) implemen
         if (!joinMap.containsKey(DeviceSpecificationJoinEnum.PERSON_JOIN)) {
             joinMap.put(
                 DeviceSpecificationJoinEnum.PERSON_JOIN,
-                getOrCreateAccountJoin(joinMap, root).join("person", JoinType.INNER)
+                getOrCreateAccountJoin(joinMap, root).join("person", JoinType.LEFT)
             );
         }
 
@@ -114,8 +114,9 @@ public record DeviceSpecification(DeviceSpecificationCriteria criteria) implemen
                 return cb.or(
                     cb.equal(root.get("deviceNumber"), keyword),
                     cb.like(
-                        cb.lower(getOrCreateAccountJoin(joinMap, root).get("username")), pattern),
-                    cb.like(cb.lower(getOrCreatePersonJoin(joinMap, root).get("name")), pattern),
+                        cb.lower(getOrCreateAccountJoin(joinMap, root).get("username")),
+                        pattern
+                    ), cb.like(cb.lower(getOrCreatePersonJoin(joinMap, root).get("name")), pattern),
                     cb.like(cb.lower(getOrCreatePersonJoin(joinMap, root).get("lastName")), pattern)
                 );
             });

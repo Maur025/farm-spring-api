@@ -1,6 +1,5 @@
 package com.kernotec.farm.parametric.rest.csv.imports;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kernotec.farm.account.command.account.AccountCreateManyCmd;
 import com.kernotec.farm.account.jpa.dto.entity.AccountDto;
 import com.kernotec.farm.account.jpa.dto.mapper.AccountDtoFlatMapper;
@@ -41,8 +40,6 @@ public class HandleAccount implements HandleImport<AccountRequest> {
     private final AccountCreateManyCmd accountCreateManyCmd;
     private final LinkUtil linkUtil;
 
-    private final ObjectMapper objectMapper;
-
     @Override
     public HandleTypeEnum handleType() {
         return HandleTypeEnum.ACCOUNT;
@@ -56,7 +53,8 @@ public class HandleAccount implements HandleImport<AccountRequest> {
             .collect(Collectors.toMap(
                 account -> csvImportCommon.getAccountUniqueCode(
                     request.inverseSocialNetworkMap()
-                        .get(account.getSocialNetworkId()), account.getUsername()
+                        .get(account.getSocialNetworkId()), account.getUsername(),
+                    account.getAccountLink()
                 ), account -> account
             ));
 
@@ -86,7 +84,8 @@ public class HandleAccount implements HandleImport<AccountRequest> {
             .collect(Collectors.toMap(
                 accountDto -> csvImportCommon.getAccountUniqueCode(
                     request.inverseSocialNetworkMap()
-                        .get(accountDto.getSocialNetworkId()), accountDto.getUsername()
+                        .get(accountDto.getSocialNetworkId()), accountDto.getUsername(),
+                    accountDto.getAccountLink()
                 ), AccountDto::getId
             ));
 
@@ -99,7 +98,8 @@ public class HandleAccount implements HandleImport<AccountRequest> {
             .collect(Collectors.toMap(
                 accountDto -> csvImportCommon.getAccountUniqueCode(
                     request.inverseSocialNetworkMap()
-                        .get(accountDto.getSocialNetworkId()), accountDto.getUsername()
+                        .get(accountDto.getSocialNetworkId()), accountDto.getUsername(),
+                    accountDto.getAccountLink()
                 ), AccountDto::getId
             ));
 
@@ -121,7 +121,8 @@ public class HandleAccount implements HandleImport<AccountRequest> {
 
                 accountMatchMap.put(
                     csvImportCommon.getAccountUniqueCode(
-                        socialNetworkCodeString, account.getUsername()), account.getId()
+                        socialNetworkCodeString, account.getUsername(), account.getAccountLink()),
+                    account.getId()
                 );
             }
         }
@@ -215,7 +216,7 @@ public class HandleAccount implements HandleImport<AccountRequest> {
                 && facebookAccountMatchMap.containsKey(
                 csvImportCommon.getAccountUniqueCode(
                     socialNetworkCode.toString(),
-                    account.getUsername()
+                    account.getUsername(), account.getAccountLink()
                 )))
             {
                 continue;
@@ -225,7 +226,7 @@ public class HandleAccount implements HandleImport<AccountRequest> {
                 && accountMatchMap.containsKey(
                 csvImportCommon.getAccountUniqueCode(
                     socialNetworkCode.toString(),
-                    account.getUsername()
+                    account.getUsername(), account.getAccountLink()
                 )))
             {
                 continue;

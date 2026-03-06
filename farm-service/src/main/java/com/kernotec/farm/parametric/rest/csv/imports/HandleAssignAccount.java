@@ -71,9 +71,12 @@ public class HandleAssignAccount implements HandleImport<AssignAccountRequest> {
             for (SocialConfig socialConfig : configs) {
                 String username = socialConfig.userFn.apply(dto);
                 String observation = socialConfig.obsFn.apply(dto);
+                String accountLink = socialConfig.linkFn == null ? null : socialConfig.linkFn.apply(
+                    dto);
 
                 addAccountAssigments(AccountAddRequest.builder()
                     .username(username)
+                    .accountLink(accountLink)
                     .accountType(socialConfig.type)
                     .accountMap(accountMap)
                     .addDeviceAccountFn(accountId -> deviceAccountListToSave.add(
@@ -121,6 +124,7 @@ public class HandleAssignAccount implements HandleImport<AssignAccountRequest> {
                 .type(SocialNetworkEnum.FACEBOOK)
                 .userFn(ImportExcelDataDto::getFacebookUsername)
                 .obsFn(ImportExcelDataDto::getFacebookObservation)
+                .linkFn(ImportExcelDataDto::getFacebookAccountLink)
                 .build(),
 
             SocialConfig.builder()
@@ -155,7 +159,7 @@ public class HandleAssignAccount implements HandleImport<AssignAccountRequest> {
         UUID accountId = request.accountMap.get(
             csvImportCommon.getAccountUniqueCode(
                 String.valueOf(request.accountType),
-                request.username
+                request.username, request.accountLink
             ));
 
         request.addDeviceAccountFn.accept(accountId);
@@ -333,14 +337,15 @@ public class HandleAssignAccount implements HandleImport<AssignAccountRequest> {
     public record AccountAddRequest(String username, SocialNetworkEnum accountType,
                                     Map<String, UUID> accountMap, Consumer<UUID> addDeviceAccountFn,
                                     Consumer<UUID> addAssignedChipFn, Consumer<UUID> addExtensionFn,
-                                    Consumer<UUID> addObservationFn)
+                                    Consumer<UUID> addObservationFn, String accountLink)
     {
 
     }
 
     @Builder
     public record SocialConfig(SocialNetworkEnum type, Function<ImportExcelDataDto, String> userFn,
-                               Function<ImportExcelDataDto, String> obsFn)
+                               Function<ImportExcelDataDto, String> obsFn,
+                               Function<ImportExcelDataDto, String> linkFn)
     {
 
     }

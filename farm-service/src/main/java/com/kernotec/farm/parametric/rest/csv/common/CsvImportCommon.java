@@ -1,6 +1,7 @@
 package com.kernotec.farm.parametric.rest.csv.common;
 
 import com.kernotec.farm.account.jpa.entity.Person;
+import com.kernotec.farm.parametric.jpa.enums.SocialNetworkEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,15 @@ public class CsvImportCommon {
         return phoneNumber;
     }
 
-    public String getAccountUniqueCode(String socialNetworkCode, String username) {
+    public String getAccountUniqueCode(String socialNetworkCode, String username,
+        String accountLink)
+    {
+        SocialNetworkEnum socialNetworkEnum = SocialNetworkEnum.fromValue(socialNetworkCode);
+
+        if (socialNetworkEnum.equals(SocialNetworkEnum.FACEBOOK)) {
+            return String.format("%s|%s", socialNetworkCode, accountLink);
+        }
+
         return String.format("%s|%s", socialNetworkCode, username);
     }
 
